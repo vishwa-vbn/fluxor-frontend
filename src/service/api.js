@@ -1,7 +1,7 @@
 import axios from "axios";
 import { DOMAIN_API_URI, PATH_API_URI } from "./apiConstants";
 import { getState, getStore } from "../store/configure/configureStore";
-// import { updateToken } from "../store/auth/authActions";
+import { updateToken } from "../store/auth/authActions";
 
 const AUTH = "auth/";
 

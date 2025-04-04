@@ -80,6 +80,82 @@ export function login(email, password) {
     };
   }
 
+
+  export function register(name,email, password) {
+
+    console.log("email",email, password)
+    return (dispatch) => {
+      if (email === "" || password === "") {
+        dispatch({
+          type: actionTypes.AUTH_ERROR,
+          payload: {
+            authPending: false,
+            authSuccess: false,
+            authError: "Fill all the fields.",
+            accessToken: null,
+            refreshToken: null,
+            profileurl: null,
+            loginUser: null,
+          },
+        });
+        return;
+      }
+  
+      dispatch({
+        type: actionTypes.AUTH_PENDING,
+        payload: {
+          authPending: true,
+          authSuccess: false,
+          authError: null,
+          accessToken: null,
+          refreshToken: null,
+          profileurl: null,
+          loginUser: null,
+        },
+      });
+  
+      axios
+        .post("https://fluxor-backend.vercel.app/api/users/register", {
+          username:name,
+          email: email,
+          password: password,
+        },
+        {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+        .then((response) => {
+          dispatch({
+            type: actionTypes.AUTH_SUCCESS,
+            payload: {
+              authPending: false,
+              authSuccess: true,
+              authError: null,
+              accessToken: response.data.accessToken,
+              refreshToken: response.data.refreshToken,
+              profileurl: null,
+              loginUser: response.data,
+            },
+          });
+        })
+        .catch((err) => {
+          dispatch({
+            type: actionTypes.AUTH_ERROR,
+            payload: {
+              authPending: false,
+              authSuccess: false,
+              authError: "Enter valid credentials",
+              accessToken: null,
+              refreshToken: null,
+              profileurl: null,
+              loginUser: null,
+            },
+          });
+        });
+    };
+  }
+
 // export function logout() {
 //   return (dispatch) => {
 //     let headers = {
@@ -357,16 +433,16 @@ export function login(email, password) {
 //   };
 // }
 
-// export function updateToken(token, refreshToken) {
-//   // console.log("test", token, refreshToken);
-//   return (dispatch) => {
-//     // console.log(" Update token,refresh ::", token, refreshToken);
-//     dispatch({
-//       type: actionTypes.UPDATE_TOKEN_SUCCESS,
-//       payload: {
-//         accessToken: token,
-//         refreshToken: refreshToken,
-//       },
-//     });
-//   };
-// }
+export function updateToken(token, refreshToken) {
+  // console.log("test", token, refreshToken);
+  return (dispatch) => {
+    // console.log(" Update token,refresh ::", token, refreshToken);
+    dispatch({
+      type: actionTypes.UPDATE_TOKEN_SUCCESS,
+      payload: {
+        accessToken: token,
+        refreshToken: refreshToken,
+      },
+    });
+  };
+}

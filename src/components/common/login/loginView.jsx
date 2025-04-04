@@ -1,134 +1,85 @@
 import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Input,
+  FormControl,
+  FormLabel,
+  Heading,
+  Text,
+  VStack,
+  HStack,
+  Divider,
+  useToast,
+  Spinner,
+} from "@chakra-ui/react";
 
 const AuthView = ({ onLogin, onSignup, loading }) => {
   const [activeTab, setActiveTab] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const toast = useToast();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (activeTab === "login") {
-      onLogin(email, password );
+      onLogin(email, password);
     } else {
-      onSignup(email, password );
+      onSignup(email, password);
     }
   };
 
-  const switchTab = () => {
-    setActiveTab(activeTab === "login" ? "signup" : "login");
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md border-t-4 border-indigo-600">
+    <Box minH="100vh" display="flex" justifyContent="center" alignItems="center" bg="gray.50" p={4}>
+      <Box bg="white" p={8} rounded="xl" shadow="md" maxW="md" w="full" borderTop="4px" borderColor="indigo.600">
         {/* Header */}
-        <div className="flex items-center justify-center mb-6">
-          <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xl font-bold mr-2">
+        <VStack spacing={3} mb={6} align="center">
+          <Box w={10} h={10} bg="indigo.600" rounded="full" display="flex" alignItems="center" justifyContent="center" color="white" fontWeight="bold" fontSize="xl">
             F
-          </div>
-          <h2 className="text-2xl font-semibold text-gray-800">luxor</h2>
-        </div>
+          </Box>
+          <Heading size="lg" color="gray.800">
+            luxor
+          </Heading>
+        </VStack>
 
         {/* Tabs */}
-        <div className="flex justify-center mb-6 space-x-4">
-          <button
-            className={`px-4 py-2 text-lg font-medium transition-colors duration-200 ${
-              activeTab === "login"
-                ? "border-b-2 border-indigo-600 text-indigo-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("login")}
-          >
+        <HStack justify="center" mb={6} spacing={4}>
+          <Button variant={activeTab === "login" ? "solid" : "ghost"} colorScheme="indigo" onClick={() => setActiveTab("login")}>
             Login
-          </button>
-          <button
-            className={`px-4 py-2 text-lg font-medium transition-colors duration-200 ${
-              activeTab === "signup"
-                ? "border-b-2 border-indigo-600 text-indigo-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("signup")}
-          >
+          </Button>
+          <Button variant={activeTab === "signup" ? "solid" : "ghost"} colorScheme="indigo" onClick={() => setActiveTab("signup")}>
             Sign Up
-          </button>
-        </div>
+          </Button>
+        </HStack>
 
-        {/* Welcome Text */}
-        <div className="text-center mb-6">
-          <p className="text-gray-600 text-sm mt-1">
-            {activeTab === "login"
-              ? "Sign in to continue"
-              : "Create your account"}
-          </p>
-        </div>
+        <Text textAlign="center" color="gray.600" fontSize="sm" mb={6}>
+          {activeTab === "login" ? "Sign in to continue" : "Create your account"}
+        </Text>
 
         {/* Form */}
-        <div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-medium mb-2"
-              htmlFor="email"
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="your@email.com"
-            />
-          </div>
+        <VStack spacing={4} as="form" onSubmit={handleSubmit}>
+          <FormControl isRequired>
+            <FormLabel>Email Address</FormLabel>
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" focusBorderColor="indigo.500" />
+          </FormControl>
 
-          <div className="mb-6">
-            <label
-              className="block text-gray-700 text-sm font-medium mb-2"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-            />
-          </div>
+          <FormControl isRequired>
+            <FormLabel>Password</FormLabel>
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" focusBorderColor="indigo.500" />
+          </FormControl>
 
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="w-full bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition duration-200 font-medium disabled:bg-indigo-400 disabled:cursor-not-allowed"
-            disabled={loading}
-          >
-            {loading
-              ? activeTab === "login"
-                ? "Logging in..."
-                : "Signing up..."
-              : activeTab === "login"
-              ? "Sign In"
-              : "Sign Up"}
-          </button>
-        </div>
+          <Button type="submit" colorScheme="indigo" w="full" isDisabled={loading}>
+            {loading ? <Spinner size="sm" /> : activeTab === "login" ? "Sign In" : "Sign Up"}
+          </Button>
+        </VStack>
 
         {/* Tab Switch Link */}
-        <div className="mt-4 text-center">
-          <button
-            onClick={switchTab}
-            className="text-indigo-600 hover:underline text-sm focus:outline-none"
-          >
-            {activeTab === "login"
-              ? "Need an account? Sign up"
-              : "Already have an account? Sign in"}
-          </button>
-        </div>
-      </div>
-    </div>
+        <Divider my={4} />
+        <Text textAlign="center" fontSize="sm" color="indigo.600" cursor="pointer" _hover={{ textDecoration: "underline" }} onClick={() => setActiveTab(activeTab === "login" ? "signup" : "login")}>
+          {activeTab === "login" ? "Need an account? Sign up" : "Already have an account? Sign in"}
+        </Text>
+      </Box>
+    </Box>
   );
 };
 
