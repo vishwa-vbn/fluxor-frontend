@@ -9,7 +9,8 @@ class Auth {
 
   isAuthenticated() {
     // if (!localStorage.getItem("temp_token") ) {
-    if (!getState().auth.accessToken) {
+    if (!getState().auth?.loginUser?.token) {
+      console.log("inside auth check",getState().auth.accessToken)
       this.authenticated = false;
     } else {
       this.authenticated = true;

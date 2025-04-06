@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import LoginView from './loginView';
-import { login,register } from '../../../store/auth/authActions';
+import { forgotPassword, login,register } from '../../../store/auth/authActions';
 
 class LoginContainer extends Component {
   handleLogin = (email,password) => {
@@ -14,12 +14,17 @@ class LoginContainer extends Component {
   {
     this.props.register(name,email,password);
   }
+  handleForgotPassword=(email) =>
+  {
+    this.props.forgotPassword(email);
+  }
 
   render() {
     return (
       <LoginView
         onLogin={this.handleLogin}
         onSignup={this.handleRegister}
+        onForgotPassword={this.handleForgotPassword}
         auth={this.props.auth}
         loading={this.props.loading}
       />
@@ -27,10 +32,14 @@ class LoginContainer extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state) => (
+
+  console.log("redux state",state),
+  
+  {
 });
 
 const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ login,register}, dispatch);
+  bindActionCreators({ login,register,forgotPassword}, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginContainer);

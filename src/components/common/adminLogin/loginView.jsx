@@ -4,20 +4,20 @@ import {
   email as emailRule,
   samePasswords,
   password as passwordRule,
-} from "../../../utils/validator"; // Make sure this matches your file path
+} from "../../../utils/validator";
 
-import Input from "../../controls/input/inputView"; // import the reusable component
+import Input from "../../controls/input/inputView";
 
-const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
+const AdminAuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
   const [view, setView] = useState("login");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [name, setName] = useState("");
   const [errors, setErrors] = useState({});
 
   const resetFields = () => {
-    setName("");
+    setUsername("");
     setEmail("");
     setPassword("");
     setConfirmPassword("");
@@ -31,19 +31,20 @@ const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    let validationResult = { errors: {} };
 
     const fields = {
-      name,
+      username,
       email,
       password,
       confirmPassword,
     };
 
+    let validationResult = { errors: {} };
+
     if (view === "signup") {
       validationResult = validate(
         {
-          required: ["name", "email", "password", "confirmPassword"],
+          required: ["username", "email", "password", "confirmPassword"],
           custom: [
             emailRule(["email"]),
             passwordRule(["password"]),
@@ -80,7 +81,7 @@ const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
       if (view === "login") {
         onLogin(email, password);
       } else if (view === "signup") {
-        onSignup(name, email, password);
+        onSignup( username, email, password );
       } else if (view === "forgot") {
         onForgotPassword(email);
       }
@@ -92,22 +93,22 @@ const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
       <div className="w-full max-w-sm border border-gray-200 p-6 rounded-[5px]">
         <h1 className="text-lg font-medium text-black mb-4 text-center">
           {view === "login"
-            ? "Sign in"
+            ? "Admin Sign in"
             : view === "signup"
-            ? "Create account"
-            : "Reset your password"}
+            ? "Admin Register"
+            : "Reset Password"}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-sm">
           {view === "signup" && (
             <div>
-              <label className="block mb-1 text-gray-600">Full Name</label>
+              <label className="block mb-1 text-gray-600">Username</label>
               <Input
                 type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                error={errors.username}
                 className="w-full border p-2 text-black rounded-[5px]"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                error={errors.name}
               />
             </div>
           )}
@@ -117,10 +118,10 @@ const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
               <label className="block mb-1 text-gray-600">Email</label>
               <Input
                 type="email"
-                className="w-full border p-2 text-black rounded-[5px]"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 error={errors.email}
+                className="w-full border p-2 text-black rounded-[5px]"
               />
             </div>
           )}
@@ -130,10 +131,10 @@ const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
               <label className="block mb-1 text-gray-600">Password</label>
               <Input
                 type="password"
-                className="w-full border p-2 text-black rounded-[5px]"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 error={errors.password}
+                className="w-full border p-2 text-black rounded-[5px]"
               />
             </div>
           )}
@@ -145,10 +146,10 @@ const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
               </label>
               <Input
                 type="password"
-                className="w-full border p-2 text-black rounded-[5px]"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 error={errors.confirmPassword}
+                className="w-full border p-2 text-black rounded-[5px]"
               />
             </div>
           )}
@@ -163,7 +164,7 @@ const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
               : view === "login"
               ? "Sign In"
               : view === "signup"
-              ? "Sign Up"
+              ? "Register"
               : "Send Reset Link"}
           </button>
         </form>
@@ -177,7 +178,7 @@ const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
                   className="text-black cursor-pointer hover:underline"
                   onClick={() => switchView("signup")}
                 >
-                  Sign up
+                  Register
                 </span>
               </div>
               <div>
@@ -192,7 +193,7 @@ const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
           )}
           {view === "signup" && (
             <div>
-              Already have an account?{" "}
+              Already registered?{" "}
               <span
                 className="text-black cursor-pointer hover:underline"
                 onClick={() => switchView("login")}
@@ -203,12 +204,12 @@ const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
           )}
           {view === "forgot" && (
             <div>
-              Remember your password?{" "}
+              Remembered password?{" "}
               <span
                 className="text-black cursor-pointer hover:underline"
                 onClick={() => switchView("login")}
               >
-                Go back to Sign in
+                Back to Sign in
               </span>
             </div>
           )}
@@ -218,4 +219,4 @@ const AuthView = ({ onLogin, onSignup, onForgotPassword, loading }) => {
   );
 };
 
-export default AuthView;
+export default AdminAuthView;

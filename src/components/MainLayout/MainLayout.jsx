@@ -4,18 +4,21 @@ import PropTypes from "prop-types";
 import { bindActionCreators } from "redux";
 import connect from "react-redux/es/connect/connect";
 // import { logout } from "../../store/auth/authActions";
+import AdminSidebar from "../common/adminsidebar/adminsidebar";
+import './MainLayout.css';
 
 class MainLayout extends React.Component {
   componentDidMount() {}
 
   render() {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-100">
-        <TopNavBar />
-        <main className="flex-grow container mx-auto px-4 py-6">
+      <div className=" w-screen h-screen flex flex-row items-center min-h-screen bg-gray-100">
+        <AdminSidebar />
+
+        <main className="h-screen w-screen overflow-auto scrollbar-hide">
+
           {this.props.children}
         </main>
-       
       </div>
     );
   }
@@ -23,17 +26,9 @@ class MainLayout extends React.Component {
 
 MainLayout.propTypes = {
   children: PropTypes.object.isRequired,
-  getState: PropTypes.func.isRequired,
-  stateLoaded: PropTypes.bool,
 };
 
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators(
-    {
-      logout: logout,
-    },
-    dispatch
-  );
+const mapDispatchToProps = (dispatch) => bindActionCreators({}, dispatch);
 
 const mapStateToProps = (state) => ({});
 

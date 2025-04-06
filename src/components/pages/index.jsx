@@ -3,6 +3,14 @@ import { Route, Switch, Redirect } from "react-router-dom";
 
 import RestrictedRoute from "../restricted/index";
 import LoginContainer from "../common/login/loginContainer.jsx";
+import AdminLoginContainer from "../common/adminLogin/loginContainer.jsx"
+import resetPasswordContainer from "../common/resetPassword/resetPasswordContainer.jsx";
+import SettingsContainer from "./admin/settings/settingsContainer.jsx";
+import DashboardContainer from "./admin/dashboard/dashboardContainer.jsx";
+import PostsContainer from "./admin/posts/postsContainer.jsx";
+import CreatePostContainer from "./admin/createPost/createPostContainer.jsx";
+import CategoriesContainer from "./admin/categories/categoriesContainer.jsx";
+import CommentsContainer from "./admin/comments/commentsContainer.jsx";
 
 function App({ match }) {
   console.log("match:", match);
@@ -11,10 +19,31 @@ function App({ match }) {
 //   );
 
   var routes = [
-    // {
-    //   component: HomeContainer,
-    //   link: "home",
-    // },
+    {
+      component: SettingsContainer,
+      link: "settings",
+    },
+    {
+      component: DashboardContainer,
+      link: "dashboard",
+    },
+    {
+      component: PostsContainer,
+      link: "posts",
+    },
+
+    {
+      component:CreatePostContainer,
+      link:"create-post"
+    },
+    {
+      component:CategoriesContainer,
+      link:"categories"
+    },
+    {
+      component:CommentsContainer,
+      link:"comments"
+    }
     // {
     //   component: ChangePasswordContainer,
     //   link: "change_password",
@@ -25,6 +54,17 @@ function App({ match }) {
     {
       component: LoginContainer,
       link: "/login",
+    },
+
+    {
+
+      component:AdminLoginContainer,
+      link:"/admin/login"
+
+    },
+    {
+      component: resetPasswordContainer,
+      link: "/reset-password",
     },
 ]
 

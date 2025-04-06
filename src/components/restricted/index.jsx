@@ -1,53 +1,40 @@
 import React from "react";
-import { Route, withRouter, Redirect } from "react-router-dom";
-import connect from "react-redux/es/connect/connect";
-import auth from "./auth";
+import { Route, Redirect } from "react-router-dom";
+import { useSelector } from "react-redux";
 import MainLayout from "../MainLayout/MainLayout";
+import { hasRoutePermission } from "../../utils/authUtils";
+import auth from "./auth";
+
 const RestrictedRoute = ({ component: Component, path, ...rest }) => {
+  console.log("permissions",useSelector((state) => state.auth.loginUser))
+  const { permissions } = useSelector((state) => state.auth.loginUser);
+
+  console.log("permissions",permissions)
+  const isAuthenticated = auth.isAuthenticated();
+  
+  console.log("is authenticated",isAuthenticated)
+  const isAuthorized = hasRoutePermission(permissions, path);
+
+  console.log("is authorized",isAuthorized)
+
   return (
-    // <Route
-    //   {...rest}
-    //   render={(props) => {
-    //     return (
-    //       <div>
-    //         <TopNavBar />
-
-    //         <Component {...props} />
-    //       </div>
-    //     );
-    //   }}
-    // />
-
     <Route
       {...rest}
-      render={(props) => {
-        if (auth.isAuthenticated()) {
-          return (
-            // <div className="page_content_wrapper">
-            //   <Sidebar />
-            //   <SideBarMobile />
-            //   <Header label={"Home Screen"} Icon={IoFastFood} />
-            //   <Component {...props} />
-
-            // </div>
+      render={(props) =>
+        isAuthenticated ? (
+          isAuthorized ? (
             <MainLayout>
               <Component {...props} />
             </MainLayout>
-          );
-        } else {
-          return (
-            <Redirect
-              to={{
-                pathname: "/login",
-              }}
-            />
-          );
-        }
-      }}
+          ) : (
+            <Redirect to="/unauthorized" />
+          )
+        ) : (
+          <Redirect to="/login" />
+        )
+      }
     />
   );
 };
 
-const mapStateToProps = (state) => ({});
-
-export default withRouter(connect(mapStateToProps)(RestrictedRoute));
+export default RestrictedRoute;
