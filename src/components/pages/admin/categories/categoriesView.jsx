@@ -13,7 +13,7 @@ import SearchBar from "../../../controls/searchbar/searchbar";
 
 const CategoriesView = ({
   categories,
-  allCategories,
+  allCategories = [],
   isLoading,
   search,
   onSearchChange,
@@ -78,7 +78,9 @@ const CategoriesView = ({
     {
       name: "Actions",
       cell: (row) => (
-        <div className="flex justify-center space-x-2"> {/* Center actions */}
+        <div className="flex justify-center space-x-2">
+          {" "}
+          {/* Center actions */}
           <Button variant="ghost" size="sm" onClick={() => onEditClick(row)}>
             <Edit className="w-4 h-4 text-blue-600" />
           </Button>
@@ -94,7 +96,6 @@ const CategoriesView = ({
       right: true, // Keeping this to align actions to the right if necessary
     },
   ];
-  
 
   const sampleUserData = {
     name: "John Doe",
@@ -130,12 +131,13 @@ const CategoriesView = ({
 
           {/* ─── Search + Filter ─────────────── */}
           <div className="flex justify-end gap-4 mb-4">
-          <SearchBar
-  searchQuery={search}
-  setSearchQuery={(val) => onSearchChange({ target: { value: val } })}
-  placeholder="Search categories..."
-/>
-
+            <SearchBar
+              searchQuery={search}
+              setSearchQuery={(val) =>
+                onSearchChange({ target: { value: val } })
+              }
+              placeholder="Search categories..."
+            />
 
             <div className="w-[200px]">
               <Select
@@ -144,10 +146,12 @@ const CategoriesView = ({
                 placeholder="Filter by parent"
                 options={[
                   { value: "all", label: "All Parents" },
-                  ...allCategories.map((c) => ({
-                    value: String(c.id),
-                    label: c.name,
-                  })),
+                  ...(Array.isArray(allCategories)
+                    ? allCategories.map((c) => ({
+                        value: String(c.id),
+                        label: c.name,
+                      }))
+                    : []),
                 ]}
               />
             </div>
@@ -157,7 +161,7 @@ const CategoriesView = ({
           <Card>
             <DataTable
               columns={columns}
-              data={filtered}
+              data={Array.isArray(filtered) ? filtered : []}
               progressPending={isLoading}
               noDataComponent="No categories found"
               pagination
@@ -173,6 +177,7 @@ const CategoriesView = ({
             isOpen={isAddOpen}
             onClose={onAddClose}
             onSubmit={onAddSubmit}
+            initialData={{ name: '', slug: '', parentId: null, featuredImage: '' }}
           >
             <Input label="Name" name="name" required />
             <Input label="Slug" name="slug" required />
@@ -180,10 +185,13 @@ const CategoriesView = ({
             <Select
               label="Parent Category"
               name="parentId"
-              options={allCategories.map((c) => ({
-                value: c.id,
-                label: c.name,
-              }))}
+              options={
+                Array.isArray(allCategories) && selectedCategory
+                  ? allCategories
+                      .filter((c) => c.id !== selectedCategory.id)
+                      .map((c) => ({ value: c.id, label: c.name }))
+                  : []
+              }
               allowEmpty
             />
           </Modal>
@@ -207,9 +215,13 @@ const CategoriesView = ({
               <Select
                 label="Parent Category"
                 name="parentId"
-                options={allCategories
-                  .filter((c) => c.id !== selectedCategory.id)
-                  .map((c) => ({ value: c.id, label: c.name }))}
+                options={
+                  Array.isArray(allCategories) && selectedCategory
+                    ? allCategories
+                        .filter((c) => c.id !== selectedCategory.id)
+                        .map((c) => ({ value: c.id, label: c.name }))
+                    : []
+                }
                 allowEmpty
               />
             </Modal>

@@ -6,6 +6,7 @@ import alert from '../alert/alertReducer';
 import loader from '../loader/loaderReducer';
 import post from '../post/postReducer';
 import tags from '../tags/tagsReducer';
+import categories from '../category/categoryReducer'
 
 export const rootReducer = combineReducers({
   router: routerReducer,
@@ -13,6 +14,7 @@ export const rootReducer = combineReducers({
   loader,
   alert,
   post,
-  tags
+  tags,
+  categories
  
 });
