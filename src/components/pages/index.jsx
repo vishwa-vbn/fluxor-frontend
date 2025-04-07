@@ -11,6 +11,7 @@ import PostsContainer from "./admin/posts/postsContainer.jsx";
 import CreatePostContainer from "./admin/createPost/createPostContainer.jsx";
 import CategoriesContainer from "./admin/categories/categoriesContainer.jsx";
 import CommentsContainer from "./admin/comments/commentsContainer.jsx";
+import TagsContainer from "./admin/tags/tagsContainer.jsx";
 
 function App({ match }) {
   console.log("match:", match);
@@ -43,6 +44,10 @@ function App({ match }) {
     {
       component:CommentsContainer,
       link:"comments"
+    },
+    {
+      component:TagsContainer,
+      link:"tags"
     }
     // {
     //   component: ChangePasswordContainer,

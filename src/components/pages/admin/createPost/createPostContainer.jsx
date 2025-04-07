@@ -4,6 +4,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import CreatePost from "./createPost";
+import { createPost } from "../../../../store/post/postActions";
 
 class CreatePostContainer extends Component {
   state = {
@@ -19,7 +20,10 @@ class CreatePostContainer extends Component {
     ],
   };
 
-  handleCreatePost = (postData) => {};
+  handleCreatePost = (postData) => {
+
+    
+  };
 
   handleImageUpload = (file) => {};
 
@@ -38,6 +42,7 @@ class CreatePostContainer extends Component {
         onCreatePost={this.handleCreatePost}
         onUploadImage={this.handleImageUpload}
         tags={safeTags}
+        createPost={this.props.createPost}
         categories={safeCategories}
         loading={creating}
         error={error}
@@ -46,9 +51,13 @@ class CreatePostContainer extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => (
+  console.log("redux state in create post", state.post),
+  {});
 
-const mapDispatchToProps = (dispatch) => bindActionCreators({}, dispatch);
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  createPost,
+}, dispatch);
 
 export default connect(
   mapStateToProps,

@@ -57,6 +57,10 @@ export default function AdminSidebar() {
               <li>
                 <Link to="/categories">Categories</Link>
               </li>
+
+              <li>
+                <Link to="/tags">Tags</Link>
+              </li>
             </ul>
           </details>
         </li>

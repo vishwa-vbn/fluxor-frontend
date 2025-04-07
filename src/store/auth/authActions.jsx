@@ -1,14 +1,150 @@
 // import Api from "../../service/api";
-// import { showAlert } from "../alert/alertActions";
-// import { showLoader, hideLoader } from "../loader/loaderActions";
+import { showAlert } from "../alert/alertActions";
+import { showLoader, hideLoader } from "../loader/loaderActions";
 import Api from "../../service/api";
-// import { history, getState } from "../configure/configureStore";
+
 import { actionTypes } from "./authReducer";
 import axios from "axios";
 
 export function login(email, password) {
   return (dispatch) => {
     if (!email || !password) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Login Error",
+          type: "error",
+          msg: "Fill all the fields.",
+        })
+      );
+
+
+      dispatch({
+        type: actionTypes.AUTH_ERROR,
+        payload: {
+          authPending: false,
+          authSuccess: false,
+          authError: "Fill all the fields.",
+          accessToken: null,
+          refreshToken: null,
+          profileurl: null,
+          loginUser: null,
+        },
+      });
+      return;
+    }
+
+    dispatch(showLoader());
+
+
+    dispatch({
+      type: actionTypes.AUTH_PENDING,
+      payload: {
+        authPending: true,
+        authSuccess: false,
+        authError: null,
+        accessToken: null,
+        refreshToken: null,
+        profileurl: null,
+        loginUser: null,
+      },
+    });
+
+    axios
+      .post("https://fluxor-backend.vercel.app/api/users/login", {
+        email,
+        password,
+      })
+      .then((response) => {
+        console.log("response is", response);
+
+
+
+        dispatch(
+          handleRedirect(response.data.user.roleid, response.data.user.role)
+        );
+
+        dispatch({
+          type: actionTypes.AUTH_SUCCESS,
+          payload: {
+            authPending: false,
+            authSuccess: true,
+            authError: null,
+            accessToken: response.data.accessToken,
+            refreshToken: response.data.refreshToken,
+            profileurl: null,
+            loginUser: response.data,
+          },
+        });
+
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Login Successful",
+            type: "success",
+            msg: "Welcome back!",
+          })
+        );
+
+      dispatch(hideLoader());
+
+      })
+      .catch((err) => {
+
+      dispatch(hideLoader());
+
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Login Failed",
+            type: "error",
+            msg: "Enter valid credentials",
+          })
+        );
+
+        dispatch({
+          type: actionTypes.AUTH_ERROR,
+          payload: {
+            authPending: false,
+            authSuccess: false,
+            authError: "Enter valid credentials",
+            accessToken: null,
+            refreshToken: null,
+            profileurl: null,
+            loginUser: null,
+          },
+        });
+      });
+  };
+}
+
+export function handleRedirect(roleid, rolename) {
+  console.log("role id", roleid, rolename);
+  return (dispatch) => {
+    setTimeout(() => {
+      if (rolename === "admin" || roleid === 1) {
+        window.location.href = "/dashboard";
+      } else if (rolename === "user" || roleid === 4) {
+        window.location.href = "/home";
+      } else {
+        window.location.href = "/default";
+      }
+    }, 3000); // 3000 milliseconds = 3 seconds
+  };
+}
+
+export function register(name, email, password) {
+  return (dispatch) => {
+    if (!email || !password || !name) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Registration Error",
+          type: "error",
+          msg: "Fill all the fields.",
+        })
+      );
+
       dispatch({
         type: actionTypes.AUTH_ERROR,
         payload: {
@@ -38,7 +174,108 @@ export function login(email, password) {
     });
 
     axios
-      .post("https://fluxor-backend.vercel.app/api/users/login", {
+      .post("https://fluxor-backend.vercel.app/api/users/register", {
+        username: name,
+        email,
+        password,
+      })
+      .then((response) => {
+        console.log("Registration response:", response);
+
+        dispatch({
+          type: actionTypes.AUTH_SUCCESS,
+          payload: {
+            authPending: false,
+            authSuccess: true,
+            authError: null,
+            accessToken: response.data.accessToken,
+            refreshToken: response.data.refreshToken,
+            profileurl: null,
+            loginUser: response.data,
+          },
+        });
+
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Registration Successful",
+            type: "success",
+            msg: "Welcome to the platform!",
+          })
+        );
+      })
+      .catch((err) => {
+        console.error("Registration error:", err);
+
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Registration Failed",
+            type: "error",
+            msg: "Enter valid credentials",
+          })
+        );
+
+        dispatch({
+          type: actionTypes.AUTH_ERROR,
+          payload: {
+            authPending: false,
+            authSuccess: false,
+            authError: "Enter valid credentials",
+            accessToken: null,
+            refreshToken: null,
+            profileurl: null,
+            loginUser: null,
+          },
+        });
+      });
+  };
+}
+
+export function registerAdmin(name, email, password) {
+  console.log("register admin called", name, email, password);
+  return (dispatch) => {
+    if (!email || !password || !name) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Registration Error",
+          type: "error",
+          msg: "Fill all the fields.",
+        })
+      );
+
+      dispatch({
+        type: actionTypes.AUTH_ERROR,
+        payload: {
+          authPending: false,
+          authSuccess: false,
+          authError: "Fill all the fields.",
+          accessToken: null,
+          refreshToken: null,
+          profileurl: null,
+          loginUser: null,
+        },
+      });
+      return;
+    }
+
+    dispatch({
+      type: actionTypes.AUTH_PENDING,
+      payload: {
+        authPending: true,
+        authSuccess: false,
+        authError: null,
+        accessToken: null,
+        refreshToken: null,
+        profileurl: null,
+        loginUser: null,
+      },
+    });
+
+    axios
+      .post("https://fluxor-backend.vercel.app/api/users/register/admin", {
+        username: name,
         email,
         password,
       })
@@ -55,8 +292,26 @@ export function login(email, password) {
             loginUser: response.data,
           },
         });
+
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Registration Successful",
+            type: "success",
+            msg: "Admin account created!",
+          })
+        );
       })
       .catch((err) => {
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Registration Failed",
+            type: "error",
+            msg: "Enter valid credentials",
+          })
+        );
+
         dispatch({
           type: actionTypes.AUTH_ERROR,
           payload: {
@@ -72,146 +327,21 @@ export function login(email, password) {
       });
   };
 }
-
-export function register(name, email, password) {
-  return (dispatch) => {
-    if (!email || !password || !name) {
-      dispatch({
-        type: actionTypes.AUTH_ERROR,
-        payload: {
-          authPending: false,
-          authSuccess: false,
-          authError: "Fill all the fields.",
-          accessToken: null,
-          refreshToken: null,
-          profileurl: null,
-          loginUser: null,
-        },
-      });
-      return;
-    }
-
-    dispatch({
-      type: actionTypes.AUTH_PENDING,
-      payload: {
-        authPending: true,
-        authSuccess: false,
-        authError: null,
-        accessToken: null,
-        refreshToken: null,
-        profileurl: null,
-        loginUser: null,
-      },
-    });
-
-    Api.post("users/register", { username: name, email, password }) // Using centralized API handler
-      .then((response) => {
-        dispatch({
-          type: actionTypes.AUTH_SUCCESS,
-          payload: {
-            authPending: false,
-            authSuccess: true,
-            authError: null,
-            accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken,
-            profileurl: null,
-            loginUser: response.data,
-          },
-        });
-      })
-      .catch((err) => {
-        dispatch({
-          type: actionTypes.AUTH_ERROR,
-          payload: {
-            authPending: false,
-            authSuccess: false,
-            authError: "Enter valid credentials",
-            accessToken: null,
-            refreshToken: null,
-            profileurl: null,
-            loginUser: null,
-          },
-        });
-      });
-  };
-}
-
-
-
-
-export function registerAdmin(name, email, password) {
-
-  console.log("register admin called",name,email,password)
-  return (dispatch) => {
-    if (!email || !password || !name) {
-      dispatch({
-        type: actionTypes.AUTH_ERROR,
-        payload: {
-          authPending: false,
-          authSuccess: false,
-          authError: "Fill all the fields.",
-          accessToken: null,
-          refreshToken: null,
-          profileurl: null,
-          loginUser: null,
-        },
-      });
-      return;
-    }
-
-    dispatch({
-      type: actionTypes.AUTH_PENDING,
-      payload: {
-        authPending: true,
-        authSuccess: false,
-        authError: null,
-        accessToken: null,
-        refreshToken: null,
-        profileurl: null,
-        loginUser: null,
-      },
-    });
-
-    Api.post("users/register/admin", { username: name, email, password }) // Using centralized API handler
-      .then((response) => {
-        dispatch({
-          type: actionTypes.AUTH_SUCCESS,
-          payload: {
-            authPending: false,
-            authSuccess: true,
-            authError: null,
-            accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken,
-            profileurl: null,
-            loginUser: response.data,
-          },
-        });
-      })
-      .catch((err) => {
-        dispatch({
-          type: actionTypes.AUTH_ERROR,
-          payload: {
-            authPending: false,
-            authSuccess: false,
-            authError: "Enter valid credentials",
-            accessToken: null,
-            refreshToken: null,
-            profileurl: null,
-            loginUser: null,
-          },
-        });
-      });
-  };
-}
-
-
-
 
 export function forgotPassword(email) {
   console.log("Forgot Password Email:", email);
 
   return (dispatch) => {
     if (!email) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Missing Email",
+          type: "error",
+          msg: "Please enter your email.",
+        })
+      );
+
       dispatch({
         type: actionTypes.AUTH_ERROR,
         payload: {
@@ -240,7 +370,10 @@ export function forgotPassword(email) {
       },
     });
 
-    Api.post("users/forgot-password", { email })
+    axios
+      .post("https://fluxor-backend.vercel.app/api/users/forgot-password", {
+        email,
+      })
       .then((response) => {
         dispatch({
           type: actionTypes.AUTH_SUCCESS,
@@ -254,9 +387,28 @@ export function forgotPassword(email) {
             loginUser: null,
           },
         });
+
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Email Sent",
+            type: "success",
+            msg: "Password reset link sent to your email!",
+          })
+        );
+
         console.log("Forgot password email sent:", response.data);
       })
       .catch((err) => {
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Failed",
+            type: "error",
+            msg: "Email not found or server error.",
+          })
+        );
+
         dispatch({
           type: actionTypes.AUTH_ERROR,
           payload: {
@@ -269,15 +421,24 @@ export function forgotPassword(email) {
             loginUser: null,
           },
         });
+
         console.error("Forgot password error:", err);
       });
   };
 }
 
-
 export function resetPassword(newPassword, token) {
   return (dispatch) => {
     if (!token || !newPassword) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Missing Fields",
+          type: "error",
+          msg: "Token and new password are required.",
+        })
+      );
+
       dispatch({
         type: actionTypes.AUTH_ERROR,
         payload: {
@@ -306,7 +467,11 @@ export function resetPassword(newPassword, token) {
       },
     });
 
-    Api.post(`users/reset-password?token=${token}`, { newPassword })
+    axios
+      .post(
+        `https://fluxor-backend.vercel.app/api/users/reset-password?token=${token}`,
+        { newPassword }
+      )
       .then((response) => {
         dispatch({
           type: actionTypes.AUTH_SUCCESS,
@@ -320,9 +485,28 @@ export function resetPassword(newPassword, token) {
             loginUser: response.data,
           },
         });
+
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Password Reset",
+            type: "success",
+            msg: "Your password has been reset successfully!",
+          })
+        );
       })
       .catch((err) => {
         console.error("Reset password error:", err);
+
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Reset Failed",
+            type: "error",
+            msg: "Reset password failed. Try again.",
+          })
+        );
+
         dispatch({
           type: actionTypes.AUTH_ERROR,
           payload: {
@@ -338,9 +522,6 @@ export function resetPassword(newPassword, token) {
       });
   };
 }
-
-
-
 
 // export function logout() {
 //   return (dispatch) => {
@@ -428,196 +609,6 @@ export function resetPassword(newPassword, token) {
 //   };
 // }
 
-// export function resetPassword(pwd, cnf_pwd, email, token) {
-//   return (dispatch) => {
-//     let data = {
-//       userName: email,
-//       newPassword: pwd,
-//       otp: token,
-//     };
-//     if (pwd !== cnf_pwd) {
-//       dispatch(
-//         showAlert({
-//           isOpen: true,
-//           title: "error",
-//           type: "danger",
-//           msg: "Passwords don't match",
-//         })
-//       );
-//     } else {
-//       dispatch(showLoader());
-//       Api.post("auth/password/reset", data)
-
-//         .then((response) => {
-//           // console.log("Reset Response:", response);
-//           dispatch(hideLoader());
-//           dispatch({
-//             type: actionTypes.RESET_PASSWORD,
-//             payload: {
-//               resetPassword: true,
-//             },
-//           });
-
-//           history.push("/login");
-
-//           showAlert({
-//             isOpen: true,
-//             title: "Success",
-//             type: "success",
-//             msg: "Password Reset Successfully",
-//           });
-//         })
-//         .catch((err) => {
-//           dispatch(hideLoader());
-//           dispatch({
-//             type: actionTypes.RESET_PASSWORD,
-//             payload: {
-//               resetPassword: false,
-//             },
-//           });
-//         });
-//     }
-//   };
-// }
-
-// export function forgotPassword(email) {
-//   return (dispatch) => {
-//     let data = {
-//       userName: email,
-//     };
-//     Api.post("auth/password/forgot", data)
-
-//       .then((response) => {
-//         dispatch(hideLoader());
-//         dispatch({
-//           type: actionTypes.FORGOT_PASSWORD,
-//           payload: {
-//             forgotPassword: true,
-//           },
-//         });
-
-//         history.push(
-//           "/reset_password?email=" + email + "&token=" + response.data.otp
-//         );
-//       })
-//       .catch((err) => {
-//         dispatch(hideLoader());
-//         dispatch({
-//           type: actionTypes.FORGOT_PASSWORD,
-//           payload: {
-//             authPending: false,
-//             authSuccess: false,
-//             authError: null,
-//             accessToken: null,
-//             refreshToken: null,
-//             profileurl: null,
-//             loginUser: null,
-
-//             forgotPassword: false,
-//           },
-//         });
-//         dispatch(
-//           showAlert({
-//             isOpen: true,
-//             title: "error",
-//             type: "danger",
-//             msg: "Error In Processing Request,",
-//           })
-//         );
-//       });
-//   };
-// }
-
-// export function changePassword(old_pwd, pwd, cnf_pwd, token, refToken) {
-//   // export function changePassword(pwd, cnf_pwd, email) {
-
-//   return (dispatch) => {
-//     let data = {
-//       oldPassword: old_pwd,
-//       // userName: email,
-//       newPassword: pwd,
-//     };
-//     let headers = {
-//       "Content-Type": "application/json",
-//       Authorization: "Bearer " + token,
-//     };
-//     if (pwd !== cnf_pwd) {
-//       dispatch(
-//         showAlert({
-//           isOpen: true,
-//           title: "error",
-//           type: "danger",
-//           msg: "Passwords don't match",
-//         })
-//       );
-//     } else {
-//       dispatch(showLoader());
-//       dispatch({
-//         type: actionTypes.CHANGE_PASSWORD_PENDING,
-//         payload: {
-//           changePasswordPending: true,
-//           changePasswordSuccess: false,
-//           changePasswordError: null,
-//         },
-//       });
-//       console.log("Data headers:", data, headers);
-
-//       Api.post("auth/password/change", data, headers)
-
-//         .then((response) => {
-//           // console.log(response);
-//           if (response.data) {
-//             dispatch(hideLoader());
-//             dispatch({
-//               type: actionTypes.CHANGE_PASSWORD_SUCCESS,
-//               payload: {
-//                 changePasswordPending: false,
-//                 changePasswordSuccess: true,
-//                 changePasswordError: null,
-//               },
-//             });
-//             dispatch(
-//               showAlert({
-//                 isOpen: true,
-//                 title: "Success",
-//                 type: "success",
-//                 msg: response.message,
-//               })
-//             );
-//           } else {
-//             dispatch(hideLoader());
-//             dispatch(
-//               showAlert({
-//                 isOpen: true,
-//                 title: "error",
-//                 type: "danger",
-//                 msg: response.message,
-//               })
-//             );
-//           }
-//         })
-//         .catch((err) => {
-//           dispatch(hideLoader());
-//           dispatch({
-//             type: actionTypes.CHANGE_PASSWORD_ERROR,
-//             payload: {
-//               changePasswordPending: false,
-//               changePasswordSuccess: true,
-//               changePasswordError: null,
-//             },
-//           });
-//           dispatch(
-//             showAlert({
-//               isOpen: true,
-//               title: "error",
-//               type: "danger",
-//               msg: "Incorrect Old Password",
-//             })
-//           );
-//         });
-//     }
-//   };
-// }
 
 export function updateToken(token, refreshToken) {
   // console.log("test", token, refreshToken);
