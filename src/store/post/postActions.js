@@ -2,6 +2,8 @@ import axios from "axios";
 import { getState } from "../configure/configureStore";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
+import { createPostCategory } from "../postCategories/postCategoriesActions";
+import { createPostTag } from "../postTags/postTagsActions";
 
 // Action Types
 export const POST_CREATE_PENDING = "POST_CREATE_PENDING";
@@ -31,28 +33,108 @@ export const POST_DELETE_ERROR = "POST_DELETE_ERROR";
 // Base API URL
 const API_URL = "https://fluxor-backend.vercel.app/api/posts";
 
+// // CREATE POST
+// export const createPost = (data) => async (dispatch) => {
+//   dispatch({ type: POST_CREATE_PENDING });
+//   dispatch(showLoader());
+
+//   const token = getState().auth?.loginUser?.token;
+
+//   try {
+//     const res = await axios.post(API_URL, data, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": "application/json",
+//       },
+//     });
+
+//     dispatch({ type: POST_CREATE_SUCCESS, payload: res.data });
+//     dispatch(
+//       showAlert({
+//         isOpen: true,
+//         title: "Post Created",
+//         type: "success",
+//         msg: "New post has been created successfully.",
+//       })
+//     );
+//   } catch (err) {
+//     dispatch({
+//       type: POST_CREATE_ERROR,
+//       payload: err.response?.data?.message || err.message,
+//     });
+//     dispatch(
+//       showAlert({
+//         isOpen: true,
+//         title: "Creation Failed",
+//         type: "error",
+//         msg: err.response?.data?.message || err.message,
+//       })
+//     );
+//   } finally {
+//     dispatch(hideLoader());
+//   }
+// };
+
+
 // CREATE POST
 export const createPost = (data) => async (dispatch) => {
   dispatch({ type: POST_CREATE_PENDING });
   dispatch(showLoader());
 
   const token = getState().auth?.loginUser?.token;
+  console.log("user is", getState().auth?.loginUser)
+  const authorId = getState().auth?.loginUser?.user?.id;
+
+
+  // Prepare post data with only allowed fields and add authorId
+  const postData = {
+    title: data.title,
+    slug: data.slug,
+    excerpt: data.excerpt,
+    content: data.content,
+    featuredImage: data.featuredImage || "",
+    authorId: authorId,
+    status: data.status || "draft",
+    publishedAt: data.publishedAt || "",
+    metaTitle: data.metaTitle || "",
+    metaDescription: data.metaDescription || "",
+    isCommentsEnabled: data.isCommentsEnabled || false,
+    viewCount: data.viewCount || 0
+  };
 
   try {
-    const res = await axios.post(API_URL, data, {
+    // Create the post first
+    const postResponse = await axios.post(API_URL, postData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
 
-    dispatch({ type: POST_CREATE_SUCCESS, payload: res.data });
+    console.log("response id is", postResponse)
+    const postId = postResponse?.data?.data?.id;
+
+    // Handle category mapping if provided
+    if (data.selectedCategory || data.categoryId) {
+      const categoryId = data.selectedCategory || data.categoryId;
+      await dispatch(createPostCategory({ postId, categoryId }));
+    }
+
+    // Handle tags mapping if provided
+    if (data.selectedTags?.length || data.tags?.length) {
+      const tags = data.selectedTags || data.tags;
+      for (const tagId of tags) {
+        await dispatch(createPostTag({ postId, tagId }));
+      }
+    }
+
+    dispatch({ type: POST_CREATE_SUCCESS, payload: postResponse.data });
     dispatch(
       showAlert({
         isOpen: true,
         title: "Post Created",
         type: "success",
-        msg: "New post has been created successfully.",
+        msg: "New post and its mappings have been created successfully.",
       })
     );
   } catch (err) {
