@@ -1,10 +1,18 @@
+// postActions.js
 import axios from "axios";
 import { getState } from "../configure/configureStore";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
-import { createPostCategory } from "../postCategories/postCategoriesActions";
-import { createPostTag } from "../postTags/postTagsActions";
-
+import {
+  createPostCategory,
+  getCategoriesByPostId,
+  deletePostCategory,
+} from "../postCategories/postCategoriesActions";
+import {
+  createPostTag,
+  getTagsByPostId,
+  deletePostTag,
+} from "../postTags/postTagsActions";
 // Action Types
 export const POST_CREATE_PENDING = "POST_CREATE_PENDING";
 export const POST_CREATE_SUCCESS = "POST_CREATE_SUCCESS";
@@ -33,58 +41,14 @@ export const POST_DELETE_ERROR = "POST_DELETE_ERROR";
 // Base API URL
 const API_URL = "https://fluxor-backend.vercel.app/api/posts";
 
-// // CREATE POST
-// export const createPost = (data) => async (dispatch) => {
-//   dispatch({ type: POST_CREATE_PENDING });
-//   dispatch(showLoader());
-
-//   const token = getState().auth?.loginUser?.token;
-
-//   try {
-//     const res = await axios.post(API_URL, data, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     dispatch({ type: POST_CREATE_SUCCESS, payload: res.data });
-//     dispatch(
-//       showAlert({
-//         isOpen: true,
-//         title: "Post Created",
-//         type: "success",
-//         msg: "New post has been created successfully.",
-//       })
-//     );
-//   } catch (err) {
-//     dispatch({
-//       type: POST_CREATE_ERROR,
-//       payload: err.response?.data?.message || err.message,
-//     });
-//     dispatch(
-//       showAlert({
-//         isOpen: true,
-//         title: "Creation Failed",
-//         type: "error",
-//         msg: err.response?.data?.message || err.message,
-//       })
-//     );
-//   } finally {
-//     dispatch(hideLoader());
-//   }
-// };
-
-
 // CREATE POST
 export const createPost = (data) => async (dispatch) => {
   dispatch({ type: POST_CREATE_PENDING });
   dispatch(showLoader());
 
   const token = getState().auth?.loginUser?.token;
-  console.log("user is", getState().auth?.loginUser)
+  console.log("user is", getState().auth?.loginUser);
   const authorId = getState().auth?.loginUser?.user?.id;
-
 
   // Prepare post data with only allowed fields and add authorId
   const postData = {
@@ -99,7 +63,7 @@ export const createPost = (data) => async (dispatch) => {
     metaTitle: data.metaTitle || "",
     metaDescription: data.metaDescription || "",
     isCommentsEnabled: data.isCommentsEnabled || false,
-    viewCount: data.viewCount || 0
+    viewCount: data.viewCount || 0,
   };
 
   try {
@@ -111,7 +75,7 @@ export const createPost = (data) => async (dispatch) => {
       },
     });
 
-    console.log("response id is", postResponse)
+    console.log("response id is", postResponse);
     const postId = postResponse?.data?.data?.id;
 
     // Handle category mapping if provided
@@ -156,6 +120,7 @@ export const createPost = (data) => async (dispatch) => {
 };
 
 // GET ALL POSTS
+// GET ALL POSTS
 export const getAllPosts = (page = 1, limit = 10) => async (dispatch) => {
   dispatch({ type: POST_FETCH_ALL_PENDING });
   dispatch(showLoader());
@@ -168,7 +133,38 @@ export const getAllPosts = (page = 1, limit = 10) => async (dispatch) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    dispatch({ type: POST_FETCH_ALL_SUCCESS, payload: res.data });
+
+    // Enhance each post with tags and categories from state
+    const enhancedPosts = await Promise.all(
+      res.data.data.map(async (post) => {
+        await Promise.all([
+          dispatch(getCategoriesByPostId(post.id)),
+          dispatch(getTagsByPostId(post.id)),
+        ]);
+
+        const state = getState();
+        const categories = state.postCategories?.categoriesByPost || [];
+        const tags = state.postTags?.tagsByPost || [];
+
+        const selectedCategory = categories.length > 0 ? categories[0].id : "";
+        const selectedTags = tags.map(tag => tag.id);
+
+        return {
+          ...post,
+          selectedCategory,
+          selectedTags
+        };
+      })
+    );
+
+    dispatch({
+      type: POST_FETCH_ALL_SUCCESS,
+      payload: { 
+        success: true,
+        message: "Posts retrieved successfully",
+        data: enhancedPosts 
+      },
+    });
   } catch (err) {
     dispatch({
       type: POST_FETCH_ALL_ERROR,
@@ -195,12 +191,46 @@ export const getPublishedPosts = (page = 1, limit = 10) => async (dispatch) => {
   const token = getState().auth?.loginUser?.token;
 
   try {
-    const res = await axios.get(`${API_URL}/status/published?page=${page}&limit=${limit}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const res = await axios.get(
+      `${API_URL}/status/published?page=${page}&limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    // Enhance each post with tags and categories from state
+    const enhancedPosts = await Promise.all(
+      res.data.data.map(async (post) => {
+        await Promise.all([
+          dispatch(getCategoriesByPostId(post.id)),
+          dispatch(getTagsByPostId(post.id)),
+        ]);
+
+        const state = getState();
+        const categories = state.postCategories?.categoriesByPost || [];
+        const tags = state.postTags?.tagsByPost || [];
+
+        const selectedCategory = categories.length > 0 ? categories[0].id : "";
+        const selectedTags = tags.map(tag => tag.id);
+
+        return {
+          ...post,
+          selectedCategory,
+          selectedTags
+        };
+      })
+    );
+
+    dispatch({
+      type: POST_FETCH_PUBLISHED_SUCCESS,
+      payload: { 
+        success: true,
+        message: "Published posts retrieved successfully",
+        data: enhancedPosts 
       },
     });
-    dispatch({ type: POST_FETCH_PUBLISHED_SUCCESS, payload: res.data });
   } catch (err) {
     dispatch({
       type: POST_FETCH_PUBLISHED_ERROR,
@@ -227,12 +257,45 @@ export const getPostBySlug = (slug) => async (dispatch) => {
   const token = getState().auth?.loginUser?.token;
 
   try {
-    const res = await axios.get(`${API_URL}/slug/${slug}`, {
+    // Get basic post data
+    const postRes = await axios.get(`${API_URL}/slug/${slug}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    dispatch({ type: POST_FETCH_BY_SLUG_SUCCESS, payload: res.data });
+
+    const postId = postRes.data.data.id;
+
+    // Trigger category and tag fetches
+    await Promise.all([
+      dispatch(getCategoriesByPostId(postId)),
+      dispatch(getTagsByPostId(postId)),
+    ]);
+
+    // Get categories and tags from Redux state
+    const state = getState();
+    const categories = state.postCategories?.categoriesByPost || [];
+    const tags = state.postTags?.tagsByPost || [];
+
+    // Extract IDs
+    const selectedCategory = categories.length > 0 ? categories[0].id : "";
+    const selectedTags = tags.map(tag => tag.id);
+
+    // Construct complete post object
+    const completePost = {
+      ...postRes.data.data,
+      selectedCategory,
+      selectedTags
+    };
+
+    dispatch({
+      type: POST_FETCH_BY_SLUG_SUCCESS,
+      payload: { 
+        success: true,
+        message: "Post retrieved successfully",
+        data: completePost 
+      },
+    });
   } catch (err) {
     dispatch({
       type: POST_FETCH_BY_SLUG_ERROR,
@@ -250,7 +313,6 @@ export const getPostBySlug = (slug) => async (dispatch) => {
     dispatch(hideLoader());
   }
 };
-
 // UPDATE POST
 export const updatePost = (id, data) => async (dispatch) => {
   dispatch({ type: POST_UPDATE_PENDING });
@@ -258,13 +320,86 @@ export const updatePost = (id, data) => async (dispatch) => {
 
   const token = getState().auth?.loginUser?.token;
 
+  const postData = {
+    title: data.title,
+    slug: data.slug,
+    excerpt: data.excerpt,
+    content: data.content,
+    featuredImage: data.featuredImage || "",
+    status: data.status || "draft",
+    publishedAt: data.publishedAt || "",
+    metaTitle: data.metaTitle || "",
+    metaDescription: data.metaDescription || "",
+    isCommentsEnabled: data.isCommentsEnabled || false,
+    viewCount: data.viewCount || 0,
+  };
+
   try {
-    const res = await axios.put(`${API_URL}/${id}`, data, {
+    // Update basic post data
+    const res = await axios.put(`${API_URL}/${id}`, postData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
+
+    // Get current mappings from state after fetching
+    await Promise.all([
+      dispatch(getCategoriesByPostId(id)),
+      dispatch(getTagsByPostId(id)),
+    ]);
+
+    const state = getState();
+    const currentCategories = state.postCategories?.categoriesByPost || [];
+    const currentTags = state.postTags?.tagsByPost || [];
+
+    const currentCategoryIds = currentCategories.map(c => c.id);
+    const currentTagIds = currentTags.map(t => t.id);
+    const newCategoryId = data.selectedCategory || data.categoryId;
+    const newTagIds = data.selectedTags || data.tags || [];
+
+    // Handle category mapping
+    if (newCategoryId) {
+      if (currentCategoryIds.length > 0 && !currentCategoryIds.includes(newCategoryId)) {
+        // Remove existing category if different
+        await dispatch(deletePostCategory({ 
+          postId: id, 
+          categoryId: currentCategoryIds[0] 
+        }));
+        await dispatch(createPostCategory({ postId: id, categoryId: newCategoryId }));
+      } else if (currentCategoryIds.length === 0) {
+        // Add new category if none exists
+        await dispatch(createPostCategory({ postId: id, categoryId: newCategoryId }));
+      }
+    } else if (currentCategoryIds.length > 0) {
+      // Remove category if new one is not provided but old one exists
+      await dispatch(deletePostCategory({ 
+        postId: id, 
+        categoryId: currentCategoryIds[0] 
+      }));
+    }
+
+    // Handle tags mapping
+    const tagsToRemove = currentTagIds.filter(tagId => !newTagIds.includes(tagId));
+    const tagsToAdd = newTagIds.filter(tagId => !currentTagIds.includes(tagId));
+
+    // Remove tags that are no longer needed
+    if (tagsToRemove.length > 0) {
+      await Promise.all(
+        tagsToRemove.map(tagId => 
+          dispatch(deletePostTag({ postId: id, tagId }))
+        )
+      );
+    }
+
+    // Add new tags
+    if (tagsToAdd.length > 0) {
+      await Promise.all(
+        tagsToAdd.map(tagId => 
+          dispatch(createPostTag({ postId: id, tagId }))
+        )
+      );
+    }
 
     dispatch({ type: POST_UPDATE_SUCCESS, payload: res.data });
     dispatch(
@@ -272,7 +407,7 @@ export const updatePost = (id, data) => async (dispatch) => {
         isOpen: true,
         title: "Post Updated",
         type: "success",
-        msg: "Post updated successfully.",
+        msg: "Post and its mappings updated successfully.",
       })
     );
   } catch (err) {

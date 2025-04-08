@@ -3,58 +3,40 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import Post from "./postsView";
+import { getAllPosts, getPublishedPosts, deletePost } from "../../../../store/post/postActions"; // Adjust path
 
 class PostContainer extends Component {
+  componentDidMount() {
+    // Fetch all posts when component mounts
+    this.props.getAllPosts();
+    // Or if you only want published posts:
+    // this.props.getPublishedPosts();
+  }
+
   render() {
-    // Dummy data for now
-    const dummyPosts = [
-      {
-        id: 1,
-        title: "React Redux Tutorial",
-        author: { username: "JohnDoe", avatar: "" },
-        status: "published",
-        publishedAt: "2024-04-01",
-        viewCount: 120,
-        slug: "react-redux-tutorial"
-      },
-      {
-        id: 2,
-        title: "Understanding useEffect",
-        author: { username: "JaneSmith", avatar: "" },
-        status: "draft",
-        publishedAt: null,
-        viewCount: 87,
-        slug: "understanding-useeffect"
-      },
-      {
-        id: 3,
-        title: "Deploying React Apps",
-        author: { username: "DevGuy", avatar: "" },
-        status: "scheduled",
-        publishedAt: "2024-04-15",
-        viewCount: 45,
-        slug: "deploying-react-apps"
-      }
-    ];
+    const { posts, loading } = this.props;
 
     return (
       <Post
-        posts={dummyPosts}
-        loading={false}
-        // You can add more props later like fetchPosts or deletePost
+        posts={posts || []}
+        loading={loading}
+        deletePost={this.props.deletePost} // Pass delete action to Post component
       />
     );
   }
 }
 
 const mapStateToProps = (state) => ({
-  // Not using redux state yet
+  posts: state.post?.posts?.data, // Adjust based on your reducer structure
+  loading: state.posts?.loading || false, // Adjust based on your reducer structure
 });
 
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
     {
-      // No actions wired up yet
+      getAllPosts,
+      getPublishedPosts,
+      deletePost,
     },
     dispatch
   );

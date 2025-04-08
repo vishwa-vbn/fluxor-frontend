@@ -9,6 +9,7 @@ import SettingsContainer from "./admin/settings/settingsContainer.jsx";
 import DashboardContainer from "./admin/dashboard/dashboardContainer.jsx";
 import PostsContainer from "./admin/posts/postsContainer.jsx";
 import CreatePostContainer from "./admin/createPost/createPostContainer.jsx";
+import EditPostContainer from './admin/editpost/editpostContainer.jsx'
 import CategoriesContainer from "./admin/categories/categoriesContainer.jsx";
 import CommentsContainer from "./admin/comments/commentsContainer.jsx";
 import TagsContainer from "./admin/tags/tagsContainer.jsx";
@@ -48,6 +49,10 @@ function App({ match }) {
     {
       component:TagsContainer,
       link:"tags"
+    },
+    {
+      component:EditPostContainer,
+      link:"edit-post/:slug"
     }
     // {
     //   component: ChangePasswordContainer,

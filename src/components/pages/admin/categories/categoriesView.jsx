@@ -13,7 +13,7 @@ import SearchBar from "../../../controls/searchbar/searchbar";
 
 const CategoriesView = ({
   categories,
-  allCategories,
+  allCategories = [],
   isLoading,
   search,
   onSearchChange,
@@ -155,7 +155,7 @@ const CategoriesView = ({
           <Card>
             <DataTable
               columns={columns}
-              data={filtered}
+              data={Array.isArray(filtered) ? filtered : []}
               progressPending={isLoading}
               noDataComponent="No categories found"
               pagination
