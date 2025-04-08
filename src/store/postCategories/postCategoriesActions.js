@@ -7,13 +7,19 @@ export const POST_CATEGORIES_CREATE_PENDING = "POST_CATEGORIES_CREATE_PENDING";
 export const POST_CATEGORIES_CREATE_SUCCESS = "POST_CATEGORIES_CREATE_SUCCESS";
 export const POST_CATEGORIES_CREATE_ERROR = "POST_CATEGORIES_CREATE_ERROR";
 
-export const POST_CATEGORIES_FETCH_BY_POST_PENDING = "POST_CATEGORIES_FETCH_BY_POST_PENDING";
-export const POST_CATEGORIES_FETCH_BY_POST_SUCCESS = "POST_CATEGORIES_FETCH_BY_POST_SUCCESS";
-export const POST_CATEGORIES_FETCH_BY_POST_ERROR = "POST_CATEGORIES_FETCH_BY_POST_ERROR";
+export const POST_CATEGORIES_FETCH_BY_POST_PENDING =
+  "POST_CATEGORIES_FETCH_BY_POST_PENDING";
+export const POST_CATEGORIES_FETCH_BY_POST_SUCCESS =
+  "POST_CATEGORIES_FETCH_BY_POST_SUCCESS";
+export const POST_CATEGORIES_FETCH_BY_POST_ERROR =
+  "POST_CATEGORIES_FETCH_BY_POST_ERROR";
 
-export const POST_CATEGORIES_FETCH_BY_CATEGORY_PENDING = "POST_CATEGORIES_FETCH_BY_CATEGORY_PENDING";
-export const POST_CATEGORIES_FETCH_BY_CATEGORY_SUCCESS = "POST_CATEGORIES_FETCH_BY_CATEGORY_SUCCESS";
-export const POST_CATEGORIES_FETCH_BY_CATEGORY_ERROR = "POST_CATEGORIES_FETCH_BY_CATEGORY_ERROR";
+export const POST_CATEGORIES_FETCH_BY_CATEGORY_PENDING =
+  "POST_CATEGORIES_FETCH_BY_CATEGORY_PENDING";
+export const POST_CATEGORIES_FETCH_BY_CATEGORY_SUCCESS =
+  "POST_CATEGORIES_FETCH_BY_CATEGORY_SUCCESS";
+export const POST_CATEGORIES_FETCH_BY_CATEGORY_ERROR =
+  "POST_CATEGORIES_FETCH_BY_CATEGORY_ERROR";
 
 export const POST_CATEGORIES_DELETE_PENDING = "POST_CATEGORIES_DELETE_PENDING";
 export const POST_CATEGORIES_DELETE_SUCCESS = "POST_CATEGORIES_DELETE_SUCCESS";
@@ -74,7 +80,10 @@ export const getCategoriesByPostId = (postId) => async (dispatch) => {
         Authorization: `${token}`,
       },
     });
-    dispatch({ type: POST_CATEGORIES_FETCH_BY_POST_SUCCESS, payload: res.data });
+    dispatch({
+      type: POST_CATEGORIES_FETCH_BY_POST_SUCCESS,
+      payload: res.data,
+    });
   } catch (err) {
     dispatch({
       type: POST_CATEGORIES_FETCH_BY_POST_ERROR,
@@ -105,7 +114,10 @@ export const getPostsByCategoryId = (categoryId) => async (dispatch) => {
         Authorization: `${token}`,
       },
     });
-    dispatch({ type: POST_CATEGORIES_FETCH_BY_CATEGORY_SUCCESS, payload: res.data });
+    dispatch({
+      type: POST_CATEGORIES_FETCH_BY_CATEGORY_SUCCESS,
+      payload: res.data,
+    });
   } catch (err) {
     dispatch({
       type: POST_CATEGORIES_FETCH_BY_CATEGORY_ERROR,
@@ -125,9 +137,7 @@ export const getPostsByCategoryId = (categoryId) => async (dispatch) => {
 };
 
 // DELETE POST-CATEGORY MAPPING
-export const deletePostCategory = (data) => async (dispatch)=>
-
-{
+export const deletePostCategory = (data) => async (dispatch) => {
   dispatch({ type: POST_CATEGORIES_DELETE_PENDING });
   dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;

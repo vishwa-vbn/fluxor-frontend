@@ -1,3 +1,4 @@
+// postsView.js
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import { Eye, Edit, Trash2, PlusCircle, Search } from "lucide-react";
@@ -56,15 +57,17 @@ const columns = (onDeleteClick) => [
   {
     name: "Date",
     selector: (row) =>
-      new Date(row.publishedAt).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      }),
+      row.publishedAt
+        ? new Date(row.publishedAt).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })
+        : "Not Published",
   },
   {
     name: "Views",
-    selector: (row) => row.viewCount,
+    selector: (row) => row.viewCount || 0,
     sortable: true,
   },
   {
@@ -77,7 +80,7 @@ const columns = (onDeleteClick) => [
             <Eye className="w-4 h-4 text-black" />
           </Button>
         </Link>
-        <Link to={`/admin/posts/edit/${row.id}`}>
+        <Link to={`/edit-post/${row.slug}`}>
           <Button variant="ghost" size="sm">
             <Edit className="w-4 h-4 text-blue-600" />
           </Button>
@@ -90,7 +93,7 @@ const columns = (onDeleteClick) => [
   },
 ];
 
-export default function Post({ posts = [], loading }) {
+export default function Post({ posts = [], loading, deletePost }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [filteredPosts, setFilteredPosts] = useState(posts);
@@ -98,7 +101,7 @@ export default function Post({ posts = [], loading }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Filter by search + status
+  // Filter posts when posts, search, or statusFilter changes
   useEffect(() => {
     const filtered = posts.filter((post) => {
       const matchesSearch =
@@ -114,7 +117,9 @@ export default function Post({ posts = [], loading }) {
   }, [search, statusFilter, posts]);
 
   const handleDelete = () => {
-    console.log("Deleting post:", selectedPost);
+    if (selectedPost?.id && deletePost) {
+      deletePost(selectedPost.id); // Dispatch delete action
+    }
     setIsDialogOpen(false);
   };
 
@@ -128,17 +133,15 @@ export default function Post({ posts = [], loading }) {
       />
 
       <div className="flex-1 w-full max-w-11/12 mx-auto py-8 space-y-6">
-        {/* ─── Header + New Post Button ───────────────────────────── */}
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">All Posts</h1>
-          <Link to="/admin/posts/create">
+          <Link to="/create-post">
             <Button variant="primary" size="md" className="flex items-center">
               <PlusCircle className="w-4 h-4 mr-2" /> New Post
             </Button>
           </Link>
         </div>
 
-        {/* ─── Filters floating right ────────────────────────────── */}
         <div className="flex justify-end gap-4 mb-4">
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="relative w-[300px]">
@@ -169,7 +172,6 @@ export default function Post({ posts = [], loading }) {
           </div>
         </div>
 
-        {/* ─── Data Table ──────────────────────────────────────────── */}
         <div className="bg-white rounded-[5px] shadow-sm p-4 transition hover:shadow-md">
           <DataTable
             columns={columns((post) => {
@@ -185,7 +187,6 @@ export default function Post({ posts = [], loading }) {
           />
         </div>
 
-        {/* ─── Delete Confirmation ────────────────────────────────── */}
         {selectedPost && (
           <AlertDialog
             open={isDialogOpen}

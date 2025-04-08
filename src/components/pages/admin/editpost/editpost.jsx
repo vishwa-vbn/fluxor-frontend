@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import moment from "moment";
 
 import {
@@ -26,8 +26,17 @@ import TopNavbar from "../../../common/topNavbar/topNavbar";
 
 import { ArrowLeft, ImagePlus, Loader2 } from "lucide-react";
 
-const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => {
+const EditPost = ({
+  tags = [],
+  categories = [],
+  onUpdatePost,
+  onFetchPost,
+  post,
+  loading,
+  error,
+}) => {
   const navigate = useHistory();
+  const { slug } = useParams(); // Get slug from URL params
   const [activeTab, setActiveTab] = useState("content");
   const [isGeneratingSlug, setIsGeneratingSlug] = useState(false);
 
@@ -46,24 +55,33 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
     selectedTags: [],
   });
 
+  // Fetch post data when component mounts or slug changes
   useEffect(() => {
-    if (initialData) {
+    console.log("slug", slug);
+    if (slug) {
+      onFetchPost(slug);
+    }
+  }, [slug]);
+
+  // Populate form data when post is fetched
+  useEffect(() => {
+    if (post?.data) {
       setFormData({
-        title: initialData.title || "",
-        slug: initialData.slug || "",
-        excerpt: initialData.excerpt || "",
-        content: initialData.content || "",
-        metaTitle: initialData.metaTitle || "",
-        metaDescription: initialData.metaDescription || "",
-        status: initialData.status || "draft",
-        publishedAt: initialData.publishedAt || "",
-        featuredImage: initialData.featuredImage || "",
-        isCommentsEnabled: initialData.isCommentsEnabled ?? true,
-        selectedCategory: initialData.categoryId || "",
-        selectedTags: initialData.tagIds || [],
+        title: post.data.title || "",
+        slug: post.data.slug || "",
+        excerpt: post.data.excerpt || "",
+        content: post.data.content || "",
+        metaTitle: post.data.metatitle || "", // Note: JSON has "metatitle"
+        metaDescription: post.data.metadescription || "", // Note: JSON has "metadescription"
+        status: post.data.status || "draft",
+        publishedAt: post.data.publishedat || "", // Note: JSON has "publishedat"
+        featuredImage: post.data.featuredimage || "", // Note: JSON has "featuredimage"
+        isCommentsEnabled: post.data.iscommentsenabled ?? false, // Match JSON field
+        selectedCategory: post.data.selectedCategory || "", // Match JSON field
+        selectedTags: post.data.selectedTags || [], // Already an array of IDs, no mapping needed
       });
     }
-  }, [initialData]);
+  }, [post]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -82,17 +100,14 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
     }, 500);
   };
 
-  const handleSubmit = () => {
-    const dataToUpdate = {
+  const handleSubmit = (status = formData.status) => {
+    const dataToSubmit = {
       ...formData,
+      status,
       categoryId: formData.selectedCategory,
-      tagIds: formData.selectedTags,
+      tags: formData.selectedTags,
     };
-    console.log("Updated:", dataToUpdate);
-    setTimeout(() => {
-      alert("Post updated!");
-      onUpdatePost?.(dataToUpdate);
-    }, 1000);
+    onUpdatePost(post.data.id, dataToSubmit); // Pass post ID and updated data
   };
 
   const sampleUserData = {
@@ -116,32 +131,51 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
 
         <div className="flex-1 max-w-11/12 w-full mx-auto py-5 space-y-8">
           <div className="border-0 mb-0 border-gray-200">
-            <div className="px-6 py-1 flex justify-end items-end">
+            <div className="px-6 py-1 flex justify-between items-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate.push("/posts")}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Posts
+              </Button>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleSubmit("draft")}
+                  disabled={loading}
                 >
+                  {loading && status === "draft" ? (
+                    <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                  ) : null}
                   Save as Draft
                 </Button>
                 <Button
                   variant="primary"
                   size="sm"
                   onClick={() => handleSubmit("published")}
+                  disabled={loading}
                 >
+                  {loading && status === "published" ? (
+                    <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                  ) : null}
                   Update & Publish
                 </Button>
               </div>
             </div>
           </div>
 
+          {error && <div className="text-red-500 text-center">{error}</div>}
+
           <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Column */}
               <div className="lg:col-span-2 space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Edit Post</CardTitle>
+                    <CardTitle>Edit Post Details</CardTitle>
                   </CardHeader>
                   <CardContent className="flex flex-col space-y-4">
                     <Input
@@ -152,6 +186,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                         handleChange("title", e.target.value);
                         if (!formData.slug) generateSlug();
                       }}
+                      disabled={loading}
                     />
 
                     <div className="flex-1 flex-col sm:flex-row items-center gap-2 mb-2">
@@ -160,13 +195,14 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                         value={formData.slug}
                         placeholder="Auto-generated slug"
                         onChange={(e) => handleChange("slug", e.target.value)}
+                        disabled={loading}
                       />
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         onClick={generateSlug}
-                        disabled={isGeneratingSlug}
+                        disabled={isGeneratingSlug || loading}
                       >
                         {isGeneratingSlug ? (
                           <Loader2 className="animate-spin h-4 w-4" />
@@ -182,6 +218,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                       onChange={(e) => handleChange("excerpt", e.target.value)}
                       placeholder="Short post description"
                       className="h-20 resize-none"
+                      disabled={loading}
                     />
                   </CardContent>
                 </Card>
@@ -210,6 +247,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                         <RichTextEditor
                           value={formData.content}
                           onChange={(val) => handleChange("content", val)}
+                          disabled={loading}
                         />
                       </CardContent>
                     </Card>
@@ -228,6 +266,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                             handleChange("metaTitle", e.target.value)
                           }
                           placeholder="SEO title"
+                          disabled={loading}
                         />
                         <Textarea
                           label="Meta Description"
@@ -237,6 +276,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                           }
                           placeholder="SEO description"
                           className="h-20 resize-none"
+                          disabled={loading}
                         />
                       </CardContent>
                     </Card>
@@ -244,6 +284,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                 </Tabs>
               </div>
 
+              {/* Right Column */}
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
@@ -259,6 +300,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                         { label: "Published", value: "published" },
                         { label: "Scheduled", value: "scheduled" },
                       ]}
+                      disabled={loading}
                     />
 
                     {formData.status === "scheduled" && (
@@ -278,6 +320,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                             moment(e.target.value).format("YYYY-MM-DD HH:mm:ss")
                           )
                         }
+                        disabled={loading}
                       />
                     )}
                   </CardContent>
@@ -301,6 +344,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                           size="xs"
                           className="absolute top-2 right-2"
                           onClick={() => handleChange("featuredImage", "")}
+                          disabled={loading}
                         >
                           Remove
                         </Button>
@@ -321,6 +365,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                         handleChange("featuredImage", e.target.value)
                       }
                       placeholder="https://example.com/image.jpg"
+                      disabled={loading}
                     />
                   </CardContent>
                 </Card>
@@ -329,7 +374,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                   <CardHeader>
                     <CardTitle>Categories & Tags</CardTitle>
                   </CardHeader>
-                  <CardContent className=" flex flex-col gap-1.5">
+                  <CardContent className="flex flex-col gap-1.5">
                     <Select
                       label="Category"
                       value={formData.selectedCategory}
@@ -338,6 +383,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                         label: c.name,
                         value: c.id,
                       }))}
+                      disabled={loading}
                     />
 
                     <Select
@@ -351,6 +397,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                         label: t.name,
                         value: t.id,
                       }))}
+                      disabled={loading}
                     />
                   </CardContent>
                 </Card>
@@ -366,6 +413,7 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                       onChange={(e) =>
                         handleChange("isCommentsEnabled", e.target.checked)
                       }
+                      disabled={loading}
                     />
                   </CardContent>
                   <CardFooter>
@@ -373,7 +421,11 @@ const EditPost = ({ initialData, tags = [], categories = [], onUpdatePost }) => 
                       variant="primary"
                       className="w-full"
                       onClick={() => handleSubmit()}
+                      disabled={loading}
                     >
+                      {loading ? (
+                        <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                      ) : null}
                       Update Post
                     </Button>
                   </CardFooter>

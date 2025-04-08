@@ -9,22 +9,17 @@ class CreatePostContainer extends Component {
     this.props.createPost(postData);
   };
 
-  handleImageUpload = (file) => {
-    // Implement image upload logic if needed
-    // This could dispatch an action to upload the image and return a URL
-  };
+  handleImageUpload = (file) => {};
 
-  componentDidMount() {
-    // If you need to fetch tags or categories on mount, dispatch actions here
-    // e.g., this.props.getAllCategories();
-  }
+  componentDidMount() {}
 
   render() {
     const { tags, categories, loading, error } = this.props;
 
-    // Ensure safe data for rendering
     const safeTags = Array.isArray(tags) ? tags : [];
-    const safeCategories = Array.isArray(categories?.data) ? categories.data : [];
+    const safeCategories = Array.isArray(categories?.data)
+      ? categories.data
+      : [];
 
     return (
       <CreatePost
