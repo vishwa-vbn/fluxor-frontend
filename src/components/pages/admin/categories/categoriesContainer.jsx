@@ -1,107 +1,87 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import CategoriesView from "./categoriesView";
+
 import {
-  getAllCategories,
   createCategory,
+  getAllCategories,
+  getCategoryById,
   updateCategory,
   deleteCategory,
-} from '../../../../store/category/categoryActions';
-import CategoriesView from './categoriesView';
+} from "../../../../store/categories/categoriesAction";
 
 class CategoriesContainer extends Component {
   state = {
-    search: '',
-    isAddOpen: false,
-    isEditOpen: false,
-    selectedCategory: null,
+    search: "",
   };
 
   componentDidMount() {
     this.props.getAllCategories();
   }
 
-  handleSearchChange = (e) => {
-    this.setState({ search: e.target.value });
+  handleCreate = (categoryData) => {
+    this.props.createCategory(categoryData);
   };
 
-  openAddModal = () => this.setState({ isAddOpen: true });
-  closeAddModal = () => this.setState({ isAddOpen: false });
-
-  openEditModal = (category) =>
-    this.setState({ selectedCategory: category, isEditOpen: true });
-  closeEditModal = () =>
-    this.setState({ selectedCategory: null, isEditOpen: false });
-
-  handleAddCategory = (data) => {
-    this.props.createCategory(data).then(() => {
-      this.closeAddModal();
-    });
+  handleUpdate = (id, updatedData) => {
+    this.props.updateCategory(id, updatedData);
   };
 
-  handleEditCategory = (data) => {
-    const { selectedCategory } = this.state;
-    if (!selectedCategory) return;
-
-    this.props.updateCategory(selectedCategory.id, data).then(() => {
-      this.closeEditModal();
-    });
-  };
-
-  handleDeleteCategory = (id) => {
+  handleDelete = (id) => {
     this.props.deleteCategory(id);
   };
 
-  getFilteredCategories = () => {
-    const { search } = this.state;
-    const { categories } = this.props;
+  handleEditRequest = (id) => {
+    this.props.getCategoryById(id);
+  };
 
-    if (!search) return categories;
-
-    return categories.filter((cat) =>
-      cat.name.toLowerCase().includes(search.toLowerCase()) ||
-      cat.slug.toLowerCase().includes(search.toLowerCase())
-    );
+  handleSearchChange = (query) => {
+    this.setState({ search: query });
   };
 
   render() {
-    const { isAddOpen, isEditOpen, selectedCategory, search } = this.state;
-    const { categories, loading } = this.props;
+    const { categories, loading, error, selectedCategory } = this.props;
+    const { search } = this.state;
 
     return (
       <CategoriesView
-        categories={this.getFilteredCategories()}
-        allCategories={categories||[]}
+        categories={categories}
+        allCategories={categories}
         isLoading={loading}
+        error={error}
         search={search}
         onSearchChange={this.handleSearchChange}
-        onAddClick={this.openAddModal}
-        onEditClick={this.openEditModal}
-        onDeleteClick={this.handleDeleteCategory}
-        isAddOpen={isAddOpen}
-        isEditOpen={isEditOpen}
-        onAddSubmit={this.handleAddCategory}
-        onEditSubmit={this.handleEditCategory}
-        onAddClose={this.closeAddModal}
-        onEditClose={this.closeEditModal}
         selectedCategory={selectedCategory}
+        onCreate={this.handleCreate}
+        onUpdate={this.handleUpdate}
+        onDelete={this.handleDelete}
+        onEditRequest={this.handleEditRequest}
       />
     );
   }
 }
 
-const mapStateToProps = (state) => (
-  console.log("redux", state),
-  {
-  categories: state.categories.categories.data,
-  loading: state.categories.loading,
-  error: state.categories.error,
+const mapStateToProps = (state) => ({
+  categories: state.category?.categories?.data || [],
+  loading: state.category?.loading || false,
+  error: state.category?.error || null,
+  selectedCategory: state.category?.selectedCategory || null,
 });
 
-const mapDispatchToProps = {
-  getAllCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-};
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators(
+    {
+      createCategory,
+      getAllCategories,
+      getCategoryById,
+      updateCategory,
+      deleteCategory,
+    },
+    dispatch
+  );
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoriesContainer);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CategoriesContainer);

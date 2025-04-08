@@ -1,5 +1,3 @@
-// pages/CreatePostContainer.jsx
-
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -7,40 +5,47 @@ import CreatePost from "./createPost";
 import { createPost } from "../../../../store/post/postActions";
 
 class CreatePostContainer extends Component {
- 
-
   handleCreatePost = (postData) => {
-    console.log("Dispatching createPost with:", postData);
     this.props.createPost(postData);
   };
 
   handleImageUpload = (file) => {
-    // Optional: handle image upload here
+    // Implement image upload logic if needed
+    // This could dispatch an action to upload the image and return a URL
   };
 
+  componentDidMount() {
+    // If you need to fetch tags or categories on mount, dispatch actions here
+    // e.g., this.props.getAllCategories();
+  }
+
   render() {
-   
+    const { tags, categories, loading, error } = this.props;
+
+    // Ensure safe data for rendering
+    const safeTags = Array.isArray(tags) ? tags : [];
+    const safeCategories = Array.isArray(categories?.data) ? categories.data : [];
 
     return (
       <CreatePost
         onCreatePost={this.handleCreatePost}
         onUploadImage={this.handleImageUpload}
-        tags={this.props.tags}
-        categories={this.props.categories}
-        // loading={creating}
-        // error={error}
+        tags={safeTags}
+        createPost={this.props.createPost}
+        categories={safeCategories}
+        loading={loading}
+        error={error}
       />
     );
   }
 }
 
 const mapStateToProps = (state) => ({
- 
-  post:state.post?.post,
-  tags: state.tags?.tags || [],
-  categories: state.categories?.categories?.data || [],
+  tags: state.tags?.tags || [], // Assuming there's a tags reducer
+  categories: state.category?.categories || {},
+  loading: state.post?.loading || false,
+  error: state.post?.error || null,
 });
-
 
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
@@ -50,4 +55,7 @@ const mapDispatchToProps = (dispatch) =>
     dispatch
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreatePostContainer);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreatePostContainer);
