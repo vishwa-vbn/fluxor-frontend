@@ -1,117 +1,87 @@
-// CategoriesContainer.jsx
-import React, { Component } from 'react';
-import CategoriesView from './categoriesView';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import CategoriesView from "./categoriesView";
 
-const mockCategories = [
-  {
-    id: 1,
-    name: 'Technology',
-    slug: 'technology',
-    description: 'Posts related to tech',
-    parentId: null,
-    postCount: 5,
-    featuredImage: '',
-  },
-  {
-    id: 2,
-    name: 'Programming',
-    slug: 'programming',
-    description: 'All about coding',
-    parentId: 1,
-    postCount: 3,
-    featuredImage: '',
-  },
-  {
-    id: 3,
-    name: 'Design',
-    slug: 'design',
-    description: '',
-    parentId: null,
-    postCount: 2,
-    featuredImage: '',
-  },
-];
+import {
+  createCategory,
+  getAllCategories,
+  getCategoryById,
+  updateCategory,
+  deleteCategory,
+} from "../../../../store/categories/categoriesAction";
 
 class CategoriesContainer extends Component {
   state = {
-    categories: mockCategories,
-    search: '',
-    isAddOpen: false,
-    isEditOpen: false,
-    selectedCategory: null,
-    loading: false,
+    search: "",
   };
 
-  handleSearchChange = (e) => {
-    this.setState({ search: e.target.value });
+  componentDidMount() {
+    this.props.getAllCategories();
+  }
+
+  handleCreate = (categoryData) => {
+    this.props.createCategory(categoryData);
   };
 
-  openAddModal = () => this.setState({ isAddOpen: true });
-  closeAddModal = () => this.setState({ isAddOpen: false });
-
-  openEditModal = (category) => this.setState({ selectedCategory: category, isEditOpen: true });
-  closeEditModal = () => this.setState({ selectedCategory: null, isEditOpen: false });
-
-  handleAddCategory = (data) => {
-    const newCategory = {
-      ...data,
-      id: Date.now(),
-      postCount: 0,
-    };
-    this.setState((prevState) => ({
-      categories: [...prevState.categories, newCategory],
-      isAddOpen: false,
-    }));
+  handleUpdate = (id, updatedData) => {
+    this.props.updateCategory(id, updatedData);
   };
 
-  handleEditCategory = (data) => {
-    const { selectedCategory, categories } = this.state;
-    if (!selectedCategory) return;
-
-    const updated = categories.map((cat) =>
-      cat.id === selectedCategory.id ? { ...cat, ...data } : cat
-    );
-    this.setState({ categories: updated, isEditOpen: false, selectedCategory: null });
+  handleDelete = (id) => {
+    this.props.deleteCategory(id);
   };
 
-  handleDeleteCategory = (id) => {
-    this.setState((prevState) => ({
-      categories: prevState.categories.filter((cat) => cat.id !== id),
-    }));
+  handleEditRequest = (id) => {
+    this.props.getCategoryById(id);
   };
 
-  getFilteredCategories = () => {
-    const { search, categories } = this.state;
-    if (!search) return categories;
-    return categories.filter((cat) =>
-      cat.name.toLowerCase().includes(search.toLowerCase()) ||
-      cat.slug.toLowerCase().includes(search.toLowerCase())
-    );
+  handleSearchChange = (query) => {
+    this.setState({ search: query });
   };
 
   render() {
-    const { categories, search, isAddOpen, isEditOpen, selectedCategory, loading } = this.state;
+    const { categories, loading, error, selectedCategory } = this.props;
+    const { search } = this.state;
 
     return (
       <CategoriesView
-        categories={this.getFilteredCategories()}
+        categories={categories}
         allCategories={categories}
         isLoading={loading}
+        error={error}
         search={search}
         onSearchChange={this.handleSearchChange}
-        onAddClick={this.openAddModal}
-        onEditClick={this.openEditModal}
-        onDeleteClick={this.handleDeleteCategory}
-        isAddOpen={isAddOpen}
-        isEditOpen={isEditOpen}
-        onAddSubmit={this.handleAddCategory}
-        onEditSubmit={this.handleEditCategory}
-        onAddClose={this.closeAddModal}
-        onEditClose={this.closeEditModal}
         selectedCategory={selectedCategory}
+        onCreate={this.handleCreate}
+        onUpdate={this.handleUpdate}
+        onDelete={this.handleDelete}
+        onEditRequest={this.handleEditRequest}
       />
     );
   }
 }
 
-export default CategoriesContainer;
+const mapStateToProps = (state) => ({
+  categories: state.category?.categories?.data || [],
+  loading: state.category?.loading || false,
+  error: state.category?.error || null,
+  selectedCategory: state.category?.selectedCategory || null,
+});
+
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators(
+    {
+      createCategory,
+      getAllCategories,
+      getCategoryById,
+      updateCategory,
+      deleteCategory,
+    },
+    dispatch
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CategoriesContainer);
