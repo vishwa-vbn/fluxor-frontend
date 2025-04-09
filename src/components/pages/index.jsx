@@ -13,6 +13,8 @@ import EditPostContainer from './admin/editpost/editpostContainer.jsx'
 import CategoriesContainer from "./admin/categories/categoriesContainer.jsx";
 import CommentsContainer from "./admin/comments/commentsContainer.jsx";
 import TagsContainer from "./admin/tags/tagsContainer.jsx";
+import UsersContainer from "./admin/users/userContainer.jsx";
+import { components } from "react-select";
 
 function App({ match }) {
   console.log("match:", match);
@@ -53,6 +55,10 @@ function App({ match }) {
     {
       component:EditPostContainer,
       link:"edit-post/:slug"
+    },
+    {
+      component:UsersContainer,
+      link:"users"
     }
     // {
     //   component: ChangePasswordContainer,

@@ -41,7 +41,7 @@ class EditPostContainer extends Component {
 }
 
 const mapStateToProps = (state) => (
-  console.log("current post", state.post.currentPost.data),
+  console.log("current post", state.post.currentPost),
   {
     tags: state.tags?.tags || [], // Assuming there's a tags reducer
     categories: state.category?.categories || {},
