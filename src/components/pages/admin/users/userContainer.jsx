@@ -1,39 +1,33 @@
-import React, { useEffect, useState } from 'react';
-// import { connect } from 'react-redux';
-// import { bindActionCreators } from 'redux';
-// import {
-//   getAllUsers,
-//   createUser,
-//   updateUser,
-//   deleteUser,
-// } from '../../../../store/users/usersActions';
-import UsersView from './userView';
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { 
+  fetchAllUsers, 
+  updateUser, 
+  deleteUser, 
+  bulkDeleteUsers 
+} from "../../../../store/auth/authActions"; // Adjust path as needed
+import UsersView from "./userView";
 
-const UsersContainer = (/*{
+const UsersContainer = ({
   users,
-  loading,
-  getAllUsers,
-  createUser,
+  fetchUsersPending,
+  fetchUsersError,
+  fetchAllUsers,
   updateUser,
   deleteUser,
-}*/) => {
-  const [search, setSearch] = useState('');
+  bulkDeleteUsers,
+}) => {
+  const [search, setSearch] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserIds, setSelectedUserIds] = useState([]); // For bulk delete
 
-  // Dummy data
-  const [users, setUsers] = useState([
-    { id: 1, name: "John Doe", email: "john@example.com", role: "admin", bio: "System administrator" },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", role: "user", bio: "Regular user" },
-    { id: 3, name: "Bob Johnson", email: "bob@example.com", role: "editor", bio: "Content creator" },
-  ]);
-  const loading = false; // Static for now since no async actions
-
-  // Fetch users on mount (commented out since using dummy data)
-  /*useEffect(() => {
-    getAllUsers();
-  }, [getAllUsers]);*/
+  // Fetch users on mount
+  useEffect(() => {
+    fetchAllUsers();
+  }, [fetchAllUsers]);
 
   // Log selectedUser changes for debugging
   useEffect(() => {
@@ -50,7 +44,7 @@ const UsersContainer = (/*{
   const closeAddModal = () => setIsAddOpen(false);
 
   const openEditModal = (user) => {
-    setSelectedUser({ ...user }); // Create a copy to avoid mutating original
+    setSelectedUser({ ...user });
     setIsEditOpen(true);
   };
   const closeEditModal = () => {
@@ -58,34 +52,41 @@ const UsersContainer = (/*{
     setIsEditOpen(false);
   };
 
-  // Handle form submissions with dummy data
+  // Handler for adding a user (placeholder, assuming API exists elsewhere)
   const handleAddUser = (data) => {
-    const newUser = {
-      id: users.length + 1, // Simple ID generation for demo
-      name: data.name,
-      email: data.email,
-      role: data.role || 'user', // Default role if not provided
-      bio: data.bio || '',
-    };
-    setUsers([...users, newUser]);
+    console.log("Add user:", data);
     closeAddModal();
   };
 
+  // Handler for editing a user
   const handleEditUser = (data) => {
     if (!selectedUser) return;
-    const updatedUser = {
-      id: selectedUser.id,
-      name: data.name,
+    updateUser(selectedUser.id, {
+      username: data.name,
       email: data.email,
-      role: data.role,
-      bio: data.bio || '',
-    };
-    setUsers(users.map(user => user.id === selectedUser.id ? updatedUser : user));
-    closeEditModal();
+      // Note: If your API expects 'role' instead of 'password', adjust accordingly
+      // password: "newSecurePassword123", // Uncomment and adjust if needed
+    }).then(() => {
+      fetchAllUsers(); // Refresh user list after update
+      closeEditModal();
+    });
   };
 
+  // Handler for deleting a single user
   const handleDeleteUser = (id) => {
-    setUsers(users.filter(user => user.id !== id));
+    deleteUser(id).then(() => {
+      fetchAllUsers(); // Refresh user list after deletion
+    });
+  };
+
+  // Handler for bulk deleting users
+  const handleBulkDeleteUsers = () => {
+    if (selectedUserIds.length > 0) {
+      bulkDeleteUsers(selectedUserIds).then(() => {
+        fetchAllUsers(); // Refresh user list after bulk deletion
+        setSelectedUserIds([]); // Clear selection
+      });
+    }
   };
 
   // Filter users based on search
@@ -104,12 +105,13 @@ const UsersContainer = (/*{
     <UsersView
       users={getFilteredUsers()}
       allUsers={users}
-      isLoading={loading}
+      isLoading={fetchUsersPending}
       search={search}
       onSearchChange={handleSearchChange}
       onAddClick={openAddModal}
       onEditClick={openEditModal}
       onDeleteClick={handleDeleteUser}
+      onBulkDeleteClick={handleBulkDeleteUsers} // Pass bulk delete handler
       isAddOpen={isAddOpen}
       isEditOpen={isEditOpen}
       onAddSubmit={handleAddUser}
@@ -117,27 +119,27 @@ const UsersContainer = (/*{
       onAddClose={closeAddModal}
       onEditClose={closeEditModal}
       selectedUser={selectedUser}
+      selectedUserIds={selectedUserIds}
+      setSelectedUserIds={setSelectedUserIds} // Pass selection state and setter
     />
   );
 };
 
-/*
 const mapStateToProps = (state) => ({
-  users: state.users?.users || [],
-  loading: state.users?.loading || false,
+  users: state.auth.users || [],
+  fetchUsersPending: state.auth.fetchUsersPending || false,
+  fetchUsersError: state.auth.fetchUsersError || null,
 });
 
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
     {
-      getAllUsers,
-      createUser,
+      fetchAllUsers,
       updateUser,
       deleteUser,
+      bulkDeleteUsers,
     },
     dispatch
   );
 
 export default connect(mapStateToProps, mapDispatchToProps)(UsersContainer);
-*/
-export default UsersContainer;
