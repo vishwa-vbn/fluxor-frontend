@@ -1,129 +1,179 @@
-import React, { useEffect, useState } from "react";
+import React, { Component } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { 
   fetchAllUsers, 
   updateUser, 
   deleteUser, 
-  bulkDeleteUsers 
-} from "../../../../store/auth/authActions"; // Adjust path as needed
+  bulkDeleteUsers,
+  registerNormalAdminUser,
+  registerNormalUser,
+} from "../../../../store/auth/authActions";
 import UsersView from "./userView";
 
-const UsersContainer = ({
-  users,
-  fetchUsersPending,
-  fetchUsersError,
-  fetchAllUsers,
-  updateUser,
-  deleteUser,
-  bulkDeleteUsers,
-}) => {
-  const [search, setSearch] = useState("");
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedUserIds, setSelectedUserIds] = useState([]); // For bulk delete
+class UsersContainer extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      search: "",
+      isAddOpen: false,
+      isEditOpen: false,
+      selectedUser: null,
+      selectedUserIds: [],
+    };
+  }
 
-  // Fetch users on mount
-  useEffect(() => {
-    fetchAllUsers();
-  }, [fetchAllUsers]);
+  componentDidMount() {
+    this.props.fetchAllUsers();
+  }
 
-  // Log selectedUser changes for debugging
-  useEffect(() => {
-    console.log("selected user", selectedUser);
-  }, [selectedUser]);
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.selectedUser !== this.state.selectedUser) {
+      console.log("selected user", this.state.selectedUser);
+    }
+  }
 
-  // Handle search input
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
+  handleSearchChange = (e) => {
+    this.setState({ search: e.target.value });
   };
 
-  // Modal controls
-  const openAddModal = () => setIsAddOpen(true);
-  const closeAddModal = () => setIsAddOpen(false);
+  openAddModal = () => this.setState({ isAddOpen: true });
+  closeAddModal = () => this.setState({ isAddOpen: false });
 
-  const openEditModal = (user) => {
-    setSelectedUser({ ...user });
-    setIsEditOpen(true);
-  };
-  const closeEditModal = () => {
-    setSelectedUser(null);
-    setIsEditOpen(false);
+  openEditModal = (user) => {
+    this.setState({ selectedUser: { ...user }, isEditOpen: true });
   };
 
-  // Handler for adding a user (placeholder, assuming API exists elsewhere)
-  const handleAddUser = (data) => {
-    console.log("Add user:", data);
-    closeAddModal();
+  closeEditModal = () => {
+    this.setState({ selectedUser: null, isEditOpen: false });
   };
 
-  // Handler for editing a user
-  const handleEditUser = (data) => {
-    if (!selectedUser) return;
-    updateUser(selectedUser.id, {
-      username: data.name,
+  getRoleId = (role) => {
+    return role === "admin" ? 1 : 4;
+  };
+
+  handleAddUser = (data) => {
+    const userData = {
+      username: data.username,
       email: data.email,
-      // Note: If your API expects 'role' instead of 'password', adjust accordingly
-      // password: "newSecurePassword123", // Uncomment and adjust if needed
-    }).then(() => {
-      fetchAllUsers(); // Refresh user list after update
-      closeEditModal();
+      password: data.password,
+      name: data.name,
+      bio: data.bio,
+      avatar: data.avatar || "",
+      role: data.role,
+      roleid: this.getRoleId(data.role),
+    };
+
+    const registerPromise = userData.role === "admin" 
+      ? this.props.registerNormalAdminUser(
+          userData.username,
+          userData.email,
+          userData.password,
+          userData.name,
+          userData.bio,
+          userData.avatar,
+          userData.role
+        )
+      : this.props.registerNormalUser(
+          userData.username,
+          userData.email,
+          userData.password,
+          userData.name,
+          userData.bio,
+          userData.avatar,
+          userData.role
+        );
+
+    registerPromise
+      .then(() => {
+        console.log("User added successfully:", userData);
+        this.props.fetchAllUsers();
+        this.closeAddModal();
+      })
+      .catch((error) => {
+        console.error("Error adding user:", error);
+      });
+  };
+
+  handleEditUser = (data) => {
+    if (!this.state.selectedUser) return;
+    const updateData = {
+      username: data.username,
+      email: data.email,
+      name: data.name,
+      bio: data.bio,
+      avatar: data.avatar,
+      role: data.role,
+      roleid: this.getRoleId(data.role),
+    };
+    if (data.password) {
+      updateData.password = data.password;
+    }
+    
+    this.props.updateUser(this.state.selectedUser.id, updateData)
+      .then(() => {
+        this.props.fetchAllUsers();
+        this.closeEditModal();
+      })
+      .catch((error) => {
+        console.error("Error updating user:", error);
+      });
+  };
+
+  handleDeleteUser = (id) => {
+    this.props.deleteUser(id).then(() => {
+      this.props.fetchAllUsers();
     });
   };
 
-  // Handler for deleting a single user
-  const handleDeleteUser = (id) => {
-    deleteUser(id).then(() => {
-      fetchAllUsers(); // Refresh user list after deletion
-    });
-  };
-
-  // Handler for bulk deleting users
-  const handleBulkDeleteUsers = () => {
-    if (selectedUserIds.length > 0) {
-      bulkDeleteUsers(selectedUserIds).then(() => {
-        fetchAllUsers(); // Refresh user list after bulk deletion
-        setSelectedUserIds([]); // Clear selection
+  handleBulkDeleteUsers = () => {
+    if (this.state.selectedUserIds.length > 0) {
+      this.props.bulkDeleteUsers(this.state.selectedUserIds).then(() => {
+        this.props.fetchAllUsers();
+        this.setState({ selectedUserIds: [] });
       });
     }
   };
 
-  // Filter users based on search
-  const getFilteredUsers = () => {
+  getFilteredUsers = () => {
+    const { users } = this.props;
     if (!users || !Array.isArray(users)) return [];
-    if (!search) return users;
+    if (!this.state.search) return users;
     return users.filter(
       (user) =>
-        user.name?.toLowerCase().includes(search.toLowerCase()) ||
-        user.email?.toLowerCase().includes(search.toLowerCase()) ||
-        user.role?.toLowerCase().includes(search.toLowerCase())
+        user.username?.toLowerCase().includes(this.state.search.toLowerCase()) ||
+        user.email?.toLowerCase().includes(this.state.search.toLowerCase()) ||
+        user.name?.toLowerCase().includes(this.state.search.toLowerCase()) ||
+        user.bio?.toLowerCase().includes(this.state.search.toLowerCase()) ||
+        user.role?.toLowerCase().includes(this.state.search.toLowerCase())
     );
   };
 
-  return (
-    <UsersView
-      users={getFilteredUsers()}
-      allUsers={users}
-      isLoading={fetchUsersPending}
-      search={search}
-      onSearchChange={handleSearchChange}
-      onAddClick={openAddModal}
-      onEditClick={openEditModal}
-      onDeleteClick={handleDeleteUser}
-      onBulkDeleteClick={handleBulkDeleteUsers} // Pass bulk delete handler
-      isAddOpen={isAddOpen}
-      isEditOpen={isEditOpen}
-      onAddSubmit={handleAddUser}
-      onEditSubmit={handleEditUser}
-      onAddClose={closeAddModal}
-      onEditClose={closeEditModal}
-      selectedUser={selectedUser}
-      selectedUserIds={selectedUserIds}
-      setSelectedUserIds={setSelectedUserIds} // Pass selection state and setter
-    />
-  );
-};
+  render() {
+    return (
+      <UsersView
+        users={this.getFilteredUsers()}
+        allUsers={this.props.users}
+        isLoading={this.props.fetchUsersPending}
+        search={this.state.search}
+        onSearchChange={this.handleSearchChange}
+        onAddClick={this.openAddModal}
+        onEditClick={this.openEditModal}
+        onDeleteClick={this.handleDeleteUser}
+        onBulkDeleteClick={this.handleBulkDeleteUsers}
+        isAddOpen={this.state.isAddOpen}
+        isEditOpen={this.state.isEditOpen}
+        onAddSubmit={this.handleAddUser}
+        onEditSubmit={this.handleEditUser}
+        onAddClose={this.closeAddModal}
+        onEditClose={this.closeEditModal}
+        selectedUser={this.state.selectedUser}
+        selectedUserIds={this.state.selectedUserIds}
+        setSelectedUserIds={(ids) => this.setState({ selectedUserIds: ids })}
+      />
+    );
+  }
+}
 
 const mapStateToProps = (state) => ({
   users: state.auth.users || [],
@@ -138,6 +188,8 @@ const mapDispatchToProps = (dispatch) =>
       updateUser,
       deleteUser,
       bulkDeleteUsers,
+      registerNormalAdminUser,
+      registerNormalUser,
     },
     dispatch
   );

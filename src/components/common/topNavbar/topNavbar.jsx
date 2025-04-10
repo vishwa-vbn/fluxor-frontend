@@ -1,11 +1,17 @@
-// TopNavbar.jsx
 import { Bell, Settings, Search, LogOut } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 
-export default function TopNavbar({ userData, onSearch, notificationCount = 0 }) {
+export default function TopNavbar({ onSearch, notificationCount = 0 }) {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  
+  // Get user data from Redux store
+  const authState = useSelector((state) => state.auth);
+  const userData = authState?.loginUser?.user || {};
 
   // Extract current route name dynamically and capitalize it
   const currentRoute = location.pathname
@@ -16,7 +22,7 @@ export default function TopNavbar({ userData, onSearch, notificationCount = 0 })
 
   // Generate initials from user name
   const getInitials = (name) => {
-    if (!name) return "U";
+    if (!name) return userData.username?.[0]?.toUpperCase() || "U";
     const nameParts = name.split(" ");
     return nameParts.length > 1
       ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
@@ -29,8 +35,44 @@ export default function TopNavbar({ userData, onSearch, notificationCount = 0 })
     if (onSearch) onSearch(searchQuery);
   };
 
+  // Toggle dropdown on click
+  const toggleDropdown = () => {
+    setIsDropdownOpen((prev) => !prev);
+  };
+
+  // Handle clicks outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Render profile image or initials
+  const renderProfileImage = () => {
+    if (userData.avatar) {
+      return (
+        <img 
+          src={userData.avatar}
+          alt="Profile"
+          className="w-10 h-10 rounded-full object-cover"
+          onError={(e) => e.target.outerHTML = `<div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-lg">${getInitials(userData.name)}</div>`}
+        />
+      );
+    }
+    return (
+      <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-lg">
+        {getInitials(userData.name)}
+      </div>
+    );
+  };
+
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-transparent border-0 sticky top-0 z-50 hidden md:block">
       <div className="max-w-11/12 mx-auto px-0 py-3 flex justify-between items-center">
         {/* Left: Dynamic Route Name */}
         <h1 className="text-2xl font-bold text-gray-800">
@@ -69,39 +111,47 @@ export default function TopNavbar({ userData, onSearch, notificationCount = 0 })
           </button>
 
           {/* User Profile */}
-          <div className="relative group">
-            <Link to="/admin/profile" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-lg">
-                {getInitials(userData?.name)}
-              </div>
+          <div ref={dropdownRef} className="relative">
+            <button 
+              onClick={toggleDropdown}
+              className="flex items-center gap-2 focus:outline-none"
+            >
+              {renderProfileImage()}
               <span className="text-sm font-medium text-gray-700 hidden md:block">
-                {userData?.name || "User"}
+                {userData.name || userData.username || "User"}
               </span>
-            </Link>
+            </button>
 
             {/* Dropdown Menu */}
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden group-hover:block z-10">
-              <div className="py-2">
-                <Link
-                  to="/admin/profile"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Profile
-                </Link>
-                <Link
-                  to="/admin/settings"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Settings
-                </Link>
-                <button
-                  onClick={() => console.log("Logout clicked")} // Replace with actual logout logic
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                >
-                  <LogOut className="w-4 h-4" /> Logout
-                </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                <div className="py-2">
+                  <Link
+                    to="/admin/profile"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/admin/settings"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    Settings
+                  </Link>
+                  <button
+                    onClick={() => {
+                      console.log("Logout clicked");
+                      setIsDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" /> Logout
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

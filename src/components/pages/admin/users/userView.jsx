@@ -68,10 +68,16 @@ const UsersView = ({
       width: "50px",
     },
     {
+      name: "Username",
+      selector: (row) => row.username,
+      sortable: true,
+      cell: (row) => <div className="text-center">{row.username || "Unnamed"}</div>,
+    },
+    {
       name: "Name",
       selector: (row) => row.name,
       sortable: true,
-      cell: (row) => <div className="text-center">{row.name || "Unnamed"}</div>,
+      cell: (row) => <div className="text-center">{row.name || "-"}</div>,
     },
     {
       name: "Email",
@@ -91,6 +97,20 @@ const UsersView = ({
       cell: (row) => (
         <div className="text-center max-w-[200px] truncate">
           {row.bio || "-"}
+        </div>
+      ),
+    },
+    {
+      name: "Avatar",
+      selector: (row) => row.avatar,
+      cell: (row) => (
+        <div className="text-center">
+          <img 
+            src={row.avatar ||""} 
+            alt="avatar" 
+            className="w-8 h-8 rounded-full mx-auto" 
+            onError={(e) => e.target.src = ""}
+          />
         </div>
       ),
     },
@@ -185,10 +205,12 @@ const UsersView = ({
             isOpen={isAddOpen}
             onClose={onAddClose}
             onSubmit={onAddSubmit}
-            initialData={{ name: "", email: "", role: "user", bio: "" }}
+            initialData={{ username: "", email: "", role: "user", name: "", bio: "", avatar: "", password: "" }}
           >
+            <Input label="Username" name="username" required />
             <Input label="Name" name="name" required />
             <Input label="Email" name="email" type="email" required />
+            <Input label="Password" name="password" type="password" required />
             <Select
               label="Role"
               name="role"
@@ -196,6 +218,7 @@ const UsersView = ({
               defaultValue="user"
             />
             <Textarea label="Bio" name="bio" rows={3} />
+            <Input label="Avatar URL" name="avatar" type="url" />
           </Modal>
 
           {/* Edit Modal */}
@@ -206,12 +229,21 @@ const UsersView = ({
               onClose={onEditClose}
               onSubmit={onEditSubmit}
               initialData={{
+                username: selectedUser.username || "",
                 name: selectedUser.name || "",
                 email: selectedUser.email || "",
                 role: selectedUser.role || "user",
                 bio: selectedUser.bio || "",
+                avatar: selectedUser.avatar || "",
+                password: ""
               }}
             >
+              <Input
+                label="Username"
+                name="username"
+                required
+                defaultValue={selectedUser.username || ""}
+              />
               <Input
                 label="Name"
                 name="name"
@@ -225,6 +257,11 @@ const UsersView = ({
                 required
                 defaultValue={selectedUser.email || ""}
               />
+              <Input
+                label="Password (leave blank to keep unchanged)"
+                name="password"
+                type="password"
+              />
               <Select
                 label="Role"
                 name="role"
@@ -236,6 +273,12 @@ const UsersView = ({
                 name="bio"
                 rows={3}
                 defaultValue={selectedUser.bio || ""}
+              />
+              <Input
+                label="Avatar URL"
+                name="avatar"
+                type="url"
+                defaultValue={selectedUser.avatar || ""}
               />
             </Modal>
           )}

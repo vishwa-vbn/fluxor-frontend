@@ -470,7 +470,7 @@ const CreatePost = ({ tags = [], categories = [], onCreatePost, loading, error }
 
         <div className="flex-1 max-w-11/12 w-full mx-auto py-5 space-y-8">
           <div className="border-0 mb-0 border-gray-200">
-            <div className="px-6 py-1 flex justify-end items-end">
+            <div className="px-0 py-1 flex justify-end items-end">
               <div className="flex gap-2">
                 <Button
                   variant="outline"

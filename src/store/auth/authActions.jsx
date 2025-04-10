@@ -883,6 +883,223 @@ export function resetPassword(newPassword, token) {
 //   };
 // }
 
+
+
+
+
+export function registerNormalUser(username,
+  email,
+  password,
+  name,
+  bio,
+  avatar,
+  role) {
+  return (dispatch) => {
+    if (!email || !password || !name ||!username || !bio || !avatar ||!role) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Registration Error",
+          type: "error",
+          msg: "Fill all the fields.",
+        })
+      );
+
+      // dispatch({
+      //   type: actionTypes.AUTH_ERROR,
+      //   payload: {
+      //     authPending: false,
+      //     authSuccess: false,
+      //     authError: "Fill all the fields.",
+      //     accessToken: null,
+      //     refreshToken: null,
+      //     profileurl: null,
+      //     loginUser: null,
+      //   },
+      // });
+      return;
+    }
+
+    // dispatch({
+    //   type: actionTypes.AUTH_PENDING,
+    //   payload: {
+    //     authPending: true,
+    //     authSuccess: false,
+    //     authError: null,
+    //     accessToken: null,
+    //     refreshToken: null,
+    //     profileurl: null,
+    //     loginUser: null,
+    //   },
+    // });
+
+    axios
+      .post("https://fluxor-backend.vercel.app/api/users/register", {
+        username,
+        email,
+        password,
+        name,
+        bio,avatar,
+        role
+      })
+      .then((response) => {
+        console.log("Registration response:", response);
+
+        // dispatch({
+        //   type: actionTypes.AUTH_SUCCESS,
+        //   payload: {
+        //     authPending: false,
+        //     authSuccess: true,
+        //     authError: null,
+        //     accessToken: response.data.accessToken,
+        //     refreshToken: response.data.refreshToken,
+        //     profileurl: null,
+        //     loginUser: response.data,
+        //   },
+        // });
+
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "User Added Successful",
+            type: "success",
+            msg: "Welcome to the platform!",
+          })
+        );
+      })
+      .catch((err) => {
+        console.error("Registration error:", err);
+
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Registration Failed",
+            type: "error",
+            msg: "Enter valid credentials",
+          })
+        );
+
+        // dispatch({
+        //   type: actionTypes.AUTH_ERROR,
+        //   payload: {
+        //     authPending: false,
+        //     authSuccess: false,
+        //     authError: "Enter valid credentials",
+        //     accessToken: null,
+        //     refreshToken: null,
+        //     profileurl: null,
+        //     loginUser: null,
+        //   },
+        // });
+      });
+  };
+}
+
+export function registerNormalAdminUser(username,
+  email,
+  password,
+  name,
+  bio,
+  avatar,
+  role) {
+  return (dispatch) => {
+    if (!email || !password || !name ||!username || !bio || !avatar ||!role) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Registration Error",
+          type: "error",
+          msg: "Fill all the fields.",
+        })
+      );
+
+      // dispatch({
+      //   type: actionTypes.AUTH_ERROR,
+      //   payload: {
+      //     authPending: false,
+      //     authSuccess: false,
+      //     authError: "Fill all the fields.",
+      //     accessToken: null,
+      //     refreshToken: null,
+      //     profileurl: null,
+      //     loginUser: null,
+      //   },
+      // });
+      return;
+    }
+
+    // dispatch({
+    //   type: actionTypes.AUTH_PENDING,
+    //   payload: {
+    //     authPending: true,
+    //     authSuccess: false,
+    //     authError: null,
+    //     accessToken: null,
+    //     refreshToken: null,
+    //     profileurl: null,
+    //     loginUser: null,
+    //   },
+    // });
+
+    axios
+      .post("https://fluxor-backend.vercel.app/api/users/register/admin", {
+        username,
+        email,
+        password,
+        name,
+        bio,
+        avatar,
+        role
+      })
+      .then((response) => {
+        // dispatch({
+        //   type: actionTypes.AUTH_SUCCESS,
+        //   payload: {
+        //     authPending: false,
+        //     authSuccess: true,
+        //     authError: null,
+        //     accessToken: response.data.accessToken,
+        //     refreshToken: response.data.refreshToken,
+        //     profileurl: null,
+        //     loginUser: response.data,
+        //   },
+        // });
+
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Registration Successful",
+            type: "success",
+            msg: "Admin account created!",
+          })
+        );
+      })
+      .catch((err) => {
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Registration Failed",
+            type: "error",
+            msg: "Enter valid credentials",
+          })
+        );
+
+        // dispatch({
+        //   type: actionTypes.AUTH_ERROR,
+        //   payload: {
+        //     authPending: false,
+        //     authSuccess: false,
+        //     authError: "Enter valid credentials",
+        //     accessToken: null,
+        //     refreshToken: null,
+        //     profileurl: null,
+        //     loginUser: null,
+        //   },
+        // });
+      });
+  };
+}
+
 export function updateToken(token, refreshToken) {
   // console.log("test", token, refreshToken);
   return (dispatch) => {

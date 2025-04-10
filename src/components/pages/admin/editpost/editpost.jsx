@@ -131,7 +131,7 @@ const EditPost = ({
 
         <div className="flex-1 max-w-11/12 w-full mx-auto py-5 space-y-8">
           <div className="border-0 mb-0 border-gray-200">
-            <div className="px-6 py-1 flex justify-between items-end">
+            <div className="px-0 py-1 flex justify-between items-end">
               <Button
                 variant="outline"
                 size="sm"

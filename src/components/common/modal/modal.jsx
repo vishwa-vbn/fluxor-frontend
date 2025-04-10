@@ -53,9 +53,9 @@ const Modal = ({
       : children;
 
   return createPortal(
-    <dialog open className="modal modal-open">
-      <div className="modal-box bg-white text-black max-w-xl w-full">
-        <div className="flex justify-between items-center border-b pb-2 mb-4">
+    <dialog open className="modal modal-open ">
+      <div className="modal-box bg-white text-black max-w-xl w-full px-3.5" style={{ borderRadius: '5px' }}>
+        <div className="flex justify-between items-center border-b pb-2 mb-4 px-1">
           <h3 className="text-lg font-bold">{title}</h3>
           <button onClick={onClose} className="btn btn-sm btn-circle btn-ghost">
             ✕
@@ -63,19 +63,38 @@ const Modal = ({
         </div>
 
         {mode === "form" ? (
-          <form onSubmit={handleSubmit} className="space-y-4 overflow-visible">
-            {enhancedChildren}
-            <div className="modal-action">
-              <button type="submit" className="btn btn-primary">
-                Submit
-              </button>
-              <button type="button" className="btn" onClick={onClose}>
+          <form onSubmit={handleSubmit} className="px-4">
+            <div className="max-h-[60vh] overflow-y-auto scrollbar-hide px-1">
+              <div className="grid grid-cols-1 gap-4">
+                {enhancedChildren}
+              </div>
+            </div>
+            <div className="mt-6 pt-4 border-t flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="md"
+                onClick={onClose}
+              >
                 Cancel
-              </button>
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                size="md"
+              >
+                Submit
+              </Button>
             </div>
           </form>
         ) : (
-          <div className="space-y-4">{enhancedChildren}</div>
+          <div className="px-4">
+            <div className="max-h-[60vh] overflow-y-auto pr-2">
+              <div className="grid grid-cols-1 gap-4">
+                {enhancedChildren}
+              </div>
+            </div>
+          </div>
         )}
       </div>
       <form method="dialog" className="modal-backdrop bg-black/30">

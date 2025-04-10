@@ -13,10 +13,11 @@ const Button = ({
 }) => {
   const baseClass = clsx(
     "rounded-[5px] px-4 py-2 text-sm font-medium transition-colors duration-150",
+    "flex flex-row items-center justify-center flex-nowrap", // Added flex properties
     {
       "w-full": fullWidth,
       "opacity-50 cursor-not-allowed": loading || disabled,
-      "text-ellipsis overflow-hidden whitespace-nowrap": true, // Add overflow handling
+      "text-ellipsis overflow-hidden whitespace-nowrap": true, // Keep overflow handling
     }
   );
 
@@ -33,7 +34,7 @@ const Button = ({
     sm: "text-sm py-1 px-2",
     md: "text-base py-2 px-4",
     lg: "text-lg py-3 px-6",
-    mini: "text-sm py-[5px] px-3", // Custom mini button size
+    mini: "text-sm py-[5px] px-3",
   }[size];
 
   return (
