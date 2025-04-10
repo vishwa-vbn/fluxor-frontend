@@ -18,6 +18,7 @@ const UsersView = ({
   onAddClick,
   onEditClick,
   onDeleteClick,
+  onBulkDeleteClick,
   isAddOpen,
   isEditOpen,
   onAddSubmit,
@@ -25,21 +26,52 @@ const UsersView = ({
   onAddClose,
   onEditClose,
   selectedUser,
+  selectedUserIds,
+  setSelectedUserIds,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const roleOptions = [
     { value: "admin", label: "Admin" },
     { value: "user", label: "User" },
-    { value: "editor", label: "Editor" },
   ];
 
   const columns = [
     {
+      name: (
+        <input
+          type="checkbox"
+          checked={selectedUserIds.length === users.length && users.length > 0}
+          onChange={(e) => {
+            if (e.target.checked) {
+              setSelectedUserIds(users.map((user) => user.id));
+            } else {
+              setSelectedUserIds([]);
+            }
+          }}
+        />
+      ),
+      selector: (row) => row.id,
+      cell: (row) => (
+        <input
+          type="checkbox"
+          checked={selectedUserIds.includes(row.id)}
+          onChange={(e) => {
+            if (e.target.checked) {
+              setSelectedUserIds([...selectedUserIds, row.id]);
+            } else {
+              setSelectedUserIds(selectedUserIds.filter((id) => id !== row.id));
+            }
+          }}
+        />
+      ),
+      width: "50px",
+    },
+    {
       name: "Name",
       selector: (row) => row.name,
       sortable: true,
-      cell: (row) => <div className="text-center">{row.name}</div>,
+      cell: (row) => <div className="text-center">{row.name || "Unnamed"}</div>,
     },
     {
       name: "Email",
@@ -82,8 +114,8 @@ const UsersView = ({
   ];
 
   const sampleUserData = {
-    name: "Jane Doe",
-    email: "jane@example.com",
+    name: "Admin User",
+    email: "admin@example.com",
   };
 
   const handleSearch = (query) => {
@@ -102,17 +134,19 @@ const UsersView = ({
         <main className="flex-1 max-w-11/12 w-full mx-auto px-6 py-8 space-y-8">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-800">All Users</h1>
-            <Button
-              variant="primary"
-              onClick={onAddClick}
-              className="flex items-center"
-            >
-              <PlusCircle className="w-4 h-4 mr-2" />
-              Add User
-            </Button>
+            <div className="flex space-x-2">
+              <Button
+                variant="primary"
+                onClick={onAddClick}
+                className="flex items-center"
+              >
+                <PlusCircle className="w-4 h-4 mr-2" />
+                Add User
+              </Button>
+            </div>
           </div>
 
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-end mb-4 items-center space-x-4">
             <SearchBar
               searchQuery={search}
               setSearchQuery={(val) =>
@@ -120,6 +154,16 @@ const UsersView = ({
               }
               placeholder="Search users..."
             />
+            {selectedUserIds.length > 0 && (
+              <Button
+                variant="primary"
+                onClick={onBulkDeleteClick}
+                className="flex items-center"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Bulk Delete ({selectedUserIds.length})
+              </Button>
+            )}
           </div>
 
           <Card>
@@ -162,25 +206,36 @@ const UsersView = ({
               onClose={onEditClose}
               onSubmit={onEditSubmit}
               initialData={{
-                name: selectedUser.name || '',
-                email: selectedUser.email || '',
-                role: selectedUser.role || 'user',
-                bio: selectedUser.bio || '',
+                name: selectedUser.name || "",
+                email: selectedUser.email || "",
+                role: selectedUser.role || "user",
+                bio: selectedUser.bio || "",
               }}
             >
-              <Input label="Name" name="name" required defaultValue={selectedUser.name} />
-              <Input label="Email" name="email" type="email" required defaultValue={selectedUser.email} />
+              <Input
+                label="Name"
+                name="name"
+                required
+                defaultValue={selectedUser.name || ""}
+              />
+              <Input
+                label="Email"
+                name="email"
+                type="email"
+                required
+                defaultValue={selectedUser.email || ""}
+              />
               <Select
                 label="Role"
                 name="role"
                 options={roleOptions}
-                defaultValue={selectedUser.role}
+                defaultValue={selectedUser.role || "user"}
               />
               <Textarea
                 label="Bio"
                 name="bio"
                 rows={3}
-                defaultValue={selectedUser.bio || ''}
+                defaultValue={selectedUser.bio || ""}
               />
             </Modal>
           )}

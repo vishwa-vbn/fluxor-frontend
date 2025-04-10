@@ -1,11 +1,291 @@
 // import Api from "../../service/api";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
+import { getState } from "../configure/configureStore";
+
 import Api from "../../service/api";
 
 import { actionTypes } from "./authReducer";
 import axios from "axios";
 
+export function fetchAllUsers() {
+  return (dispatch) => {
+    const token = getState().auth?.loginUser?.token;
+
+    if (!token) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Authentication Error",
+          type: "error",
+          msg: "You need to be logged in to fetch users.",
+        })
+      );
+      dispatch({
+        type: actionTypes.FETCH_USERS_ERROR,
+        payload: {
+          fetchUsersPending: false,
+          fetchUsersSuccess: false,
+          fetchUsersError: "No access token available.",
+          users: [],
+        },
+      });
+      return;
+    }
+
+    dispatch(showLoader());
+    dispatch({
+      type: actionTypes.FETCH_USERS_PENDING,
+      payload: {
+        fetchUsersPending: true,
+        fetchUsersSuccess: false,
+        fetchUsersError: null,
+        users: [],
+      },
+    });
+
+    axios
+      .get("https://fluxor-backend.vercel.app/api/users/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        dispatch(hideLoader());
+        dispatch({
+          type: actionTypes.FETCH_USERS_SUCCESS,
+          payload: {
+            fetchUsersPending: false,
+            fetchUsersSuccess: true,
+            fetchUsersError: null,
+            users: response.data, // Store the array of users
+          },
+        });
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Users Fetched",
+            type: "success",
+            msg: "Successfully retrieved all users.",
+          })
+        );
+      })
+      .catch((err) => {
+        dispatch(hideLoader());
+        dispatch({
+          type: actionTypes.FETCH_USERS_ERROR,
+          payload: {
+            fetchUsersPending: false,
+            fetchUsersSuccess: false,
+            fetchUsersError:
+              err.response?.data?.error || "Failed to fetch users.",
+            users: [],
+          },
+        });
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Fetch Failed",
+            type: "error",
+            msg: err.response?.data?.error || "Failed to fetch users.",
+          })
+        );
+      });
+  };
+}
+
+
+// Update User Action
+export function updateUser(userId, userData) {
+  return (dispatch, getState) => {
+    const token = getState().auth?.loginUser?.token;
+
+    if (!token) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Authentication Error",
+          type: "error",
+          msg: "You need to be logged in to update users.",
+        })
+      );
+      return;
+    }
+
+    dispatch(showLoader());
+    
+    axios
+      .put(`https://fluxor-backend.vercel.app/api/users/${userId}`, userData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        dispatch(hideLoader());
+        dispatch({
+          type: actionTypes.UPDATE_USER_SUCCESS,
+          payload: {
+            updatedUser: response.data,
+          },
+        });
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "User Updated",
+            type: "success",
+            msg: "User has been successfully updated.",
+          })
+        );
+      })
+      .catch((err) => {
+        dispatch(hideLoader());
+        dispatch({
+          type: actionTypes.UPDATE_USER_ERROR,
+          payload: {
+            updateUserError: err.response?.data?.error || "Failed to update user.",
+          },
+        });
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Update Failed",
+            type: "error",
+            msg: err.response?.data?.error || "Failed to update user.",
+          })
+        );
+      });
+  };
+}
+
+// Delete User Action
+export function deleteUser(userId) {
+  return (dispatch, getState) => {
+    const token = getState().auth?.loginUser?.token;
+
+    if (!token) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Authentication Error",
+          type: "error",
+          msg: "You need to be logged in to delete users.",
+        })
+      );
+      return;
+    }
+
+    dispatch(showLoader());
+    
+    axios
+      .delete(`https://fluxor-backend.vercel.app/api/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        dispatch(hideLoader());
+        dispatch({
+          type: actionTypes.DELETE_USER_SUCCESS,
+          payload: {
+            deletedUserId: userId,
+          },
+        });
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "User Deleted",
+            type: "success",
+            msg: "User has been successfully deleted.",
+          })
+        );
+      })
+      .catch((err) => {
+        dispatch(hideLoader());
+        dispatch({
+          type: actionTypes.DELETE_USER_ERROR,
+          payload: {
+            deleteUserError: err.response?.data?.error || "Failed to delete user.",
+          },
+        });
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Delete Failed",
+            type: "error",
+            msg: err.response?.data?.error || "Failed to delete user.",
+          })
+        );
+      });
+  };
+}
+
+// Bulk Delete Users Action
+export function bulkDeleteUsers(userIds) {
+  return (dispatch, getState) => {
+    const token = getState().auth?.loginUser?.token;
+
+    if (!token) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Authentication Error",
+          type: "error",
+          msg: "You need to be logged in to bulk delete users.",
+        })
+      );
+      return;
+    }
+
+    dispatch(showLoader());
+    
+    axios
+      .post(
+        "https://fluxor-backend.vercel.app/api/users/bulk-delete",
+        { userIds },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        dispatch(hideLoader());
+        dispatch({
+          type: actionTypes.BULK_DELETE_USERS_SUCCESS,
+          payload: {
+            deletedUserIds: userIds,
+          },
+        });
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Users Deleted",
+            type: "success",
+            msg: "Selected users have been successfully deleted.",
+          })
+        );
+      })
+      .catch((err) => {
+        dispatch(hideLoader());
+        dispatch({
+          type: actionTypes.BULK_DELETE_USERS_ERROR,
+          payload: {
+            bulkDeleteError: err.response?.data?.error || "Failed to bulk delete users.",
+          },
+        });
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Bulk Delete Failed",
+            type: "error",
+            msg: err.response?.data?.error || "Failed to bulk delete users.",
+          })
+        );
+      });
+  };
+}
 export function login(email, password) {
   return (dispatch) => {
     if (!email || !password) {
@@ -17,7 +297,6 @@ export function login(email, password) {
           msg: "Fill all the fields.",
         })
       );
-
 
       dispatch({
         type: actionTypes.AUTH_ERROR,
@@ -35,7 +314,6 @@ export function login(email, password) {
     }
 
     dispatch(showLoader());
-
 
     dispatch({
       type: actionTypes.AUTH_PENDING,
@@ -57,8 +335,6 @@ export function login(email, password) {
       })
       .then((response) => {
         console.log("response is", response);
-
-
 
         dispatch(
           handleRedirect(response.data.user.roleid, response.data.user.role)
@@ -86,12 +362,10 @@ export function login(email, password) {
           })
         );
 
-      dispatch(hideLoader());
-
+        dispatch(hideLoader());
       })
       .catch((err) => {
-
-      dispatch(hideLoader());
+        dispatch(hideLoader());
 
         dispatch(
           showAlert({
@@ -608,7 +882,6 @@ export function resetPassword(newPassword, token) {
 //       });
 //   };
 // }
-
 
 export function updateToken(token, refreshToken) {
   // console.log("test", token, refreshToken);

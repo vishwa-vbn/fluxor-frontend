@@ -16,6 +16,20 @@ export const actionTypes = {
     LOGOUT_PENDING: "LOGOUT_PENDING",
     LOGOUT_SUCCESS: "LOGOUT_SUCCESS",
     LOGOUT_ERROR: "LOGOUT_ERROR",
+
+
+    FETCH_USERS_PENDING: "FETCH_USERS_PENDING",
+  FETCH_USERS_SUCCESS: "FETCH_USERS_SUCCESS",
+  FETCH_USERS_ERROR: "FETCH_USERS_ERROR",
+
+
+  UPDATE_USER_SUCCESS: "UPDATE_USER_SUCCESS",
+  UPDATE_USER_ERROR: "UPDATE_USER_ERROR",
+  DELETE_USER_SUCCESS: "DELETE_USER_SUCCESS",
+  
+  DELETE_USER_ERROR: "DELETE_USER_ERROR",
+  BULK_DELETE_USERS_SUCCESS: "BULK_DELETE_USERS_SUCCESS",
+  BULK_DELETE_USERS_ERROR: "BULK_DELETE_USERS_ERROR",
   };
   
   const initialState = {
@@ -38,6 +52,11 @@ export const actionTypes = {
     logoutPending: false,
     logoutSuccess: false,
     logoutError: null,
+
+    fetchUsersPending: false,
+  fetchUsersSuccess: false,
+  fetchUsersError: null,
+    users: [],
   };
   
   export default function auth(state = initialState, action) {
@@ -69,6 +88,11 @@ export const actionTypes = {
       case actionTypes.LOGOUT_SUCCESS:
         console.log("Logout Payload:", payload);
         return Object.assign({}, state, payload);
+
+      case actionTypes.FETCH_USERS_PENDING:
+      case actionTypes.FETCH_USERS_SUCCESS:
+      case actionTypes.FETCH_USERS_ERROR:
+          return Object.assign({}, state, payload);
   
       default:
         return state;
