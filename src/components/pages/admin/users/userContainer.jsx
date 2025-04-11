@@ -24,7 +24,7 @@ class UsersContainer extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchAllUsers();
+    // this.props.fetchAllUsers();
   }
 
   componentDidUpdate(prevProps, prevState) {

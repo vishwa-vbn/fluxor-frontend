@@ -30,6 +30,10 @@ export const actionTypes = {
   DELETE_USER_ERROR: "DELETE_USER_ERROR",
   BULK_DELETE_USERS_SUCCESS: "BULK_DELETE_USERS_SUCCESS",
   BULK_DELETE_USERS_ERROR: "BULK_DELETE_USERS_ERROR",
+
+  FETCH_TARGETED_USER_PENDING: "FETCH_TARGETED_USER_PENDING",
+  FETCH_TARGETED_USER_SUCCESS: "FETCH_TARGETED_USER_SUCCESS",
+  FETCH_TARGETED_USER_ERROR: "FETCH_TARGETED_USER_ERROR",
   };
   
   const initialState = {
@@ -57,6 +61,12 @@ export const actionTypes = {
   fetchUsersSuccess: false,
   fetchUsersError: null,
     users: [],
+
+
+    fetchTargetedUserPending: false,
+  fetchTargetedUserSuccess: false,
+  fetchTargetedUserError: null,
+  targetedUser: null,
   };
   
   export default function auth(state = initialState, action) {
@@ -92,6 +102,11 @@ export const actionTypes = {
       case actionTypes.FETCH_USERS_PENDING:
       case actionTypes.FETCH_USERS_SUCCESS:
       case actionTypes.FETCH_USERS_ERROR:
+          return Object.assign({}, state, payload);
+
+      case actionTypes.FETCH_TARGETED_USER_PENDING:
+      case actionTypes.FETCH_TARGETED_USER_SUCCESS:
+      case actionTypes.FETCH_TARGETED_USER_ERROR:
           return Object.assign({}, state, payload);
   
       default:

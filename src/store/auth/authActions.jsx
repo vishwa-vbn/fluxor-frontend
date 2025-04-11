@@ -158,6 +158,84 @@ export function updateUser(userId, userData) {
   };
 }
 
+
+export function fetchTargetedUser(userId) {
+  return (dispatch, getState) => {
+    const token = getState().auth?.loginUser?.token;
+
+    if (!token) {
+      dispatch(
+        showAlert({
+          isOpen: true,
+          title: "Authentication Error",
+          type: "error",
+          msg: "You need to be logged in to fetch user data.",
+        })
+      );
+      return;
+    }
+
+    dispatch(showLoader());
+    dispatch({
+      type: actionTypes.FETCH_TARGETED_USER_PENDING,
+      payload: {
+        fetchTargetedUserPending: true,
+        fetchTargetedUserSuccess: false,
+        fetchTargetedUserError: null,
+      },
+    });
+
+    axios
+      .get(`http://localhost:3000/api/users/data/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        dispatch(hideLoader());
+        dispatch({
+          type: actionTypes.FETCH_TARGETED_USER_SUCCESS,
+          payload: {
+            fetchTargetedUserPending: false,
+            fetchTargetedUserSuccess: true,
+            fetchTargetedUserError: null,
+            targetedUser: {
+              user: response.data.user,
+              permissions: response.data.permissions,
+            },
+          },
+        });
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "User Data Fetched",
+            type: "success",
+            msg: "User data has been successfully fetched.",
+          })
+        );
+      })
+      .catch((err) => {
+        dispatch(hideLoader());
+        dispatch({
+          type: actionTypes.FETCH_TARGETED_USER_ERROR,
+          payload: {
+            fetchTargetedUserPending: false,
+            fetchTargetedUserSuccess: false,
+            fetchTargetedUserError: err.response?.data?.error || "Failed to fetch user data.",
+          },
+        });
+        dispatch(
+          showAlert({
+            isOpen: true,
+            title: "Fetch Failed",
+            type: "error",
+            msg: err.response?.data?.error || "Failed to fetch user data.",
+          })
+        );
+      });
+  };
+}
+
 // Delete User Action
 export function deleteUser(userId) {
   return (dispatch, getState) => {

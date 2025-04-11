@@ -8,6 +8,7 @@ import Button from "../../../controls/button/buttonView";
 import Select from "../../../controls/selection/selection";
 import SearchBar from "../../../controls/searchbar/searchbar";
 import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage"; // Adjust path as needed
+import { getUserInfoByKey } from "../../../../utils";
 
 const sampleUserData = {
   name: "John Doe",
@@ -24,17 +25,17 @@ const columns = (onDeleteClick) => [
   {
     name: "Author",
     cell: (row) => (
+      console.log("row",row),
       <div className="flex items-center">
         <img
           src={
-            row.author?.avatar ||
-            `https://ui-avatars.com/api/?name=${row.author?.username}`
+           getUserInfoByKey(row.authorid,"avatar")
           }
           alt=""
           className="w-8 h-8 rounded-full mr-2"
         />
         <span className="text-gray-800 font-medium">
-          {row.author?.username || "Unknown"}
+          {getUserInfoByKey(row.authorid,"username")}
         </span>
       </div>
     ),
@@ -49,7 +50,7 @@ const columns = (onDeleteClick) => [
         archived: "badge-error",
       };
       return (
-        <span className={`badge ${statusColors[row.status] || "badge-ghost"}`}>
+        <span className={`badge rounded-[3px] ${statusColors[row.status] || "badge-ghost rounded-[5px]"}`}>
           {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
         </span>
       );
@@ -58,8 +59,8 @@ const columns = (onDeleteClick) => [
   {
     name: "Date",
     selector: (row) =>
-      row.publishedAt
-        ? new Date(row.publishedAt).toLocaleDateString("en-US", {
+      row.publishedat
+        ? new Date(row.publishedat).toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
             day: "numeric",
