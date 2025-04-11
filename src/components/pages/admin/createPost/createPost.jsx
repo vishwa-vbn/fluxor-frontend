@@ -96,7 +96,7 @@
 //           toggleSidebar={() => setSidebarOpen?.((prev) => !prev)}
 //         />
 
-//         <div className="flex-1 max-w-11/12 w-full mx-auto py-5 space-y-8">
+//         <div className="flex-1 max-w-[100%] w-full mx-auto py-5 space-y-8">
 //           <div className="border-0 mb-0 border-gray-200">
 //             <div className="px-6 py-1 flex justify-end items-end">
 //               <div className="flex gap-2">
@@ -373,7 +373,6 @@
 
 // export default CreatePost;
 
-
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import moment from "moment";
@@ -402,7 +401,13 @@ import TopNavbar from "../../../common/topNavbar/topNavbar";
 
 import { ArrowLeft, ImagePlus, Loader2 } from "lucide-react";
 
-const CreatePost = ({ tags = [], categories = [], onCreatePost, loading, error }) => {
+const CreatePost = ({
+  tags = [],
+  categories = [],
+  onCreatePost,
+  loading,
+  error,
+}) => {
   const navigate = useHistory();
   const [activeTab, setActiveTab] = useState("content");
   const [isGeneratingSlug, setIsGeneratingSlug] = useState(false);
@@ -468,7 +473,7 @@ const CreatePost = ({ tags = [], categories = [], onCreatePost, loading, error }
           toggleSidebar={() => setSidebarOpen?.((prev) => !prev)}
         />
 
-        <div className="flex-1 max-w-11/12 w-full mx-auto py-5 space-y-8">
+<main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-8 space-y-8">
           <div className="border-0 mb-0 border-gray-200">
             <div className="px-0 py-1 flex justify-end items-end">
               <div className="flex gap-2">
@@ -498,9 +503,7 @@ const CreatePost = ({ tags = [], categories = [], onCreatePost, loading, error }
             </div>
           </div>
 
-          {error && (
-            <div className="text-red-500 text-center">{error}</div>
-          )}
+          {error && <div className="text-red-500 text-center">{error}</div>}
 
           <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -766,7 +769,7 @@ const CreatePost = ({ tags = [], categories = [], onCreatePost, loading, error }
               </div>
             </div>
           </form>
-        </div>
+        </main>
       </div>
     </div>
   );

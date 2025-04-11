@@ -1,12 +1,13 @@
-// postsView.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DataTable from "react-data-table-component";
-import { Eye, Edit, Trash2, PlusCircle, Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Eye, Edit, Trash2, PlusCircle, ArrowLeft } from "lucide-react";
+import { Link, useHistory } from "react-router-dom";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
 import AlertDialog from "../../../common/alertDialog/alertDialog";
 import Button from "../../../controls/button/buttonView";
 import Select from "../../../controls/selection/selection";
+import SearchBar from "../../../controls/searchbar/searchbar";
+import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage"; // Adjust path as needed
 
 const sampleUserData = {
   name: "John Doe",
@@ -100,31 +101,50 @@ export default function Post({ posts = [], loading, deletePost }) {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useHistory();
+  const containerRef = useRef(null);
 
-  // Filter posts when posts, search, or statusFilter changes
+  // Use the custom hook for responsive rows per page
+  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage({
+    rowHeight: 60,
+    navbarHeight: 60,
+    controlsHeight: 120,
+    extraPadding: 50,
+    minRows: 5,
+    maxRowsMobile: 5,
+    maxRowsTablet: 10,
+    maxRowsDesktop: 20,
+    debounceDelay: 200,
+  });
+
+  // Update filtered posts based on search text and status filter
   useEffect(() => {
     const filtered = posts.filter((post) => {
       const matchesSearch =
         post.title.toLowerCase().includes(search.toLowerCase()) ||
-        post.author?.username?.toLowerCase().includes(search.toLowerCase());
-
-      const matchesStatus =
-        statusFilter === "all" || post.status === statusFilter;
-
+        (post.author?.username &&
+          post.author.username.toLowerCase().includes(search.toLowerCase()));
+      const matchesStatus = statusFilter === "all" || post.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
     setFilteredPosts(filtered);
-  }, [search, statusFilter, posts]);
+    setCurrentPage(1); // Reset page when data changes
+  }, [search, statusFilter, posts, setCurrentPage]);
 
   const handleDelete = () => {
     if (selectedPost?.id && deletePost) {
-      deletePost(selectedPost.id); // Dispatch delete action
+      deletePost(selectedPost.id);
     }
     setIsDialogOpen(false);
   };
 
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col" ref={containerRef}>
       <TopNavbar
         userData={sampleUserData}
         onSearch={(q) => setSearch(q)}
@@ -132,9 +152,17 @@ export default function Post({ posts = [], loading, deletePost }) {
         toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
 
-      <div className="flex-1 w-full max-w-11/12 mx-auto py-8 space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-800">All Posts</h1>
+      <main className="flex-1 w-full mx-auto px-6 py-3 space-y-8">
+        <div className="flex justify-between items-center mb-2">
+          <Button
+            variant="outline"
+            size="md"
+            onClick={() => navigate.goBack()}
+            className="flex items-center text-gray-800 hover:text-blue-600"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back
+          </Button>
           <Link to="/create-post">
             <Button variant="primary" size="md" className="flex items-center">
               <PlusCircle className="w-4 h-4 mr-2" /> New Post
@@ -142,20 +170,13 @@ export default function Post({ posts = [], loading, deletePost }) {
           </Link>
         </div>
 
-        <div className="flex justify-end gap-4 mb-4">
-          <form onSubmit={(e) => e.preventDefault()}>
-            <div className="relative w-[300px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search posts..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 w-full bg-white border border-gray-300 rounded-[5px] px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </form>
-
+        <div className="flex justify-end gap-4 mb-0">
+          <SearchBar
+            searchQuery={search}
+            setSearchQuery={setSearch}
+            placeholder="Search posts..."
+            className="w-[300px]"
+          />
           <div className="w-[200px]">
             <Select
               value={statusFilter}
@@ -172,8 +193,9 @@ export default function Post({ posts = [], loading, deletePost }) {
           </div>
         </div>
 
-        <div className="bg-white rounded-[5px] shadow-sm p-4 transition hover:shadow-md">
+        <div className="bg-white rounded shadow-sm p-4 transition hover:shadow-md">
           <DataTable
+            key={`datatable-${rowsPerPage}`} // Force re-render when rowsPerPage changes
             columns={columns((post) => {
               setSelectedPost(post);
               setIsDialogOpen(true);
@@ -181,6 +203,10 @@ export default function Post({ posts = [], loading, deletePost }) {
             data={filteredPosts}
             progressPending={loading}
             pagination
+            paginationPerPage={rowsPerPage}
+            paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort((a, b) => a - b)}
+            paginationDefaultPage={currentPage}
+            onChangePage={handlePageChange}
             highlightOnHover
             striped
             noHeader
@@ -196,7 +222,7 @@ export default function Post({ posts = [], loading, deletePost }) {
             description={`This will permanently delete the post "${selectedPost.title}".`}
           />
         )}
-      </div>
+      </main>
     </div>
   );
 }

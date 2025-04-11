@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PlusCircle, Search, Edit, Trash2 } from "lucide-react";
 import { Card } from "../../../common/card/Card";
 import Input from "../../../controls/input/inputView";
@@ -9,6 +9,7 @@ import Button from "../../../controls/button/buttonView";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
 import SearchBar from "../../../controls/searchbar/searchbar";
 import Select from "../../../controls/selection/selection";
+import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage"; // Adjust path as needed
 
 const UsersView = ({
   users,
@@ -30,6 +31,24 @@ const UsersView = ({
   setSelectedUserIds,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Use the responsive rows per page hook
+  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage({
+    rowHeight: 60, // Same as Post, CategoriesView, TagsView; adjust if needed
+    navbarHeight: 60,
+    controlsHeight: 120, // Accounts for search bar, bulk delete button, and margins
+    extraPadding: 50,
+    minRows: 5,
+    maxRowsMobile: 5,
+    maxRowsTablet: 10,
+    maxRowsDesktop: 20,
+    debounceDelay: 200,
+  });
+
+  // Reset page when search or users change
+  useEffect(() => {
+    setCurrentPage(1); // Reset to page 1 when data changes
+  }, [search, users, setCurrentPage]);
 
   const roleOptions = [
     { value: "admin", label: "Admin" },
@@ -71,7 +90,9 @@ const UsersView = ({
       name: "Username",
       selector: (row) => row.username,
       sortable: true,
-      cell: (row) => <div className="text-center">{row.username || "Unnamed"}</div>,
+      cell: (row) => (
+        <div className="text-center">{row.username || "Unnamed"}</div>
+      ),
     },
     {
       name: "Name",
@@ -105,11 +126,11 @@ const UsersView = ({
       selector: (row) => row.avatar,
       cell: (row) => (
         <div className="text-center">
-          <img 
-            src={row.avatar ||""} 
-            alt="avatar" 
-            className="w-8 h-8 rounded-full mx-auto" 
-            onError={(e) => e.target.src = ""}
+          <img
+            src={row.avatar || ""}
+            alt="avatar"
+            className="w-8 h-8 rounded-full mx-auto"
+            onError={(e) => (e.target.src = "")}
           />
         </div>
       ),
@@ -142,6 +163,11 @@ const UsersView = ({
     onSearchChange({ target: { value: query } });
   };
 
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 px-0 py-0 space-y-6">
       <div className="flex-1 flex flex-col">
@@ -151,8 +177,8 @@ const UsersView = ({
           notificationCount={3}
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         />
-        <main className="flex-1 max-w-11/12 w-full mx-auto px-6 py-8 space-y-8">
-          <div className="flex justify-between items-center">
+        <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-3 space-y-8">
+          <div className="flex justify-between items-center mb-2">
             <h1 className="text-2xl font-bold text-gray-800">All Users</h1>
             <div className="flex space-x-2">
               <Button
@@ -166,7 +192,7 @@ const UsersView = ({
             </div>
           </div>
 
-          <div className="flex justify-end mb-4 items-center space-x-4">
+          <div className="flex justify-end mb-2 items-center space-x-4">
             <SearchBar
               searchQuery={search}
               setSearchQuery={(val) =>
@@ -188,11 +214,16 @@ const UsersView = ({
 
           <Card>
             <DataTable
+              key={`datatable-${rowsPerPage}`} // Force re-render when rowsPerPage changes
               columns={columns}
               data={users}
               progressPending={isLoading}
               noDataComponent="No users found"
               pagination
+              paginationPerPage={rowsPerPage}
+              paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort((a, b) => a - b)}
+              paginationDefaultPage={currentPage}
+              onChangePage={handlePageChange}
               highlightOnHover
               striped
               noHeader
@@ -205,7 +236,15 @@ const UsersView = ({
             isOpen={isAddOpen}
             onClose={onAddClose}
             onSubmit={onAddSubmit}
-            initialData={{ username: "", email: "", role: "user", name: "", bio: "", avatar: "", password: "" }}
+            initialData={{
+              username: "",
+              email: "",
+              role: "user",
+              name: "",
+              bio: "",
+              avatar: "",
+              password: "",
+            }}
           >
             <Input label="Username" name="username" required />
             <Input label="Name" name="name" required />
@@ -235,7 +274,7 @@ const UsersView = ({
                 role: selectedUser.role || "user",
                 bio: selectedUser.bio || "",
                 avatar: selectedUser.avatar || "",
-                password: ""
+                password: "",
               }}
             >
               <Input
@@ -263,7 +302,7 @@ const UsersView = ({
                 type="password"
               />
               <Select
-                label="Role"
+                label selectableHeader="Role"
                 name="role"
                 options={roleOptions}
                 defaultValue={selectedUser.role || "user"}

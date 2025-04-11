@@ -1,26 +1,85 @@
 .loader-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(229, 231, 235, 0.15); /* Very faded gray */
-    backdrop-filter: blur(2px);
+
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(229, 231, 235, 0.15); /* Very faded gray */
+  backdrop-filter: blur(2px);
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-message {
+  margin-top: 0.5rem;
+  text-align: center;
+  color: #374151; /* gray-700 */
+}
+
+/* Example styles for the loading bars animation */
+.loading-bars {
+  display: inline-block;
+  position: relative;
+}
+
+.loading-xs {
+  width: 1rem;
+  height: 1rem;
+}
+
+.loading-sm {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.loading-md {
+  width: 2rem;
+  height: 2rem;
+}
+
+.loading-lg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.loading-xl {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Tailwind-like animation for loading bars */
+.loading-bars::before,
+.loading-bars::after {
+  content: '';
+  position: absolute;
+  background: #374151; /* gray-700 */
+  animation: loading 1.2s infinite ease-in-out;
+}
+
+.loading-bars::before {
+  left: -0.5rem;
+  animation-delay: -0.24s;
+}
+
+.loading-bars::after {
+  right: -0.5rem;
+  animation-delay: 0s;
+}
+
+@keyframes loading {
+  0%, 40%, 100% {
+    transform: scaleY(0.4);
+    opacity: 0.5;
   }
-  
-  .loader-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  20% {
+    transform: scaleY(1);
+    opacity: 1;
   }
-  
-  .loader-message {
-    margin-top: 0.5rem;
-    text-align: center;
-    color: #374151; /* gray-700 */
-  }
+}

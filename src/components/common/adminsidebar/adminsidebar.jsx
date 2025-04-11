@@ -37,7 +37,7 @@ export default function AdminSidebar() {
       {/* Header */}
       <div className="h-16 flex items-center justify-center">
         <Link to="/admin" className="text-xl font-semibold tracking-tight hover:text-blue-300 transition-colors">
-          <img src={logo}  className="p-7 mt-5" alt="logo"></img>
+          {/* <img src={logo}  className="p-7 mt-5" alt="logo"></img> */}
         </Link>
       </div>
 

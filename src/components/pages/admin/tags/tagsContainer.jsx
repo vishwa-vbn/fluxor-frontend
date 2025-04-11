@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import {
   getAllTags,
   createTag,
   updateTag,
   deleteTag,
-} from '../../../../store/tags/tagsActions';
-import TagsView from './tagsView';
+} from "../../../../store/tags/tagsActions";
+import TagsView from "./tagsView";
 
 const TagsContainer = ({
   tags,
@@ -17,7 +17,7 @@ const TagsContainer = ({
   updateTag,
   deleteTag,
 }) => {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState(null);
@@ -54,8 +54,8 @@ const TagsContainer = ({
   const handleAddTag = (data) => {
     const newTag = {
       name: data.name,
-      slug: data.slug || data.name.toLowerCase().replace(/\s+/g, '-'), // Auto-generate slug if not provided
-      description: data.description || '',
+      slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"), // Auto-generate slug if not provided
+      description: data.description || "",
     };
     createTag(newTag);
     closeAddModal();
@@ -65,8 +65,8 @@ const TagsContainer = ({
     if (!selectedTag) return;
     const updatedTag = {
       name: data.name,
-      slug: data.slug || data.name.toLowerCase().replace(/\s+/g, '-'),
-      description: data.description || '',
+      slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
+      description: data.description || "",
     };
     updateTag(selectedTag.id, updatedTag); // Use 'id' consistently
     closeEditModal();

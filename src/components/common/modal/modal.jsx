@@ -39,9 +39,8 @@ const Modal = ({
       ? React.Children.map(children, (child) => {
           if (React.isValidElement(child) && child.props.name) {
             return React.cloneElement(child, {
-              value: formData[child.props.name] ?? "", // Use empty string as fallback
+              value: formData[child.props.name] ?? "",
               onChange: (e) => {
-                // Handle both direct value and event object cases
                 const value =
                   e.target?.value !== undefined ? e.target.value : e;
                 handleChange(child.props.name, value);
@@ -52,47 +51,75 @@ const Modal = ({
         })
       : children;
 
+  // Render view content without separators
+  const renderViewContent = () =>
+    React.Children.map(enhancedChildren, (child, index) => {
+      if (React.isValidElement(child)) {
+        const isLink = child.props.href; // Detect if it's a link (e.g., Post title)
+        return (
+          <div key={index} className="mb-2 last:mb-0">
+            {React.cloneElement(child, {
+              className: `${child.props.className || ""} ${
+                isLink ? "text-blue-600 hover:underline" : ""
+              }`,
+            })}
+          </div>
+        );
+      }
+      return child;
+    });
+
   return createPortal(
-    <dialog open className="modal modal-open ">
-      <div className="modal-box bg-white text-black max-w-xl w-full px-3.5" style={{ borderRadius: '5px' }}>
-        <div className="flex justify-between items-center border-b pb-2 mb-4 px-1">
-          <h3 className="text-lg font-bold">{title}</h3>
-          <button onClick={onClose} className="btn btn-sm btn-circle btn-ghost">
+    <dialog open className="modal modal-open">
+      <div
+        className="modal-box bg-white text-black max-w-lg w-full px-4 py-3"
+        style={{ borderRadius: "4px" }}
+      >
+        <div className="flex justify-between items-center border-b border-gray-300 pb-2 mb-3">
+          <h3 className="text-lg font-medium">{title}</h3>
+          <button
+            onClick={onClose}
+            className="btn btn-sm btn-circle btn-ghost hover:bg-gray-100"
+          >
             ✕
           </button>
         </div>
 
         {mode === "form" ? (
-          <form onSubmit={handleSubmit} className="px-4">
-            <div className="max-h-[60vh] overflow-y-auto scrollbar-hide px-1">
-              <div className="grid grid-cols-1 gap-4">
-                {enhancedChildren}
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pr-1">
+              <div className="grid grid-cols-1 gap-4">{enhancedChildren}</div>
             </div>
-            <div className="mt-6 pt-4 border-t flex justify-end gap-2">
+            <div className="mt-4 pt-2 border-t border-gray-300 flex justify-end gap-2">
               <Button
                 type="button"
                 variant="outline"
                 size="md"
                 onClick={onClose}
+                className="hover:bg-gray-100"
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                size="md"
-              >
+              <Button type="submit" variant="primary" size="md">
                 Submit
               </Button>
             </div>
           </form>
         ) : (
-          <div className="px-4">
-            <div className="max-h-[60vh] overflow-y-auto pr-2">
-              <div className="grid grid-cols-1 gap-4">
-                {enhancedChildren}
-              </div>
+          <div className="space-y-2">
+            <div className="max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pr-2">
+              {renderViewContent()}
+            </div>
+            <div className="mt-4 pt-2 border-t border-gray-300 flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                size="md"
+                onClick={onClose}
+                className="hover:bg-gray-100"
+              >
+                Close
+              </Button>
             </div>
           </div>
         )}
