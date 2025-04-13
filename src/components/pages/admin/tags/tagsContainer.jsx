@@ -6,6 +6,8 @@ import {
   createTag,
   updateTag,
   deleteTag,
+  initializeTagSocket, // Add this
+  cleanupTagSocket, // Add this
 } from "../../../../store/tags/tagsActions";
 import TagsView from "./tagsView";
 
@@ -16,16 +18,26 @@ const TagsContainer = ({
   createTag,
   updateTag,
   deleteTag,
+  initializeTagSocket, // Add this
+  cleanupTagSocket, // Add this
 }) => {
   const [search, setSearch] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState(null);
 
-  // Fetch tags on mount
+  // Fetch tags and initialize socket on mount
   useEffect(() => {
+    console.log("TagsContainer: Mounting - Fetching tags and initializing socket");
     getAllTags();
-  }, [getAllTags]);
+    initializeTagSocket(); // Initialize Socket.IO
+
+    // Cleanup socket on unmount
+    return () => {
+      console.log("TagsContainer: Unmounting - Cleaning up socket");
+      cleanupTagSocket(); // Cleanup Socket.IO
+    };
+  }, [getAllTags, initializeTagSocket, cleanupTagSocket]);
 
   // Log selectedTag changes for debugging
   useEffect(() => {
@@ -120,6 +132,8 @@ const mapDispatchToProps = (dispatch) =>
       createTag,
       updateTag,
       deleteTag,
+      initializeTagSocket, // Add this
+      cleanupTagSocket, // Add this
     },
     dispatch
   );

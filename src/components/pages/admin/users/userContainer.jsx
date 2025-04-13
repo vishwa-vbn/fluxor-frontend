@@ -1,14 +1,19 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { 
-  fetchAllUsers, 
-  updateUser, 
-  deleteUser, 
+import {
+  fetchAllUsers,
+  updateUser,
+  deleteUser,
   bulkDeleteUsers,
   registerNormalAdminUser,
   registerNormalUser,
+  initializeUserSocket, // Add this
+  cleanupUserSocket, // Add this
 } from "../../../../store/auth/authActions";
+
+import { initializePostCategorySocket  , cleanupPostCategorySocket} from "../../../../store/postCategories/postCategoriesActions";
+import { initializePostTagSocket,cleanupPostTagSocket } from "../../../../store/postTags/postTagsActions";
 import UsersView from "./userView";
 
 class UsersContainer extends Component {
@@ -24,7 +29,18 @@ class UsersContainer extends Component {
   }
 
   componentDidMount() {
-    // this.props.fetchAllUsers();
+    console.log("UsersContainer: Mounting - Fetching users and initializing socket");
+    this.props.fetchAllUsers();
+    this.props.initializeUserSocket(); // Initialize Socket.IO
+    this.props.initializePostCategorySocket()
+    // this.props.initializePostTagSocket()
+  }
+
+  componentWillUnmount() {
+    console.log("UsersContainer: Unmounting - Cleaning up socket");
+    this.props.cleanupUserSocket(); // Cleanup Socket.IO
+    this.props.cleanupPostCategorySocket()
+    // this.props.cleanupPostTagSocket()
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -64,25 +80,26 @@ class UsersContainer extends Component {
       roleid: this.getRoleId(data.role),
     };
 
-    const registerPromise = userData.role === "admin" 
-      ? this.props.registerNormalAdminUser(
-          userData.username,
-          userData.email,
-          userData.password,
-          userData.name,
-          userData.bio,
-          userData.avatar,
-          userData.role
-        )
-      : this.props.registerNormalUser(
-          userData.username,
-          userData.email,
-          userData.password,
-          userData.name,
-          userData.bio,
-          userData.avatar,
-          userData.role
-        );
+    const registerPromise =
+      userData.role === "admin"
+        ? this.props.registerNormalAdminUser(
+            userData.username,
+            userData.email,
+            userData.password,
+            userData.name,
+            userData.bio,
+            userData.avatar,
+            userData.role
+          )
+        : this.props.registerNormalUser(
+            userData.username,
+            userData.email,
+            userData.password,
+            userData.name,
+            userData.bio,
+            userData.avatar,
+            userData.role
+          );
 
     registerPromise
       .then(() => {
@@ -109,8 +126,9 @@ class UsersContainer extends Component {
     if (data.password) {
       updateData.password = data.password;
     }
-    
-    this.props.updateUser(this.state.selectedUser.id, updateData)
+
+    this.props
+      .updateUser(this.state.selectedUser.id, updateData)
       .then(() => {
         this.props.fetchAllUsers();
         this.closeEditModal();
@@ -190,6 +208,12 @@ const mapDispatchToProps = (dispatch) =>
       bulkDeleteUsers,
       registerNormalAdminUser,
       registerNormalUser,
+      initializeUserSocket, // Add this
+      cleanupUserSocket, // Add this
+      initializePostCategorySocket  , 
+      cleanupPostCategorySocket,
+      initializePostTagSocket,
+      cleanupPostTagSocket
     },
     dispatch
   );

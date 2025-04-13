@@ -6,14 +6,13 @@ import connect from "react-redux/es/connect/connect";
 // import { logout } from "../../store/auth/authActions";
 import AdminSidebar from "../common/adminsidebar/adminsidebar";
 import Loader from "../common/loader/loader";
-import { fetchAllUsers } from "../../store/auth/authActions";
+
 
 import './MainLayout.css';
 
 class MainLayout extends React.Component {
   componentDidMount() {
 
-    this.props.fetchAllUsers()
   }
 
   render() {
@@ -36,7 +35,7 @@ MainLayout.propTypes = {
   children: PropTypes.object.isRequired,
 };
 
-const mapDispatchToProps = (dispatch) => bindActionCreators({fetchAllUsers}, dispatch);
+const mapDispatchToProps = (dispatch) => bindActionCreators({}, dispatch);
 
 const mapStateToProps = (state) => (
   console.log("redux state",state),{});

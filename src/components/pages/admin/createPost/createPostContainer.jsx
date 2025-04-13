@@ -11,7 +11,14 @@ class CreatePostContainer extends Component {
 
   handleImageUpload = (file) => {};
 
-  componentDidMount() {}
+ componentDidMount() {
+    // console.log("UsersContainer: Mounting - Fetching users and initializing socket");
+    // this.props.fetchAllUsers();
+  }
+
+  componentWillUnmount() {
+    // console.log("UsersContainer: Unmounting - Cleaning up socket");
+  }
 
   render() {
     const { tags, categories, loading, error } = this.props;

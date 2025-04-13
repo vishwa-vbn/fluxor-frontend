@@ -28,7 +28,7 @@ export const COMMENTS_DELETE_PENDING = "COMMENTS_DELETE_PENDING";
 export const COMMENTS_DELETE_SUCCESS = "COMMENTS_DELETE_SUCCESS";
 export const COMMENTS_DELETE_ERROR = "COMMENTS_DELETE_ERROR";
 
-const API_URL = "https://fluxor-backend.vercel.app/api/comments";
+const API_URL = "https://fluxor-backend-production.up.railway.app/api/comments";
 
 // CREATE COMMENT
 export const createComment = (data) => async (dispatch) => {

@@ -84,10 +84,12 @@ export const actionTypes = {
   
       case actionTypes.UPDATE_TOKEN_SUCCESS:
         return Object.assign({}, state, payload);
+  
       case actionTypes.RESET_PASSWORD:
         return Object.assign({}, state, {
           resetPassword: payload.resetPassword,
         });
+  
       case actionTypes.FORGOT_PASSWORD:
         return Object.assign({}, state, {
           forgotPassword: payload.forgotPassword,
@@ -98,16 +100,38 @@ export const actionTypes = {
       case actionTypes.LOGOUT_SUCCESS:
         console.log("Logout Payload:", payload);
         return Object.assign({}, state, payload);
-
+  
       case actionTypes.FETCH_USERS_PENDING:
       case actionTypes.FETCH_USERS_SUCCESS:
       case actionTypes.FETCH_USERS_ERROR:
-          return Object.assign({}, state, payload);
-
+        return Object.assign({}, state, payload);
+  
+      case actionTypes.UPDATE_USER_SUCCESS:
+        return {
+          ...state,
+          users: state.users.map((user) =>
+            user.id === payload.updatedUser.id ? payload.updatedUser : user
+          ),
+        };
+  
+      case actionTypes.DELETE_USER_SUCCESS:
+        return {
+          ...state,
+          users: state.users.filter((user) => user.id !== payload.deletedUserId),
+        };
+  
+      case actionTypes.BULK_DELETE_USERS_SUCCESS:
+        return {
+          ...state,
+          users: state.users.filter(
+            (user) => !payload.deletedUserIds.includes(user.id)
+          ),
+        };
+  
       case actionTypes.FETCH_TARGETED_USER_PENDING:
       case actionTypes.FETCH_TARGETED_USER_SUCCESS:
       case actionTypes.FETCH_TARGETED_USER_ERROR:
-          return Object.assign({}, state, payload);
+        return Object.assign({}, state, payload);
   
       default:
         return state;
