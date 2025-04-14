@@ -129,7 +129,7 @@ const EditPost = ({
           toggleSidebar={() => setSidebarOpen?.((prev) => !prev)}
         />
 
-        <div className="flex-1 max-w-11/12 w-full mx-auto py-5 space-y-8">
+<main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-8 space-y-8">
           <div className="border-0 mb-0 border-gray-200">
             <div className="px-0 py-1 flex justify-between items-end">
               <Button
@@ -433,7 +433,7 @@ const EditPost = ({
               </div>
             </div>
           </form>
-        </div>
+        </main>
       </div>
     </div>
   );

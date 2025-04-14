@@ -9,6 +9,7 @@ import tags from '../tags/tagsReducer';
 import {categoryReducer} from '../categories/categoriesReducer';
 import postCategoriesReducer from '../postCategories/postCategoriesReducer';
 import postTagsReducer from '../postTags/postTagsReducer';
+import commentsReducer from "../comments/commentsReducer";
 
 export const rootReducer = combineReducers({
   router: routerReducer,
@@ -19,5 +20,6 @@ export const rootReducer = combineReducers({
   tags,
   category: categoryReducer,
   postCategories: postCategoriesReducer,
-  postTags: postTagsReducer
+  postTags: postTagsReducer,
+  comments:commentsReducer,
 });

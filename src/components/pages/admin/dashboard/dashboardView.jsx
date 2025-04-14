@@ -116,7 +116,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans flex">
+    <div className="min-h-screen  bg-gray-50 font-sans flex">
       <div className="flex-1 flex flex-col">
         <TopNavbar
           userData={sampleUserData}
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         />
   
-        <main className="flex-1 max-w-11/12 w-full mx-auto px-6 py-8 space-y-8">
+        <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-8 space-y-8">
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
             <StatCard title="Posts" value={stats.postsCount} icon={<FileText />} color="bg-blue-600" trend="+5%" />
             <StatCard title="Comments" value={stats.commentsCount} icon={<MessageSquare />} color="bg-emerald-600" trend="+12%" />

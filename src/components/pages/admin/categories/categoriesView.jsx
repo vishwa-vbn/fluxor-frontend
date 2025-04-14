@@ -10,6 +10,7 @@ import Button from "../../../controls/button/buttonView";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
 import FileUpload from "../../../controls/fileUpload/fileUpload";
 import SearchBar from "../../../controls/searchbar/searchbar";
+import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage"; // Adjust path as needed
 
 const CategoriesView = ({
   categories,
@@ -29,6 +30,19 @@ const CategoriesView = ({
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
 
+  // Use the responsive rows per page hook
+  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage({
+    rowHeight: 60, // Same as Post component; adjust if rows differ
+    navbarHeight: 60,
+    controlsHeight: 120, // Accounts for search bar, filter, and margins
+    extraPadding: 50,
+    minRows: 5,
+    maxRowsMobile: 5,
+    maxRowsTablet: 10,
+    maxRowsDesktop: 20,
+    debounceDelay: 200,
+  });
+
   useEffect(() => {
     let filteredData = categories || [];
 
@@ -45,7 +59,8 @@ const CategoriesView = ({
     }
 
     setFiltered(filteredData);
-  }, [search, parentFilter, categories]);
+    setCurrentPage(1); // Reset page when data changes
+  }, [search, parentFilter, categories, setCurrentPage]);
 
   const columns = [
     {
@@ -86,11 +101,7 @@ const CategoriesView = ({
           >
             <Edit className="w-4 h-4 text-blue-600" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(row.id)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => onDelete(row.id)}>
             <Trash2 className="w-4 h-4 text-red-600" />
           </Button>
         </div>
@@ -108,6 +119,11 @@ const CategoriesView = ({
     onSearchChange(query);
   };
 
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 px-0 py-0 space-y-6">
       <div className="flex-1 flex flex-col">
@@ -117,9 +133,9 @@ const CategoriesView = ({
           notificationCount={3}
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         />
-        <main className="flex-1 max-w-11/12 w-full mx-auto px-6 py-8 space-y-8">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-800">All Categories</h1>
+        <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-3 space-y-8">
+          <div className="flex justify-between items-center mb-2">
+            <h1 className="text-2xl font-bold text-gray-800 ">All Categories</h1>
             <Button
               variant="primary"
               onClick={() => setIsAddOpen(true)}
@@ -130,7 +146,7 @@ const CategoriesView = ({
             </Button>
           </div>
 
-          <div className="flex justify-end gap-4 mb-4">
+          <div className="flex justify-end gap-4 mb-0">
             <SearchBar
               searchQuery={search}
               setSearchQuery={handleSearch}
@@ -154,11 +170,16 @@ const CategoriesView = ({
 
           <Card>
             <DataTable
+              key={`datatable-${rowsPerPage}`} // Force re-render when rowsPerPage changes
               columns={columns}
               data={Array.isArray(filtered) ? filtered : []}
               progressPending={isLoading}
               noDataComponent="No categories found"
               pagination
+              paginationPerPage={rowsPerPage}
+              paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort((a, b) => a - b)}
+              paginationDefaultPage={currentPage}
+              onChangePage={handlePageChange}
               highlightOnHover
               striped
               noHeader

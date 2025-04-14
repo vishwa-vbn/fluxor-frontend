@@ -9,7 +9,7 @@ const SearchBar = ({
 }) => {
   return (
     <label
-      className={`input input-bordered flex items-center gap-2 bg-white border-gray-300 text-gray-800 w-60 h-9.5 ${className}`}
+      className={`flex items-center gap-2 bg-white border-1 border-gray-200 text-gray-800 w-60 h-9.5 px-2 rounded-[5px]`}
     >
       <Search className="h-4 w-4 text-gray-400" />
       <input

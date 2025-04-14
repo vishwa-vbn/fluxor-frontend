@@ -1,91 +1,183 @@
-// CommentsContainer.js
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import {
+  getCommentsByPost,
+  getApprovedComments,
+  approveComment,
+  rejectComment,
+  deleteComment,
+} from "../../../../store/comments/commentsActions";
+import { getPublishedPosts } from "../../../../store/post/postActions";
 import CommentsView from "./commentsView";
 
-// import { connect } from "react-redux";
-// import { fetchComments, deleteComment } from "../../redux/actions/commentActions";
+const CommentsContainer = ({
+  comments,
+  approvedComments,
+  posts,
+  loading,
+  commentsLoading,
+  getCommentsByPost,
+  getApprovedComments,
+  approveComment,
+  rejectComment,
+  deleteComment,
+  getPublishedPosts,
+}) => {
+  const [search, setSearch] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedComment, setSelectedComment] = useState(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [selectedPostId, setSelectedPostId] = useState("");
 
-class CommentsContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      search: "",
-      selectedStatus: "all",
-      selectedComment: null,
-      isDetailOpen: false,
-    };
-  }
+  useEffect(() => {
+    getPublishedPosts(1, 100);
+  }, [getPublishedPosts]);
 
-  componentDidMount() {
-    // this.props.fetchComments();
-  }
+  useEffect(() => {
+    if (selectedPostId) {
+      getCommentsByPost(selectedPostId);
+      getApprovedComments(selectedPostId);
+    }
+  }, [selectedPostId, getCommentsByPost, getApprovedComments]);
 
-  handleSearchChange = (e) => {
-    this.setState({ search: e.target.value });
+  useEffect(() => {
+    console.log("posts:", posts); console.log("postsLoading:", loading);
+  }, [posts, loading]);
+
+  const handlePostChange = (postId) => {
+    setSelectedPostId(postId);
   };
 
-  handleFilterChange = (val) => {
-    this.setState({ selectedStatus: val });
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
   };
 
-  openCommentDetail = (comment) => {
-    this.setState({ selectedComment: comment, isDetailOpen: true });
+  const handleFilterChange = (val) => {
+    setSelectedStatus(val);
   };
 
-  closeCommentDetail = () => {
-    this.setState({ selectedComment: null, isDetailOpen: false });
+  const handleSortChange = (field) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("desc");
+    }
   };
 
-  // handleDelete = (commentId) => {
-  //   this.props.deleteComment(commentId);
-  // };
+  const openCommentDetail = (comment) => {
+    setSelectedComment({ ...comment });
+    setIsDetailOpen(true);
+  };
 
-  render() {
-    const { search, selectedStatus, selectedComment, isDetailOpen } = this.state;
+  const closeCommentDetail = () => {
+    setSelectedComment(null);
+    setIsDetailOpen(false);
+  };
 
-    const dummyComments = [
-      {
-        id: 1,
-        authorName: "Alice",
-        content: "This is an awesome post!",
-        postTitle: "React Hooks Tips",
-        postSlug: "react-hooks-tips",
-        createdAt: "2023-12-01T12:00:00Z",
-        status: "approved",
-      },
-      {
-        id: 2,
-        authorName: "Bob",
-        content: "I don't agree with this point.",
-        postTitle: "Redux Best Practices",
-        postSlug: "redux-best-practices",
-        createdAt: "2023-12-05T15:30:00Z",
-        status: "pending",
-      },
-    ];
+  const handleApproveComment = (commentId) => {
+    approveComment(commentId);
+  };
 
-    return (
-      <CommentsView
-        comments={dummyComments}
-        search={search}
-        selectedStatus={selectedStatus}
-        onSearchChange={this.handleSearchChange}
-        onFilterChange={this.handleFilterChange}
-        onViewClick={this.openCommentDetail}
-        selectedComment={selectedComment}
-        isDetailOpen={isDetailOpen}
-        onDetailClose={this.closeCommentDetail}
-        // onDeleteClick={this.handleDelete}
-      />
-    );
-  }
-}
+  const handleRejectComment = (commentId) => {
+    rejectComment(commentId);
+  };
 
-// const mapStateToProps = (state) => ({
-//   comments: state.comments.data,
-//   loading: state.comments.loading,
-// });
+  const handleDeleteComment = (commentId) => {
+    deleteComment(commentId);
+  };
 
-// export default connect(mapStateToProps, { fetchComments, deleteComment })(CommentsContainer);
+  const getFilteredComments = () => {
+    let filteredData = selectedStatus === "approved" ? approvedComments : comments;
 
-export default CommentsContainer;
+    if (!filteredData || !Array.isArray(filteredData)) return [];
+
+    if (search) {
+      filteredData = filteredData.filter((comment) =>
+        comment.content.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    if (selectedStatus !== "all" && selectedStatus !== "approved") {
+      filteredData = filteredData.filter(
+        (comment) => comment.status === selectedStatus
+      );
+    }
+
+    filteredData = [...filteredData].sort((a, b) => {
+      const valueA = a[sortBy] || "";
+      const valueB = b[sortBy] || "";
+      if (sortBy === "createdAt") {
+        return sortOrder === "asc"
+          ? new Date(valueA) - new Date(valueB)
+          : new Date(valueB) - new Date(valueA);
+      }
+      return sortOrder === "asc"
+        ? String(valueA).localeCompare(String(valueB))
+        : String(valueB).localeCompare(String(valueA));
+    });
+
+    return filteredData;
+  };
+
+  const postOptions = posts
+    ? posts.map((post) => ({
+        value: post.id.toString(),
+        label: post.title || "Untitled Post",
+      }))
+    : [];
+
+  console.log("postOptions:", postOptions);
+
+  return (
+    <CommentsView
+      comments={getFilteredComments()}
+      allComments={comments}
+      isLoading={commentsLoading}
+      search={search}
+      selectedStatus={selectedStatus}
+      onSearchChange={handleSearchChange}
+      onFilterChange={handleFilterChange}
+      onSortChange={handleSortChange}
+      sortBy={sortBy}
+      sortOrder={sortOrder}
+      onViewClick={openCommentDetail}
+      onApproveClick={handleApproveComment}
+      onRejectClick={handleRejectComment}
+      onDeleteClick={handleDeleteComment}
+      selectedComment={selectedComment}
+      isDetailOpen={isDetailOpen}
+      onDetailClose={closeCommentDetail}
+      postOptions={postOptions}
+      selectedPostId={selectedPostId}
+      onPostChange={handlePostChange}
+      postsLoading={loading}
+    />
+  );
+};
+
+const mapStateToProps = (state) => ({
+  comments: state.comments?.comments || [],
+  approvedComments: state.comments?.approvedComments || [],
+  commentsLoading: state.comments?.loading || false,
+  posts: state.post?.publishedPosts?.data || [],
+  loading: state.post?.loading || false,
+});
+
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators(
+    {
+      getCommentsByPost,
+      getApprovedComments,
+      approveComment,
+      rejectComment,
+      deleteComment,
+      getPublishedPosts,
+    },
+    dispatch
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(CommentsContainer);

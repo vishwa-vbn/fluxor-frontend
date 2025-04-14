@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import {
   getAllTags,
   createTag,
   updateTag,
   deleteTag,
-} from '../../../../store/tags/tagsActions';
-import TagsView from './tagsView';
+  initializeTagSocket, // Add this
+  cleanupTagSocket, // Add this
+} from "../../../../store/tags/tagsActions";
+import TagsView from "./tagsView";
 
 const TagsContainer = ({
   tags,
@@ -16,16 +18,26 @@ const TagsContainer = ({
   createTag,
   updateTag,
   deleteTag,
+  initializeTagSocket, // Add this
+  cleanupTagSocket, // Add this
 }) => {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState(null);
 
-  // Fetch tags on mount
+  // Fetch tags and initialize socket on mount
   useEffect(() => {
+    console.log("TagsContainer: Mounting - Fetching tags and initializing socket");
     getAllTags();
-  }, [getAllTags]);
+    initializeTagSocket(); // Initialize Socket.IO
+
+    // Cleanup socket on unmount
+    return () => {
+      console.log("TagsContainer: Unmounting - Cleaning up socket");
+      cleanupTagSocket(); // Cleanup Socket.IO
+    };
+  }, [getAllTags, initializeTagSocket, cleanupTagSocket]);
 
   // Log selectedTag changes for debugging
   useEffect(() => {
@@ -54,8 +66,8 @@ const TagsContainer = ({
   const handleAddTag = (data) => {
     const newTag = {
       name: data.name,
-      slug: data.slug || data.name.toLowerCase().replace(/\s+/g, '-'), // Auto-generate slug if not provided
-      description: data.description || '',
+      slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"), // Auto-generate slug if not provided
+      description: data.description || "",
     };
     createTag(newTag);
     closeAddModal();
@@ -65,8 +77,8 @@ const TagsContainer = ({
     if (!selectedTag) return;
     const updatedTag = {
       name: data.name,
-      slug: data.slug || data.name.toLowerCase().replace(/\s+/g, '-'),
-      description: data.description || '',
+      slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
+      description: data.description || "",
     };
     updateTag(selectedTag.id, updatedTag); // Use 'id' consistently
     closeEditModal();
@@ -120,6 +132,8 @@ const mapDispatchToProps = (dispatch) =>
       createTag,
       updateTag,
       deleteTag,
+      initializeTagSocket, // Add this
+      cleanupTagSocket, // Add this
     },
     dispatch
   );

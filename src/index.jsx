@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { Switch, Route, Router } from "react-router-dom";
 import Alert from "./components/common/alert/alert";
-import Loader from "./components/common/loader/loader";
+// import Loader from "./components/common/loader/loader";
 import 'react-toastify/dist/ReactToastify.css';
 import "react-notifications-component/dist/theme.css";
 import { ReactNotifications } from "react-notifications-component";
@@ -21,7 +21,6 @@ ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
         <ReactNotifications />
-      <Loader/>
       <Router history={history}>
         <Switch>
           <Route path="/" component={App} />

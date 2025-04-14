@@ -25,7 +25,7 @@ export const CATEGORY_DELETE_SUCCESS = "CATEGORY_DELETE_SUCCESS";
 export const CATEGORY_DELETE_ERROR = "CATEGORY_DELETE_ERROR";
 
 // API Base
-const API_URL = "https://fluxor-backend.vercel.app/api/categories";
+const API_URL = "https://fluxor-backend-production.up.railway.app/api/categories";
 
 // CREATE
 export const createCategory = (data) => async (dispatch) => {
