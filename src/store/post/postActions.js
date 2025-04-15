@@ -470,12 +470,8 @@
 //   }
 // };
 
-
-// postActions.js
 import axios from "axios";
 import { getState } from "../configure/configureStore";
-import { showAlert } from "../alert/alertActions";
-import { showLoader, hideLoader } from "../loader/loaderActions";
 import {
   createPostCategory,
   getCategoriesByPostId,
@@ -514,13 +510,10 @@ export const POST_DELETE_SUCCESS = "POST_DELETE_SUCCESS";
 export const POST_DELETE_ERROR = "POST_DELETE_ERROR";
 
 // Base API URL
-// const API_URL = "https://fluxor-backend.vercel.app/api/posts";
 const API_URL = "https://fluxor-backend-production.up.railway.app/api/posts";
 
-
 // Socket.IO Configuration
-// const SOCKET_URL = "https://fluxor-backend.vercel.app/blog"; // Adjust for production
-const SOCKET_URL = "https://fluxor-backend-production.up.railway.app/blog"; // Adjust for production
+const SOCKET_URL = "https://fluxor-backend-production.up.railway.app/blog";
 
 let socket = null;
 
@@ -556,12 +549,14 @@ export const initializePostSocket = () => (dispatch) => {
           type: POST_UPDATE_SUCCESS,
           payload: { data: payload.record },
         });
+        dispatch(getAllPosts());
         break;
       case "DELETE":
         dispatch({
           type: POST_DELETE_SUCCESS,
           payload: { data: { id: payload.record.id } },
         });
+        dispatch(getAllPosts());
         break;
       default:
         console.warn("Unknown operation:", payload.operation);
@@ -570,14 +565,6 @@ export const initializePostSocket = () => (dispatch) => {
 
   socket.on("connect_error", (error) => {
     console.error("Socket.IO connection error for posts:", error.message);
-    dispatch(
-      showAlert({
-        isOpen: true,
-        title: "Real-Time Error",
-        type: "error",
-        msg: "Failed to connect to real-time post updates. Please refresh.",
-      })
-    );
   });
 
   socket.on("disconnect", () => {
@@ -601,13 +588,10 @@ export const cleanupPostSocket = () => () => {
 // CREATE POST
 export const createPost = (data) => async (dispatch) => {
   dispatch({ type: POST_CREATE_PENDING });
-  dispatch(showLoader());
 
   const token = getState().auth?.loginUser?.token;
-  console.log("user is", getState().auth?.loginUser);
   const authorId = getState().auth?.loginUser?.user?.id;
 
-  // Prepare post data with only allowed fields and add authorId
   const postData = {
     title: data.title,
     slug: data.slug,
@@ -624,7 +608,6 @@ export const createPost = (data) => async (dispatch) => {
   };
 
   try {
-    // Create the post first
     const postResponse = await axios.post(API_URL, postData, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -632,16 +615,13 @@ export const createPost = (data) => async (dispatch) => {
       },
     });
 
-    console.log("response id is", postResponse);
     const postId = postResponse?.data?.data?.id;
 
-    // Handle category mapping if provided
     if (data.selectedCategory || data.categoryId) {
       const categoryId = data.selectedCategory || data.categoryId;
       await dispatch(createPostCategory({ postId, categoryId }));
     }
 
-    // Handle tags mapping if provided
     if (data.selectedTags?.length || data.tags?.length) {
       const tags = data.selectedTags || data.tags;
       for (const tagId of tags) {
@@ -650,36 +630,17 @@ export const createPost = (data) => async (dispatch) => {
     }
 
     dispatch({ type: POST_CREATE_SUCCESS, payload: postResponse.data });
-    dispatch(
-      showAlert({
-        isOpen: true,
-        title: "Post Created",
-        type: "success",
-        msg: "New post and its mappings have been created successfully.",
-      })
-    );
   } catch (err) {
     dispatch({
       type: POST_CREATE_ERROR,
       payload: err.response?.data?.message || err.message,
     });
-    dispatch(
-      showAlert({
-        isOpen: true,
-        title: "Creation Failed",
-        type: "error",
-        msg: err.response?.data?.message || err.message,
-      })
-    );
-  } finally {
-    dispatch(hideLoader());
   }
 };
 
 // GET ALL POSTS
 export const getAllPosts = (page = 1, limit = 10) => async (dispatch) => {
   dispatch({ type: POST_FETCH_ALL_PENDING });
-  dispatch(showLoader());
 
   const token = getState().auth?.loginUser?.token;
 
@@ -690,7 +651,6 @@ export const getAllPosts = (page = 1, limit = 10) => async (dispatch) => {
       },
     });
 
-    // Enhance each post with tags and categories from state
     const enhancedPosts = await Promise.all(
       res.data.data.map(async (post) => {
         await Promise.all([
@@ -713,6 +673,7 @@ export const getAllPosts = (page = 1, limit = 10) => async (dispatch) => {
       })
     );
 
+
     dispatch({
       type: POST_FETCH_ALL_SUCCESS,
       payload: { 
@@ -726,23 +687,12 @@ export const getAllPosts = (page = 1, limit = 10) => async (dispatch) => {
       type: POST_FETCH_ALL_ERROR,
       payload: err.response?.data?.message || err.message,
     });
-    dispatch(
-      showAlert({
-        isOpen: true,
-        title: "Fetch Failed",
-        type: "error",
-        msg: err.response?.data?.message || err.message,
-      })
-    );
-  } finally {
-    dispatch(hideLoader());
   }
 };
 
 // GET ALL PUBLISHED POSTS
 export const getPublishedPosts = (page = 1, limit = 10) => async (dispatch) => {
   dispatch({ type: POST_FETCH_PUBLISHED_PENDING });
-  dispatch(showLoader());
 
   const token = getState().auth?.loginUser?.token;
 
@@ -756,7 +706,6 @@ export const getPublishedPosts = (page = 1, limit = 10) => async (dispatch) => {
       }
     );
 
-    // Enhance each post with tags and categories from state
     const enhancedPosts = await Promise.all(
       res.data.data.map(async (post) => {
         await Promise.all([
@@ -792,28 +741,16 @@ export const getPublishedPosts = (page = 1, limit = 10) => async (dispatch) => {
       type: POST_FETCH_PUBLISHED_ERROR,
       payload: err.response?.data?.message || err.message,
     });
-    dispatch(
-      showAlert({
-        isOpen: true,
-        title: "Fetch Failed",
-        type: "error",
-        msg: err.response?.data?.message || err.message,
-      })
-    );
-  } finally {
-    dispatch(hideLoader());
   }
 };
 
 // GET POST BY SLUG
 export const getPostBySlug = (slug) => async (dispatch) => {
   dispatch({ type: POST_FETCH_BY_SLUG_PENDING });
-  dispatch(showLoader());
 
   const token = getState().auth?.loginUser?.token;
 
   try {
-    // Get basic post data
     const postRes = await axios.get(`${API_URL}/slug/${slug}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -822,22 +759,18 @@ export const getPostBySlug = (slug) => async (dispatch) => {
 
     const postId = postRes.data.data.id;
 
-    // Trigger category and tag fetches
     await Promise.all([
       dispatch(getCategoriesByPostId(postId)),
       dispatch(getTagsByPostId(postId)),
     ]);
 
-    // Get categories and tags from Redux state
     const state = getState();
     const categories = state.postCategories?.categoriesByPost || [];
     const tags = state.postTags?.tagsByPost || [];
 
-    // Extract IDs
     const selectedCategory = categories.length > 0 ? categories[0].id : "";
     const selectedTags = tags.map(tag => tag.id);
 
-    // Construct complete post object
     const completePost = {
       ...postRes.data.data,
       selectedCategory,
@@ -857,23 +790,12 @@ export const getPostBySlug = (slug) => async (dispatch) => {
       type: POST_FETCH_BY_SLUG_ERROR,
       payload: err.response?.data?.message || err.message,
     });
-    dispatch(
-      showAlert({
-        isOpen: true,
-        title: "Fetch Failed",
-        type: "error",
-        msg: err.response?.data?.message || err.message,
-      })
-    );
-  } finally {
-    dispatch(hideLoader());
   }
 };
 
 // UPDATE POST
 export const updatePost = (id, data) => async (dispatch) => {
   dispatch({ type: POST_UPDATE_PENDING });
-  dispatch(showLoader());
 
   const token = getState().auth?.loginUser?.token;
 
@@ -892,15 +814,6 @@ export const updatePost = (id, data) => async (dispatch) => {
   };
 
   try {
-    // Update basic post data
-    const res = await axios.put(`${API_URL}/${id}`, postData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    // Get current mappings from state after fetching
     await Promise.all([
       dispatch(getCategoriesByPostId(id)),
       dispatch(getTagsByPostId(id)),
@@ -915,32 +828,26 @@ export const updatePost = (id, data) => async (dispatch) => {
     const newCategoryId = data.selectedCategory || data.categoryId;
     const newTagIds = data.selectedTags || data.tags || [];
 
-    // Handle category mapping
     if (newCategoryId) {
       if (currentCategoryIds.length > 0 && !currentCategoryIds.includes(newCategoryId)) {
-        // Remove existing category if different
         await dispatch(deletePostCategory({ 
           postId: id, 
           categoryId: currentCategoryIds[0] 
         }));
         await dispatch(createPostCategory({ postId: id, categoryId: newCategoryId }));
       } else if (currentCategoryIds.length === 0) {
-        // Add new category if none exists
         await dispatch(createPostCategory({ postId: id, categoryId: newCategoryId }));
       }
     } else if (currentCategoryIds.length > 0) {
-      // Remove category if new one is not provided but old one exists
       await dispatch(deletePostCategory({ 
         postId: id, 
         categoryId: currentCategoryIds[0] 
       }));
     }
 
-    // Handle tags mapping
     const tagsToRemove = currentTagIds.filter(tagId => !newTagIds.includes(tagId));
     const tagsToAdd = newTagIds.filter(tagId => !currentTagIds.includes(tagId));
 
-    // Remove tags that are no longer needed
     if (tagsToRemove.length > 0) {
       await Promise.all(
         tagsToRemove.map(tagId => 
@@ -949,7 +856,6 @@ export const updatePost = (id, data) => async (dispatch) => {
       );
     }
 
-    // Add new tags
     if (tagsToAdd.length > 0) {
       await Promise.all(
         tagsToAdd.map(tagId => 
@@ -958,37 +864,26 @@ export const updatePost = (id, data) => async (dispatch) => {
       );
     }
 
+    const res = await axios.put(`${API_URL}/${id}`, postData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    dispatch(getAllPosts());
     dispatch({ type: POST_UPDATE_SUCCESS, payload: res.data });
-    dispatch(
-      showAlert({
-        isOpen: true,
-        title: "Post Updated",
-        type: "success",
-        msg: "Post and its mappings updated successfully.",
-      })
-    );
   } catch (err) {
     dispatch({
       type: POST_UPDATE_ERROR,
       payload: err.response?.data?.message || err.message,
     });
-    dispatch(
-      showAlert({
-        isOpen: true,
-        title: "Update Failed",
-        type: "error",
-        msg: err.response?.data?.message || err.message,
-      })
-    );
-  } finally {
-    dispatch(hideLoader());
   }
 };
 
 // DELETE POST
 export const deletePost = (id) => async (dispatch) => {
   dispatch({ type: POST_DELETE_PENDING });
-  dispatch(showLoader());
 
   const token = getState().auth?.loginUser?.token;
 
@@ -1000,29 +895,12 @@ export const deletePost = (id) => async (dispatch) => {
       },
     });
 
+    dispatch(getAllPosts());
     dispatch({ type: POST_DELETE_SUCCESS, payload: res.data });
-    dispatch(
-      showAlert({
-        isOpen: true,
-        title: "Post Deleted",
-        type: "success",
-        msg: "Post has been deleted successfully.",
-      })
-    );
   } catch (err) {
     dispatch({
       type: POST_DELETE_ERROR,
       payload: err.response?.data?.message || err.message,
     });
-    dispatch(
-      showAlert({
-        isOpen: true,
-        title: "Delete Failed",
-        type: "error",
-        msg: err.response?.data?.message || err.message,
-      })
-    );
-  } finally {
-    dispatch(hideLoader());
   }
 };
