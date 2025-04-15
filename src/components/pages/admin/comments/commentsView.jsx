@@ -9,6 +9,7 @@ import Button from "../../../controls/button/buttonView";
 import { format } from "date-fns";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
 import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage";
+import {getPostInfoByKey, getUserInfoByKey} from'../../../../utils/index'
 
 const CommentsView = ({
   comments,
@@ -58,10 +59,10 @@ const CommentsView = ({
       sortable: true,
       cell: (row) => (
         <div className="flex flex-col">
-          <span className="font-medium">{row.authorName}</span>
+          <span className="font-medium">{getUserInfoByKey(row.authorid,"name")}</span>
           <span className="text-xs text-gray-500">
-            {row.createdAt
-              ? format(new Date(row.createdAt), "dd MMM yyyy")
+            {row.createdat
+              ? format(new Date(row.createdat), "dd MMM yyyy")
               : "N/A"}
           </span>
         </div>
@@ -80,7 +81,7 @@ const CommentsView = ({
           rel="noopener noreferrer"
           className="text-blue-500 hover:underline"
         >
-          {row.postTitle || "Unknown Post"}
+          { getPostInfoByKey(row.postid,"title") || "Unknown Post"}
         </a>
       ),
       sortField: "postTitle",

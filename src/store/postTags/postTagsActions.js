@@ -285,7 +285,7 @@ export const cleanupPostTagSocket = () => () => {
 // CREATE POST-TAG MAPPING
 export const createPostTag = (data) => async (dispatch) => {
   dispatch({ type: POST_TAGS_CREATE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -326,7 +326,7 @@ export const createPostTag = (data) => async (dispatch) => {
 // GET TAGS BY POST ID
 export const getTagsByPostId = (postId) => async (dispatch) => {
   dispatch({ type: POST_TAGS_FETCH_BY_POST_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -357,7 +357,7 @@ export const getTagsByPostId = (postId) => async (dispatch) => {
 // GET POSTS BY TAG ID
 export const getPostsByTagId = (tagId) => async (dispatch) => {
   dispatch({ type: POST_TAGS_FETCH_BY_TAG_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -388,7 +388,7 @@ export const getPostsByTagId = (tagId) => async (dispatch) => {
 // DELETE POST-TAG MAPPING
 export const deletePostTag = (data) => async (dispatch) => {
   dispatch({ type: POST_TAGS_DELETE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {

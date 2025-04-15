@@ -299,7 +299,7 @@ export const cleanupPostCategorySocket = () => () => {
 // CREATE POST-CATEGORY MAPPING
 export const createPostCategory = (data) => async (dispatch) => {
   dispatch({ type: POST_CATEGORIES_CREATE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -340,7 +340,7 @@ export const createPostCategory = (data) => async (dispatch) => {
 // GET CATEGORIES BY POST ID
 export const getCategoriesByPostId = (postId) => async (dispatch) => {
   dispatch({ type: POST_CATEGORIES_FETCH_BY_POST_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -374,7 +374,7 @@ export const getCategoriesByPostId = (postId) => async (dispatch) => {
 // GET POSTS BY CATEGORY ID
 export const getPostsByCategoryId = (categoryId) => async (dispatch) => {
   dispatch({ type: POST_CATEGORIES_FETCH_BY_CATEGORY_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -408,7 +408,7 @@ export const getPostsByCategoryId = (categoryId) => async (dispatch) => {
 // DELETE POST-CATEGORY MAPPING
 export const deletePostCategory = (data) => async (dispatch) => {
   dispatch({ type: POST_CATEGORIES_DELETE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {

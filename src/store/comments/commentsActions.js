@@ -30,6 +30,7 @@ export const COMMENTS_DELETE_ERROR = "COMMENTS_DELETE_ERROR";
 
 const API_URL = "https://fluxor-backend-production.up.railway.app/api/comments";
 
+
 // CREATE COMMENT
 export const createComment = (data) => async (dispatch) => {
   dispatch({ type: COMMENTS_CREATE_PENDING });
@@ -74,7 +75,7 @@ export const createComment = (data) => async (dispatch) => {
 // FETCH COMMENTS BY POST
 export const getCommentsByPost = (postId) => async (dispatch) => {
   dispatch({ type: COMMENTS_FETCH_BY_POST_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -105,7 +106,7 @@ export const getCommentsByPost = (postId) => async (dispatch) => {
 // FETCH APPROVED COMMENTS BY POST
 export const getApprovedComments = (postId) => async (dispatch) => {
   dispatch({ type: COMMENTS_FETCH_APPROVED_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -136,7 +137,7 @@ export const getApprovedComments = (postId) => async (dispatch) => {
 // APPROVE COMMENT
 export const approveComment = (commentId) => async (dispatch) => {
   dispatch({ type: COMMENTS_APPROVE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -176,7 +177,7 @@ export const approveComment = (commentId) => async (dispatch) => {
 // REJECT COMMENT
 export const rejectComment = (commentId) => async (dispatch) => {
   dispatch({ type: COMMENTS_REJECT_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -216,7 +217,7 @@ export const rejectComment = (commentId) => async (dispatch) => {
 // DELETE COMMENT
 export const deleteComment = (commentId) => async (dispatch) => {
   dispatch({ type: COMMENTS_DELETE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {

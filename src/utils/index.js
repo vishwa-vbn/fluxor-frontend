@@ -32,3 +32,25 @@ export const getUserInfoByKey = (id, key) => {
   console.warn(`User with id ${id} not found`);
   return "unknown";
 };
+
+
+
+export const getPostInfoByKey = (id, key) => {
+  const state = getState();
+  const posts = state.post?.posts?.data || []; // Adjust path based on your Redux state structure
+
+  // Log for debugging (optional, remove in production)
+  console.log("Posts in state:", posts);
+  console.log("Searching for id:", id, "with key:", key);
+
+  const post = posts.find((p) => p.id === id);
+  if (post) {
+    if (key in post) {
+      return post[key] !== null ? post[key] : "unknown"; // Handle null values
+    }
+    console.warn(`Key "${key}" not found for post id ${id}`);
+    return "unknown";
+  }
+  console.warn(`Post with id ${id} not found`);
+  return "unknown";
+};
