@@ -9,6 +9,7 @@ import Select from "../../../controls/selection/selection";
 import SearchBar from "../../../controls/searchbar/searchbar";
 import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage"; // Adjust path as needed
 import { getUserInfoByKey } from "../../../../utils";
+import ReusableDataTable from "../../../common/DataTable/DataTable";
 
 const sampleUserData = {
   name: "John Doe",
@@ -195,7 +196,7 @@ export default function Post({ posts = [], loading, deletePost }) {
         </div>
 
         <div className="bg-white rounded shadow-sm p-4 transition hover:shadow-md">
-          <DataTable
+          {/* <DataTable
             key={`datatable-${rowsPerPage}`} // Force re-render when rowsPerPage changes
             columns={columns((post) => {
               setSelectedPost(post);
@@ -208,6 +209,22 @@ export default function Post({ posts = [], loading, deletePost }) {
             paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort((a, b) => a - b)}
             paginationDefaultPage={currentPage}
             onChangePage={handlePageChange}
+            highlightOnHover
+            striped
+            noHeader
+          /> */}
+
+<ReusableDataTable
+            columns={columns((post) => {
+              setSelectedPost(post);
+              setIsDialogOpen(true);
+            })}
+            data={filteredPosts}
+            loading={loading}
+            rowsPerPage={rowsPerPage}
+            currentPage={currentPage}
+            onChangePage={handlePageChange}
+            paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort((a, b) => a - b)}
             highlightOnHover
             striped
             noHeader

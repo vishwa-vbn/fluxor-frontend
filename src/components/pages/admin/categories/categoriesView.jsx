@@ -11,11 +11,11 @@ import TopNavbar from "../../../common/topNavbar/topNavbar";
 import FileUpload from "../../../controls/fileUpload/fileUpload";
 import SearchBar from "../../../controls/searchbar/searchbar";
 import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage"; // Adjust path as needed
-
+import ReusableDataTable from "../../../common/DataTable/DataTable";
 const CategoriesView = ({
   categories,
   allCategories = [],
-  isLoading,
+  loading,
   search,
   onSearchChange,
   onCreate,
@@ -169,20 +169,18 @@ const CategoriesView = ({
           </div>
 
           <Card>
-            <DataTable
-              key={`datatable-${rowsPerPage}`} // Force re-render when rowsPerPage changes
+          <ReusableDataTable
               columns={columns}
               data={Array.isArray(filtered) ? filtered : []}
-              progressPending={isLoading}
-              noDataComponent="No categories found"
-              pagination
-              paginationPerPage={rowsPerPage}
-              paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort((a, b) => a - b)}
-              paginationDefaultPage={currentPage}
+              loading={loading}
+
+              rowsPerPage={rowsPerPage}
+              currentPage={currentPage}
               onChangePage={handlePageChange}
-              highlightOnHover
-              striped
-              noHeader
+              paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort((a, b) => a - b)}
+              striped={true}
+              highlightOnHover={true}
+              noHeader={true}
             />
           </Card>
 

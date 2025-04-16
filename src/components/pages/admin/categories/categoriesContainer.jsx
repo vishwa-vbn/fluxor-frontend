@@ -55,7 +55,7 @@ class CategoriesContainer extends Component {
       <CategoriesView
         categories={categories}
         allCategories={categories}
-        isLoading={loading}
+        loading={loading}
         error={error}
         search={search}
         onSearchChange={this.handleSearchChange}

@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Eye, Check, X, Trash2 } from "lucide-react";
 import { Card } from "../../../common/card/Card";
 import Modal from "../../../common/modal/modal";
-import DataTable from "react-data-table-component";
 import SearchBar from "../../../controls/searchbar/searchbar";
 import Select from "../../../controls/selection/selection";
 import Button from "../../../controls/button/buttonView";
 import { format } from "date-fns";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
 import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage";
-import {getPostInfoByKey, getUserInfoByKey} from'../../../../utils/index'
+import { getPostInfoByKey, getUserInfoByKey } from "../../../../utils/index";
+import ReusableDataTable from "../../../common/DataTable/DataTable"; // Adjust path as needed
 
 const CommentsView = ({
   comments,
@@ -59,7 +59,7 @@ const CommentsView = ({
       sortable: true,
       cell: (row) => (
         <div className="flex flex-col">
-          <span className="font-medium">{getUserInfoByKey(row.authorid,"name")}</span>
+          <span className="font-medium">{getUserInfoByKey(row.authorid, "name")}</span>
           <span className="text-xs text-gray-500">
             {row.createdat
               ? format(new Date(row.createdat), "dd MMM yyyy")
@@ -81,7 +81,7 @@ const CommentsView = ({
           rel="noopener noreferrer"
           className="text-blue-500 hover:underline"
         >
-          { getPostInfoByKey(row.postid,"title") || "Unknown Post"}
+          {getPostInfoByKey(row.postid, "title") || "Unknown Post"}
         </a>
       ),
       sortField: "postTitle",
@@ -230,74 +230,72 @@ const CommentsView = ({
           </div>
 
           <Card>
-            <DataTable
-              key={`datatable-${rowsPerPage}`}
+            <ReusableDataTable
               columns={columns}
-              data={comments}
-              progressPending={isLoading}
-              noDataComponent={
-                selectedPostId ? "No comments found" : "Please select a post"
-              }
-              pagination
-              paginationPerPage={rowsPerPage}
+              data={Array.isArray(comments) ? comments : []}
+              loading={isLoading}
+              rowsPerPage={rowsPerPage}
+              currentPage={currentPage}
+              onChangePage={handlePageChange}
               paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort(
                 (a, b) => a - b
               )}
-              paginationDefaultPage={currentPage}
-              onChangePage={handlePageChange}
-              highlightOnHover
-              striped
-              sortable
+              striped={true}
+              highlightOnHover={true}
+              noHeader={true}
+              noDataComponent={
+                selectedPostId ? "No comments found" : "Please select a post"
+              }
               onSort={handleSort}
-              sortServer
+              sortServer={true}
             />
           </Card>
 
           {selectedComment && (
-  <Modal
-    title="Comment Detail"
-    isOpen={isDetailOpen}
-    onClose={onDetailClose}
-    mode="view"
-  >
-    <div>
-      <div className="flex items-center mb-2 last:mb-0">
-        <h4 className="font-medium text-gray-700 mr-1 text-sm min-w-[80px]">Author:</h4>
-        <p className="bg-green-100 p-1 rounded text-sm border border-green-200">
-          {selectedComment.authorName || "Anonymous"}
-        </p>
-      </div>
+            <Modal
+              title="Comment Detail"
+              isOpen={isDetailOpen}
+              onClose={onDetailClose}
+              mode="view"
+            >
+              <div>
+                <div className="flex items-center mb-2 last:mb-0">
+                  <h4 className="font-medium text-gray-700 mr-1 text-sm min-w-[80px]">Author:</h4>
+                  <p className="bg-green-100 p-1 rounded text-sm border border-green-200">
+                    {selectedComment.authorName || "Anonymous"}
+                  </p>
+                </div>
 
-      <div className="flex items-center mb-2 last:mb-0">
-        <h4 className="font-medium text-gray-700 mr-1 text-sm min-w-[80px]">Post:</h4>
-        <p className="bg-purple-100 p-1 rounded text-sm border border-purple-200">
-          <a
-            href={`/post/${selectedComment.postSlug}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline"
-          >
-            {selectedComment.postTitle || "Unknown Post"}
-          </a>
-        </p>
-      </div>
+                <div className="flex items-center mb-2 last:mb-0">
+                  <h4 className="font-medium text-gray-700 mr-1 text-sm min-w-[80px]">Post:</h4>
+                  <p className="bg-purple-100 p-1 rounded text-sm border border-purple-200">
+                    <a
+                      href={`/post/${selectedComment.postSlug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      {selectedComment.postTitle || "Unknown Post"}
+                    </a>
+                  </p>
+                </div>
 
-      <div className="flex items-center mb-2 last:mb-0">
-        <h4 className="font-medium text-gray-700 mr-1 text-sm min-w-[80px]">Comment:</h4>
-        <p className="bg-yellow-100 p-1 rounded text-sm border border-yellow-200">
-          {selectedComment.content}
-        </p>
-      </div>
+                <div className="flex items-center mb-2 last:mb-0">
+                  <h4 className="font-medium text-gray-700 mr-1 text-sm min-w-[80px]">Comment:</h4>
+                  <p className="bg-yellow-100 p-1 rounded text-sm border border-yellow-200">
+                    {selectedComment.content}
+                  </p>
+                </div>
 
-      <div className="flex items-center mb-2 last:mb-0">
-        <h4 className="font-medium text-gray-700 mr-1 text-sm min-w-[80px]">Status:</h4>
-        <p className="bg-gray-100 p-1 rounded text-sm border border-gray-200">
-          {selectedComment.status}
-        </p>
-      </div>
-    </div>
-  </Modal>
-)}
+                <div className="flex items-center mb-2 last:mb-0">
+                  <h4 className="font-medium text-gray-700 mr-1 text-sm min-w-[80px]">Status:</h4>
+                  <p className="bg-gray-100 p-1 rounded text-sm border border-gray-200">
+                    {selectedComment.status}
+                  </p>
+                </div>
+              </div>
+            </Modal>
+          )}
         </main>
       </div>
     </div>
