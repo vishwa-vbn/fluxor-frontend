@@ -4,6 +4,7 @@ import PostCard from "../../../common/post-card/post-card";
 import CommentList from "../../../common/comment-list/comment-list";
 import CommentForm from "../../../common/comment-form/comment-form";
 import { Calendar, User, Eye, Share2, Facebook, Twitter, Linkedin } from "lucide-react";
+import TopNavbar from "../../../common/topNavbar/topNavbar";
 
 export default function PostPage({ post, loading, error }) {
   // Format date
@@ -14,6 +15,16 @@ export default function PostPage({ post, loading, error }) {
       month: "long",
       day: "numeric",
     });
+  };
+
+
+  const sampleUserData = {
+    name: "John Doe",
+    email: "john@example.com",
+  };
+
+  const handleSearch = (query) => {
+    onSearchChange(query);
   };
 
   // Calculate read time (approx. 200 words per minute)
@@ -134,8 +145,7 @@ export default function PostPage({ post, loading, error }) {
   }
 
   return (
-    <main className="py-12 bg-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col" >
 
 
          <TopNavbar
@@ -145,7 +155,7 @@ export default function PostPage({ post, loading, error }) {
                   toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
                 />
                 
-        <div className="flex flex-col lg:flex-row gap-8">
+                <main className="flex  align-top w-full mx-auto px-6 py-3 space-y-8">
           {/* Main Post (80% width) */}
           <div className="w-full lg:w-4/5">
             <article>
@@ -301,8 +311,7 @@ export default function PostPage({ post, loading, error }) {
               </div>
             </aside>
           )}
-        </div>
+        </main>
       </div>
-    </main>
   );
 }
