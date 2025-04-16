@@ -12,6 +12,7 @@ import FileUpload from "../../../controls/fileUpload/fileUpload";
 import SearchBar from "../../../controls/searchbar/searchbar";
 import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage"; // Adjust path as needed
 import ReusableDataTable from "../../../common/DataTable/DataTable";
+import { getCategoryInfoByKey } from "../../../../utils";
 const CategoriesView = ({
   categories,
   allCategories = [],
@@ -31,32 +32,37 @@ const CategoriesView = ({
   const [editCategory, setEditCategory] = useState(null);
 
   // Use the responsive rows per page hook
-  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage({
-    rowHeight: 60, // Same as Post component; adjust if rows differ
-    navbarHeight: 60,
-    controlsHeight: 120, // Accounts for search bar, filter, and margins
-    extraPadding: 50,
-    minRows: 5,
-    maxRowsMobile: 5,
-    maxRowsTablet: 10,
-    maxRowsDesktop: 20,
-    debounceDelay: 200,
-  });
+  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage(
+    {
+      rowHeight: 60, // Same as Post component; adjust if rows differ
+      navbarHeight: 60,
+      controlsHeight: 120, // Accounts for search bar, filter, and margins
+      extraPadding: 50,
+      minRows: 5,
+      maxRowsMobile: 5,
+      maxRowsTablet: 10,
+      maxRowsDesktop: 20,
+      debounceDelay: 200,
+    }
+  );
 
   useEffect(() => {
     let filteredData = categories || [];
 
     if (search) {
+      const query = search.toLowerCase();
       filteredData = filteredData.filter((cat) =>
-        cat.name.toLowerCase().includes(search.toLowerCase())
+        cat.name?.toLowerCase().includes(query) || cat.slug?.toLowerCase().includes(query)
       );
     }
+    
 
     if (parentFilter !== "all") {
       filteredData = filteredData.filter(
-        (cat) => String(cat.parentId) === String(parentFilter)
+        (cat) => String(cat.parentid) === String(parentFilter)
       );
     }
+    
 
     setFiltered(filteredData);
     setCurrentPage(1); // Reset page when data changes
@@ -78,13 +84,16 @@ const CategoriesView = ({
     {
       name: "Parent",
       selector: (row) => {
-        const parent = allCategories.find((cat) => cat.id === row.parentId);
-        return parent ? parent.name : "-";
+        const parent = getCategoryInfoByKey(row.parentid, "name");
+        return parent ? parent : "";
       },
       cell: (row) => (
-        <div className="text-center">
-          {allCategories?.find((cat) => cat.id === row.parentId)?.name || "-"}
-        </div>
+        console.log("row is", row),
+        (
+          <div className="text-center">
+            {getCategoryInfoByKey(row.parentid, "name")}
+          </div>
+        )
       ),
     },
     {
@@ -135,7 +144,9 @@ const CategoriesView = ({
         />
         <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-3 space-y-8">
           <div className="flex justify-between items-center mb-2">
-            <h1 className="text-2xl font-bold text-gray-800 ">All Categories</h1>
+            <h1 className="text-2xl font-bold text-gray-800 ">
+              All Categories
+            </h1>
             <Button
               variant="primary"
               onClick={() => setIsAddOpen(true)}
@@ -169,15 +180,16 @@ const CategoriesView = ({
           </div>
 
           <Card>
-          <ReusableDataTable
+            <ReusableDataTable
               columns={columns}
               data={Array.isArray(filtered) ? filtered : []}
               loading={loading}
-
               rowsPerPage={rowsPerPage}
               currentPage={currentPage}
               onChangePage={handlePageChange}
-              paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort((a, b) => a - b)}
+              paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort(
+                (a, b) => a - b
+              )}
               striped={true}
               highlightOnHover={true}
               noHeader={true}

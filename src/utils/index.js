@@ -34,6 +34,29 @@ export const getUserInfoByKey = (id, key) => {
 };
 
 
+export const getCategoryInfoByKey = (id, key) => {
+  const state = getState(); // Make sure getState is correctly imported or defined
+  const categories = state.category?.categories?.data || [];
+
+  // Optional logs for debugging
+  console.log("Categories in state:", categories);
+  console.log("Searching for id:", id, "with key:", key);
+
+  const category = categories.find((cat) => cat.id === id);
+
+  if (category) {
+    if (key in category) {
+      return category[key] !== null ? category[key] : "unknown";
+    }
+    console.warn(`Key "${key}" not found for category id ${id}`);
+    return "unknown";
+  }
+
+  console.warn(`Category with id ${id} not found`);
+  return "unknown";
+};
+
+
 
 export const getPostInfoByKey = (id, key) => {
   const state = getState();

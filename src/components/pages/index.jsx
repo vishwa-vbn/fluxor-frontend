@@ -14,7 +14,8 @@ import CategoriesContainer from "./admin/categories/categoriesContainer.jsx";
 import CommentsContainer from "./admin/comments/commentsContainer.jsx";
 import TagsContainer from "./admin/tags/tagsContainer.jsx";
 import UsersContainer from "./admin/users/userContainer.jsx";
-import { components } from "react-select";
+import PostContainer from "./user/post/postContainer.jsx";
+
 
 function App({ match }) {
   console.log("match:", match);
@@ -59,6 +60,10 @@ function App({ match }) {
     {
       component:UsersContainer,
       link:"users"
+    },
+    {
+      component:PostContainer,
+      link:"post/:slug"
     }
     // {
     //   component: ChangePasswordContainer,
