@@ -33,14 +33,14 @@ class UsersContainer extends Component {
     this.props.fetchAllUsers();
     this.props.initializeUserSocket(); // Initialize Socket.IO
     this.props.initializePostCategorySocket()
-    // this.props.initializePostTagSocket()
+    this.props.initializePostTagSocket()
   }
 
   componentWillUnmount() {
     console.log("UsersContainer: Unmounting - Cleaning up socket");
     this.props.cleanupUserSocket(); // Cleanup Socket.IO
     this.props.cleanupPostCategorySocket()
-    // this.props.cleanupPostTagSocket()
+    this.props.cleanupPostTagSocket()
   }
 
   componentDidUpdate(prevProps, prevState) {

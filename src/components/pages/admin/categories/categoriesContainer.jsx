@@ -9,6 +9,8 @@ import {
   getCategoryById,
   updateCategory,
   deleteCategory,
+  initializeCategorySocket,
+  cleanupCategorySocket,
 } from "../../../../store/categories/categoriesAction";
 
 class CategoriesContainer extends Component {
@@ -18,6 +20,11 @@ class CategoriesContainer extends Component {
 
   componentDidMount() {
     this.props.getAllCategories();
+    this.props.initializeCategorySocket();
+  }
+
+  componentWillUnmount() {
+    this.props.cleanupCategorySocket();
   }
 
   handleCreate = (categoryData) => {
@@ -48,7 +55,7 @@ class CategoriesContainer extends Component {
       <CategoriesView
         categories={categories}
         allCategories={categories}
-        isLoading={loading}
+        loading={loading}
         error={error}
         search={search}
         onSearchChange={this.handleSearchChange}
@@ -77,6 +84,8 @@ const mapDispatchToProps = (dispatch) =>
       getCategoryById,
       updateCategory,
       deleteCategory,
+      initializeCategorySocket,
+      cleanupCategorySocket,
     },
     dispatch
   );

@@ -30,7 +30,7 @@ const API_URL = "https://fluxor-backend-production.up.railway.app/api/categories
 // CREATE
 export const createCategory = (data) => async (dispatch) => {
   dispatch({ type: CATEGORY_CREATE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -180,7 +180,7 @@ export const updateCategory = (id, data) => async (dispatch) => {
 // DELETE
 export const deleteCategory = (id) => async (dispatch) => {
   dispatch({ type: CATEGORY_DELETE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {

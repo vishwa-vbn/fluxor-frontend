@@ -310,7 +310,7 @@ export const cleanupTagSocket = () => () => {
 // CREATE TAG
 export const createTag = (data) => async (dispatch) => {
   dispatch({ type: TAGS_CREATE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -351,7 +351,7 @@ export const createTag = (data) => async (dispatch) => {
 // GET ALL TAGS
 export const getAllTags = () => async (dispatch) => {
   dispatch({ type: TAGS_FETCH_ALL_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   try {
     const res = await axios.get(`${API_URL}/api/tags`);
     dispatch({ type: TAGS_FETCH_ALL_SUCCESS, payload: res.data });
@@ -376,7 +376,7 @@ export const getAllTags = () => async (dispatch) => {
 // GET TAG BY ID
 export const getTagById = (id) => async (dispatch) => {
   dispatch({ type: TAGS_FETCH_ONE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   try {
     const res = await axios.get(`${API_URL}/api/tags/${id}`);
     dispatch({ type: TAGS_FETCH_ONE_SUCCESS, payload: res.data });
@@ -401,7 +401,7 @@ export const getTagById = (id) => async (dispatch) => {
 // UPDATE TAG
 export const updateTag = (id, data) => async (dispatch) => {
   dispatch({ type: TAGS_UPDATE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
@@ -442,7 +442,7 @@ export const updateTag = (id, data) => async (dispatch) => {
 // DELETE TAG
 export const deleteTag = (id) => async (dispatch) => {
   dispatch({ type: TAGS_DELETE_PENDING });
-  dispatch(showLoader());
+  // dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
