@@ -19,7 +19,7 @@ class CategoriesContainer extends Component {
   };
 
   componentDidMount() {
-    this.props.getAllCategories();
+
     this.props.initializeCategorySocket();
   }
 

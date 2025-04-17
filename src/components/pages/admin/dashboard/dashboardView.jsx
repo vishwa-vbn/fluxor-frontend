@@ -1,16 +1,7 @@
-import {
-  FileText,
-  MessageSquare,
-  Users,
-  Eye,
-  PlusCircle,
-  Upload,
-  UserPlus,
-  Bell,
-  Settings,
-} from "lucide-react";
+import React from "react";
+import { FileText, Users, Eye, PlusCircle, Upload, UserPlus } from "lucide-react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
-import Button from "../../../controls/button/buttonView";
+import { Link } from "react-router-dom";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,7 +13,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Link } from "react-router-dom";
+import TopNavbar from "../../../common/topNavbar/topNavbar";
 
 ChartJS.register(
   CategoryScale,
@@ -34,197 +25,204 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-import TopNavbar from "../../../common/topNavbar/topNavbar";
 
-export default function AdminDashboard() {
-  const stats = {
-    postsCount: 120,
-    commentsCount: 432,
-    usersCount: 87,
-    viewsCount: 9320,
-    pendingReviews: 15,
-    activeVisitors: 243,
-  };
-
-  const barData = {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    datasets: [
-      {
-        label: "Page Views",
-        data: [1200, 1900, 1500, 2200, 1800, 2500, 2300],
-        backgroundColor: "rgba(59, 130, 246, 0.8)",
-        borderColor: "rgba(59, 130, 246, 1)",
-        borderWidth: 1,
-        borderRadius: 6,
-        hoverBackgroundColor: "rgba(59, 130, 246, 1)",
-      },
-    ],
-  };
-
-  const doughnutData = {
-    labels: ["Published", "Drafts", "Scheduled", "Archived"],
-    datasets: [
-      {
-        data: [85, 25, 15, 10],
-        backgroundColor: [
-          "#10b981", // emerald-500
-          "#f59e0b", // amber-500
-          "#3b82f6", // blue-500
-          "#ef4444", // red-500
-        ],
-        borderWidth: 0,
-        hoverOffset: 8,
-      },
-    ],
-  };
-
-  const lineData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [
-      {
-        label: "User Growth",
-        data: [50, 62, 75, 87, 98, 105],
-        borderColor: "#8b5cf6", // violet-500
-        backgroundColor: "rgba(139, 92, 246, 0.2)",
-        tension: 0.4,
-        fill: true,
-      },
-    ],
-  };
-
+export default function DashboardView({
+  stats,
+  barData,
+  doughnutData,
+  lineData,
+  quickStats,
+  userData,
+  handleSearch,
+}) {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { position: "top", labels: { font: { size: 12 } } },
-      tooltip: { backgroundColor: "#1f2937", bodyFont: { size: 12 } },
+      legend: {
+        position: "top",
+        labels: {
+          font: { size: 12, family: "'Inter', sans-serif" },
+          color: "#4B5563",
+          padding: 16,
+        },
+      },
+      tooltip: {
+        backgroundColor: "#1F2937",
+        bodyFont: { size: 12, family: "'Inter', sans-serif" },
+        titleFont: { size: 13, family: "'Inter', sans-serif" },
+        padding: 10,
+        cornerRadius: 4,
+      },
     },
     scales: {
-      y: { beginAtZero: true, grid: { color: "rgba(0, 0, 0, 0.05)" } },
-      x: { grid: { display: false } },
+      y: {
+        beginAtZero: true,
+        grid: { color: "#E5E7EB" },
+        ticks: {
+          font: { size: 12, family: "'Inter', sans-serif" },
+          color: "#4B5563",
+        },
+      },
+      x: {
+        grid: { display: false },
+        ticks: {
+          font: { size: 12, family: "'Inter', sans-serif" },
+          color: "#4B5563",
+        },
+      },
+    },
+    animation: {
+      duration: 800,
+      easing: "easeOutQuad",
     },
   };
 
-  const sampleUserData = {
-    name: "John Doe",
-    email: "john@example.com",
-  };
-
-  const handleSearch = (query) => {
-    console.log("Searching for:", query);
-    // Implement search logic here
+  const trends = {
+    postsCount: "+5%",
+    usersCount: "+3%",
+    viewsCount: "+8%",
+    pendingReviews: "-2%",
+    activeVisitors: "+15%",
   };
 
   return (
-    <div className="min-h-screen  bg-gray-50 font-sans flex">
-      <div className="flex-1 flex flex-col">
+    <div className="min-h-screen bg-gray-100 font-inter text-gray-900">
+      <div className="flex flex-col min-h-screen">
         <TopNavbar
-          userData={sampleUserData}
+          userData={userData}
           onSearch={handleSearch}
           notificationCount={3}
-          toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         />
-  
-        <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-8 space-y-8">
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-            <StatCard title="Posts" value={stats.postsCount} icon={<FileText />} color="bg-blue-600" trend="+5%" />
-            <StatCard title="Comments" value={stats.commentsCount} icon={<MessageSquare />} color="bg-emerald-600" trend="+12%" />
-            <StatCard title="Users" value={stats.usersCount} icon={<Users />} color="bg-violet-600" trend="+3%" />
-            <StatCard title="Views" value={stats.viewsCount} icon={<Eye />} color="bg-amber-600" trend="+8%" />
-            <StatCard title="Pending" value={stats.pendingReviews} icon={<FileText />} color="bg-rose-600" trend="-2%" />
-            <StatCard title="Active" value={stats.activeVisitors} icon={<Users />} color="bg-indigo-600" trend="+15%" />
-          </section>
-  
-          <section className="bg-white rounded-[5px] p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h3 className="text-lg font-semibold text-gray-800">Quick Actions</h3>
-              <div className="flex flex-wrap gap-3">
+
+        <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="space-y-8">
+            {/* Header */}
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+              <p className="mt-1 text-sm text-gray-500">
+                Monitor key metrics and manage your platform effectively.
+              </p>
+            </div>
+
+            {/* Stats Section - Grid Layout */}
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <StatCard
+                title="Total Posts"
+                value={stats.postsCount}
+                icon={<FileText className="w-6 h-6 text-blue-600" />}
+                trend={trends.postsCount}
+              />
+              <StatCard
+                title="Total Users"
+                value={stats.usersCount}
+                icon={<Users className="w-6 h-6 text-purple-600" />}
+                trend={trends.usersCount}
+              />
+              <StatCard
+                title="Total Views"
+                value={stats.viewsCount}
+                icon={<Eye className="w-6 h-6 text-green-600" />}
+                trend={trends.viewsCount}
+              />
+              <StatCard
+                title="Active Users"
+                value={stats.usersCount}
+                icon={<Users className="w-6 h-6 text-amber-600" />}
+                trend={trends.activeVisitors}
+              />
+            </section>
+
+            {/* Quick Actions Section */}
+            <section className="bg-white shadow-sm rounded-lg p-6">
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
+              <div className="flex flex-wrap gap-4">
                 <Link to="/admin/posts/create">
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium">
                     <PlusCircle className="w-4 h-4" />
                     New Post
-                  </Button>
+                  </button>
                 </Link>
                 <Link to="/admin/media">
-                  <Button variant="primary" size="sm" className="flex items-center gap-2">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium">
                     <Upload className="w-4 h-4" />
                     Upload Media
-                  </Button>
+                  </button>
                 </Link>
                 <Link to="/admin/users">
-                  <Button variant="success" size="sm" className="flex items-center gap-2">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors text-sm font-medium">
                     <UserPlus className="w-4 h-4" />
                     Add User
-                  </Button>
+                  </button>
                 </Link>
               </div>
-            </div>
-          </section>
-  
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <ChartCard title="Weekly Traffic" className="lg:col-span-8">
-              <Bar data={barData} options={chartOptions} />
-            </ChartCard>
-            <ChartCard title="Post Status" className="lg:col-span-4">
-              <Doughnut data={doughnutData} options={{ ...chartOptions, cutout: "65%" }} />
-            </ChartCard>
-          </section>
-  
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <ChartCard title="User Growth" className="lg:col-span-8">
-              <Line data={lineData} options={chartOptions} />
-            </ChartCard>
-            <div className="lg:col-span-4 bg-white rounded-[5px] shadow-sm p-6 hover:shadow-md">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Stats</h3>
-              <ul className="space-y-4 text-sm text-gray-600">
-                <li className="flex justify-between items-center">
-                  <span>Avg. Read Time</span>
-                  <span className="font-medium text-gray-800 bg-gray-100 px-2 py-1 rounded-[5px]">4.2 min</span>
-                </li>
-                <li className="flex justify-between items-center">
-                  <span>Bounce Rate</span>
-                  <span className="font-medium text-gray-800 bg-gray-100 px-2 py-1 rounded-[5px]">32%</span>
-                </li>
-                <li className="flex justify-between items-center">
-                  <span>Top Category</span>
-                  <span className="font-medium text-gray-800 bg-gray-100 px-2 py-1 rounded-[5px]">Tech</span>
-                </li>
-              </ul>
-            </div>
-          </section>
+            </section>
+
+            {/* Charts Section 1 */}
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <ChartCard title="Weekly Traffic" className="lg:col-span-2">
+                <Bar data={barData} options={chartOptions} />
+              </ChartCard>
+              <ChartCard title="Post Status">
+                <Doughnut
+                  data={doughnutData}
+                  options={{ ...chartOptions, cutout: "70%" }}
+                />
+              </ChartCard>
+            </section>
+
+            {/* Charts Section 2 */}
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <ChartCard title="User Growth" className="lg:col-span-2">
+                <Line data={lineData} options={chartOptions} />
+              </ChartCard>
+              <div className="bg-white shadow-sm rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Stats</h3>
+                <ul className="space-y-3">
+                  <li className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Avg. Read Time</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {quickStats.avgReadTime}
+                    </span>
+                  </li>
+                  <li className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Bounce Rate</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {quickStats.bounceRate}
+                    </span>
+                  </li>
+                  <li className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Top Category</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {quickStats.topCategory}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </section>
+          </div>
         </main>
       </div>
     </div>
   );
-  
 }
 
-function SidebarLink({ to, icon, label }) {
+function StatCard({ title, value, icon, trend }) {
   return (
-    <Link
-      to={to}
-      className="flex items-center gap-3 px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-colors"
-    >
-      <span className="w-5 h-5">{icon}</span>
-      <span className="text-sm font-medium">{label}</span>
-    </Link>
-  );
-}
-
-function StatCard({ title, value, icon, color, trend }) {
-  return (
-    <div className="bg-white rounded-[5px] shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-all transform hover:-translate-y-1">
-      <div className={`${color} text-white rounded-[5px] p-3`}>{icon}</div>
-      <div className="flex-1">
-        <h4 className="text-sm text-gray-500 font-medium">{title}</h4>
-        <p className="text-2xl font-semibold text-gray-800">{value}</p>
-        <span
-          className={`text-xs ${
-            trend.startsWith("+") ? "text-emerald-600" : "text-rose-600"
-          }`}
-        >
-          {trend}
-        </span>
+    <div className="bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-4">
+        <div className="p-2 bg-gray-100 rounded-md">{icon}</div>
+        <div>
+          <h4 className="text-sm text-gray-600">{title}</h4>
+          <p className="text-2xl font-semibold text-gray-900 mt-1">{value}</p>
+          <span
+            className={`text-xs font-medium ${
+              trend.startsWith("+") ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {trend}
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -232,11 +230,9 @@ function StatCard({ title, value, icon, color, trend }) {
 
 function ChartCard({ title, children, className }) {
   return (
-    <div
-      className={`bg-white rounded-[5px] shadow-sm p-6 h-[420px] transition-all hover:shadow-md ${className}`}
-    >
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
-      <div className="h-[340px]">{children}</div>
+    <div className={`bg-white shadow-sm rounded-lg p-6 ${className}`}>
+      <h3 className="text-lg font-medium text-gray-900 mb-4">{title}</h3>
+      <div className="h-80">{children}</div>
     </div>
   );
 }
