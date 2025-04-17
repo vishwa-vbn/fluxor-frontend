@@ -35,7 +35,7 @@ const PostPageContainerWithParams = (props) => {
 };
 
 const mapStateToProps = (state) => ({
-  post: state.post.currentPost.data,
+  post: state.post.currentPost?.data,
   // relatedPosts: state.post.relatedPosts,
   loading: state.post.loading,
   error: state.post.error,

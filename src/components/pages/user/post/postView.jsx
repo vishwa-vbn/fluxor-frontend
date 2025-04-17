@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import PostCard from "../../../common/post-card/post-card";
-import CommentList from "../../../common/comment-list/comment-list";
-import CommentForm from "../../../common/comment-form/comment-form";
 import { Calendar, User, Eye, Share2, Facebook, Twitter, Linkedin } from "lucide-react";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
+import CommentList from "../../../common/comment-list/comment-list";
+import CommentForm from "../../../common/comment-form/comment-form";
+import { getUserInfoByKey ,getInfoByTags ,getCategoryInfoByKey} from "../../../../utils";
 
 export default function PostPage({ post, loading, error }) {
   // Format date
@@ -17,14 +17,9 @@ export default function PostPage({ post, loading, error }) {
     });
   };
 
-
   const sampleUserData = {
     name: "John Doe",
     email: "john@example.com",
-  };
-
-  const handleSearch = (query) => {
-    onSearchChange(query);
   };
 
   // Calculate read time (approx. 200 words per minute)
@@ -63,15 +58,15 @@ export default function PostPage({ post, loading, error }) {
   };
 
   // Placeholder author, categories, and tags
-  const author = post ? { username: `User${post.authorid}` } : null;
+  const author = post?.authorid 
+
   const categories = post?.selectedCategory
-    ? [{ id: post.selectedCategory, name: `Category ${post.selectedCategory}`, slug: `category-${post.selectedCategory}` }]
+    ? [{ id: post.selectedCategory, }]
     : [];
   const tags = post?.selectedTags
     ? post.selectedTags.map((tagId) => ({
         id: tagId,
-        name: `Tag ${tagId}`,
-        slug: `tag-${tagId}`,
+      
       }))
     : [];
   const readTime = post ? calculateReadTime(post.content) : 1;
@@ -103,9 +98,9 @@ export default function PostPage({ post, loading, error }) {
   // Display loading state
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh] py-12">
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <svg
-          className="animate-spin h-12 w-12 text-blue-600"
+          className="animate-spin h-8 w-8 text-gray-600"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -131,12 +126,12 @@ export default function PostPage({ post, loading, error }) {
   // Display error state
   if (error) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Post Not Found</h1>
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center bg-gray-50 min-h-screen">
+        <h1 className="text-3xl font-serif font-bold text-gray-900 mb-4">Post Not Found</h1>
         <p className="text-gray-600 mb-6">{error}</p>
         <Link
           to="/blog"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          className="px-6 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
         >
           Return to Blog
         </Link>
@@ -145,173 +140,201 @@ export default function PostPage({ post, loading, error }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col" >
+    <div className="min-h-screen bg-gray-50">
+      <TopNavbar userData={sampleUserData} notificationCount={3} />
+      <main className="max-w-11/12 mx-auto px-4 py-12">
+        <article>
+          {post?.featuredimage && (
+            <img
+              src={post.featuredimage}
+              alt={post.title}
+              className="w-full h-96 object-cover rounded-lg mb-8"
+            />
+          )}
 
+          {/* Categories */}
+          {categories.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {categories.map((category) => (
 
-         <TopNavbar
-                  userData={sampleUserData}
-                  onSearch={handleSearch}
-                  notificationCount={3}
-                  toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-                />
-                
-                <main className="flex  align-top w-full mx-auto px-6 py-3 space-y-8">
-          {/* Main Post (80% width) */}
-          <div className="w-full lg:w-4/5">
-            <article>
-              {post?.featuredimage && (
-                <div className="w-full mb-6">
-                  <img
-                    src={post.featuredimage}
-                    alt={post.title}
-                    className="w-full h-80 object-cover rounded-lg"
-                  />
-                </div>
-              )}
+                <Link
+                  key={category.id}
+                  to={`/category/${category.slug}`}
+                  className="px-3 py-1 bg-gray-200 text-gray-800 text-sm font-medium rounded-full hover:bg-gray-300 transition-colors"
+                >
+                  {getCategoryInfoByKey(category.id,"name")}
+                </Link>
+              ))}
+            </div>
+          )}
 
-              <div>
-                {/* Categories */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {categories.length > 0 &&
-                    categories.map((category) => (
-                      <Link
-                        key={category.id}
-                        to={`/category/${category.slug}`}
-                        className="inline-block px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full hover:bg-blue-700 transition-colors"
-                      >
-                        {category.name}
-                      </Link>
-                    ))}
-                </div>
+          {/* Title */}
+          <h1 className="text-4xl font-serif font-bold text-gray-900 mb-6 leading-tight">
+            {post?.title || "Untitled Post"}
+          </h1>
 
-                {/* Title */}
-                <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-6">
-                  {post?.title || "Untitled Post"}
-                </h1>
-
-                {/* Post Meta */}
-                <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-gray-600">
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    {formatDate(post?.publishedat)}
-                  </div>
-                  <div className="flex items-center">
-                    <User className="h-4 w-4 mr-2" />
-                    {author?.username || "Unknown Author"}
-                  </div>
-                  <div className="flex items-center">
-                    <Eye className="h-4 w-4 mr-2" />
-                    {post?.viewcount || 0} views
-                  </div>
-                  <div>{readTime} min read</div>
-                </div>
-
-                {/* Author info */}
-                {author && (
-                  <div className="flex items-center mb-8">
-                    <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-lg font-medium">
-                      {author.username.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="ml-4">
-                      <p className="text-base font-semibold text-gray-900">{author.username}</p>
-                      <p className="text-sm text-gray-600">Author bio unavailable</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Post Content */}
-                <div
-                  className="prose prose-lg prose-gray max-w-none text-gray-800"
-                  dangerouslySetInnerHTML={{ __html: post?.content || "" }}
-                />
-
-                {/* Tags */}
-                {tags.length > 0 && (
-                  <div className="mt-10">
-                    <h3 className="text-base font-medium text-gray-600 mb-3">Tags:</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {tags.map((tag) => (
-                        <Link
-                          key={tag.id}
-                          to={`/blog?tag=${tag.slug}`}
-                          className="inline-block px-3 py-1 border border-gray-400 text-gray-800 text-sm rounded-md hover:bg-gray-200 transition-colors"
-                        >
-                          #{tag.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Share buttons */}
-                <div className="mt-10">
-                  <h3 className="text-base font-medium text-gray-600 mb-3">Share this post:</h3>
-                  <div className="flex space-x-3">
-                    <button
-                      onClick={() => shareOnSocial("facebook", post?.title)}
-                      className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-                    >
-                      <Facebook className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => shareOnSocial("twitter", post?.title)}
-                      className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-400 text-white hover:bg-blue-500 transition-colors"
-                    >
-                      <Twitter className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => shareOnSocial("linkedin", post?.title)}
-                      className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-800 text-white hover:bg-blue-900 transition-colors"
-                    >
-                      <Linkedin className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={copyLink}
-                      className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-600 text-white hover:bg-gray-700 transition-colors"
-                    >
-                      <Share2 className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Comments Section */}
-              {post?.iscommentsenabled && (
-                <div className="mt-12">
-                  <h2 className="text-3xl font-serif font-bold text-gray-900 mb-6">Comments</h2>
-                  <CommentList postId={post.id} />
-                  <hr className="my-8 border-gray-300" />
-                  <h3 className="text-2xl font-medium text-gray-900 mb-4">Leave a Comment</h3>
-                  <CommentForm postId={post.id} />
-                </div>
-              )}
-            </article>
+          {/* Post Meta */}
+          <div className="flex items-center gap-6 mb-8 text-sm text-gray-500">
+            <div className="flex items-center">
+              <Calendar className="h-4 w-4 mr-2" />
+              {formatDate(post?.publishedat)}
+            </div>
+            <div className="flex items-center">
+              <User className="h-4 w-4 mr-2" />
+              { getUserInfoByKey(author,"name") || "Unknown Author"}
+            </div>
+            <div className="flex items-center"> 
+              <Eye className="h-4 w-4 mr-2" />
+              {post?.viewcount || 0} views
+            </div>
+            <div>{readTime} min read</div>
           </div>
 
-          {/* Related Posts (20% width) */}
-          {dummyRelatedPosts.length > 0 && (
-            <aside className="w-full lg:w-1/5">
-              <h2 className="text-2xl font-serif font-bold text-gray-900 mb-6">Related Posts</h2>
-              <div className="space-y-6">
-                {dummyRelatedPosts.map((relatedPost) => (
-                  <div key={relatedPost.id}>
-                    <Link to={`/post/${relatedPost.slug}`}>
-                      <img
-                        src={relatedPost.featuredimage}
-                        alt={relatedPost.title}
-                        className="w-full h-32 object-cover rounded-lg mb-2"
-                      />
-                      <h3 className="text-base font-semibold text-gray-800 hover:text-blue-600 transition-colors">
-                        {relatedPost.title}
-                      </h3>
-                    </Link>
-                    <p className="text-sm text-gray-600">{formatDate(relatedPost.publishedat)}</p>
-                  </div>
+          {/* Author Info */}
+          {author && (
+            <div className="flex items-center mb-12 bg-gray-100 p-4 rounded-lg">
+              <img
+          src={getUserInfoByKey(author,"avatar")}
+          alt="Profile"
+          className="w-10 h-10 rounded-full object-cover"
+          onError={(e) =>
+            (e.target.outerHTML = `<div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm">${getInitials(
+              userData.name
+            )}</div>`)
+          }
+        />
+              <div className="ml-4">
+                <p className="text-sm font-semibold text-gray-900">{getUserInfoByKey(author,"name")}</p>
+                <p className="text-xs text-gray-500    ">{getUserInfoByKey(author,"bio")}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Post Content */}
+          <div
+            className="prose prose-lg prose-gray max-w-none text-gray-800 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: post?.content || "" }}
+          />
+
+          {/* Tags */}
+          {tags.length > 0 && (
+            <div className="mt-12">
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+
+                  console.log("tags map",tag),
+                  <Link
+                    key={tag.id}
+                    to={`/blog?tag=${tag.slug}`}
+                    className="px-3 py-1 border border-gray-300 text-gray-700 text-sm rounded-full hover:bg-gray-100 transition-colors"
+                  >
+                    #{getInfoByTags(tag.id,"name")}
+                  </Link>
                 ))}
               </div>
-            </aside>
+            </div>
           )}
-        </main>
+
+          {/* Share Buttons */}
+          <div className="mt-12">
+            <h3 className="text-sm font-medium text-gray-500 mb-3">Share this post</h3>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => shareOnSocial("facebook", post?.title)}
+                className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              >
+                <Facebook className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => shareOnSocial("twitter", post?.title)}
+                className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              >
+                <Twitter className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => shareOnSocial("linkedin", post?.title)}
+                className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              >
+                <Linkedin className="h-4 w-4" />
+              </button>
+              <button
+                onClick={copyLink}
+                className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              >
+                <Share2 className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Comments Section */}
+          {post?.iscommentsenabled && (
+  <div className="mt-12 max-w-11/12 mx-auto px-1">
+    {/* Simplified card container with gray border */}
+    <div className="bg-white rounded-lg border border-gray-200 p-6">
+      {/* Header matching post typography */}
+      <h2 className="text-2xl font-sans font-bold text-gray-900 mb-6">
+        Comments
+      </h2>
+
+      {/* Comment list with consistent styling */}
+      <div className="mb-8">
+        <CommentList postId={post.id} />
       </div>
+
+      {/* Divider matching other sections */}
+      <hr className="my-6 border-gray-200" />
+
+      {/* Comment form section */}
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <svg
+            className="w-4 h-4 mr-2 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l4-4h3.414A1.994 1.994 0 009 13.414"
+            />
+          </svg>
+          Leave a Comment
+        </h3>
+        <CommentForm postId={post.id} />
+      </div>
+    </div>
+  </div>
+)}
+
+          {/* Related Posts */}
+          {dummyRelatedPosts.length > 0 && (
+            <div className="mt-16">
+              <h2 className="text-2xl font-serif font-bold text-gray-900 mb-6">Related Posts</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {dummyRelatedPosts.map((relatedPost) => (
+                  <Link
+                    key={relatedPost.id}
+                    to={`/post/${relatedPost.slug}`}
+                    className="group"
+                  >
+                    <img
+                      src={relatedPost.featuredimage}
+                      alt={relatedPost.title}
+                      className="w-full h-48 object-cover rounded-lg mb-3 group-hover:opacity-90 transition-opacity"
+                    />
+                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-gray-700 transition-colors">
+                      {relatedPost.title}
+                    </h3>
+                    <p className="text-sm text-gray-500">{formatDate(relatedPost.publishedat)}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </article>
+      </main>
+    </div>
   );
 }

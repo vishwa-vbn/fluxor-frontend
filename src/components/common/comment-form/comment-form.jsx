@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Modal from "../modal/modal";
 import { Loader2 } from "lucide-react";
+import Button from "../../controls/button/buttonView"; // Adjust path based on your project structure
 
 export default function CommentForm({ postId, parentId, onSuccess }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,8 +31,6 @@ export default function CommentForm({ postId, parentId, onSuccess }) {
       if (!res.ok) throw new Error("Failed to submit comment");
       await res.json();
 
-      // Simulate query invalidation (replace with your cache logic if needed)
-      // e.g., queryClient.invalidateQueries([`/api/posts/${postId}/comments`]);
       alert("Comment submitted successfully!");
       setIsOpen(false);
       if (onSuccess) onSuccess();
@@ -43,26 +42,18 @@ export default function CommentForm({ postId, parentId, onSuccess }) {
   };
 
   return (
-    <div>
-      <button
+    <div className="space-y-4">
+      <Button
+        variant="outline"
         onClick={() => setIsOpen(true)}
-        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        isLoading={isSubmitting}
         disabled={isSubmitting}
       >
-        {isSubmitting ? (
-          <>
-            <Loader2 className="inline-block mr-2 h-4 w-4 animate-spin" />
-            Submitting...
-          </>
-        ) : parentId ? (
-          "Reply"
-        ) : (
-          "Post Comment"
-        )}
-      </button>
+        {parentId ? "Reply" : "Post Comment"}
+      </Button>
 
       <Modal
-        title={parentId ? "Reply to Comment" : "Post Comment"}
+        title={parentId ? "Reply to Comment" : "Post a Comment"}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onSubmit={handleSubmit}
@@ -72,15 +63,18 @@ export default function CommentForm({ postId, parentId, onSuccess }) {
           authorEmail: user ? user.email : "",
         }}
       >
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div>
-            <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="content"
+              className="block text-sm font-medium text-gray-900 mb-2"
+            >
               Your Comment
             </label>
             <textarea
               name="content"
               placeholder="Write your comment here..."
-              className="w-full min-h-[100px] border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full min-h-[120px] border border-gray-200 rounded-lg p-3 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
               required
             />
           </div>
@@ -90,21 +84,21 @@ export default function CommentForm({ postId, parentId, onSuccess }) {
               <div>
                 <label
                   htmlFor="authorName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-900 mb-2"
                 >
                   Name
                 </label>
                 <input
                   name="authorName"
                   placeholder="Your name"
-                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 rounded-lg p-3 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
                   required
                 />
               </div>
               <div>
                 <label
                   htmlFor="authorEmail"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-900 mb-2"
                 >
                   Email
                 </label>
@@ -112,7 +106,7 @@ export default function CommentForm({ postId, parentId, onSuccess }) {
                   name="authorEmail"
                   type="email"
                   placeholder="Your email"
-                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 rounded-lg p-3 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
                   required
                 />
               </div>

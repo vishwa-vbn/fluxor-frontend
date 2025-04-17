@@ -63,7 +63,7 @@ function App({ match }) {
     },
     {
       component:PostContainer,
-      link:"post/:slug"
+      link:"posts/:slug"
     }
     // {
     //   component: ChangePasswordContainer,
@@ -94,6 +94,7 @@ function App({ match }) {
 
       {routes?.map((element) => (
         <RestrictedRoute
+        exact
           path={`${match.url}${element.link}`}
           component={element.component}
         />

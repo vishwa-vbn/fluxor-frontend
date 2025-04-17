@@ -78,11 +78,11 @@ const columns = (onDeleteClick) => [
     right: true,
     cell: (row) => (
       <div className="flex space-x-2">
-        <Link to={`/post/${row.slug}`} target="_blank">
-          <Button variant="ghost" size="sm">
-            <Eye className="w-4 h-4 text-black" />
-          </Button>
-        </Link>
+        <Link to={`/posts/${row.slug}`}>
+        <Button variant="ghost" size="sm">
+          <Eye className="w-4 h-4 text-black" />
+        </Button>
+      </Link>
         <Link to={`/edit-post/${row.slug}`}>
           <Button variant="ghost" size="sm">
             <Edit className="w-4 h-4 text-blue-600" />
