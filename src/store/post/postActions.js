@@ -881,6 +881,12 @@ export const updatePost = (id, data) => async (dispatch) => {
   }
 };
 
+
+export const getRelatedPosts=()=>
+{
+
+}
+
 // DELETE POST
 export const deletePost = (id) => async (dispatch) => {
   dispatch({ type: POST_DELETE_PENDING });

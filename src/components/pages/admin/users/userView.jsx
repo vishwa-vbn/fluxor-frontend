@@ -4,12 +4,12 @@ import { Card } from "../../../common/card/Card";
 import Input from "../../../controls/input/inputView";
 import Textarea from "../../../controls/textarea/Textarea";
 import Modal from "../../../common/modal/modal";
-import DataTable from "react-data-table-component";
 import Button from "../../../controls/button/buttonView";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
 import SearchBar from "../../../controls/searchbar/searchbar";
 import Select from "../../../controls/selection/selection";
 import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage"; // Adjust path as needed
+import ReusableDataTable from "../../../common/DataTable/DataTable";
 
 const UsersView = ({
   users,
@@ -168,6 +168,12 @@ const UsersView = ({
     setCurrentPage(page);
   };
 
+  // Handle row click
+  const handleRowClick = (row) => {
+    // Optionally handle row click if needed, e.g., for navigation or selection
+    console.log("Row clicked:", row);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 px-0 py-0 space-y-6">
       <div className="flex-1 flex flex-col">
@@ -213,20 +219,20 @@ const UsersView = ({
           </div>
 
           <Card>
-            <DataTable
-              key={`datatable-${rowsPerPage}`} // Force re-render when rowsPerPage changes
+            <ReusableDataTable
               columns={columns}
               data={users}
-              progressPending={isLoading}
-              noDataComponent="No users found"
-              pagination
-              paginationPerPage={rowsPerPage}
-              paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort((a, b) => a - b)}
-              paginationDefaultPage={currentPage}
+              loading={isLoading}
+              rowsPerPage={rowsPerPage}
+              currentPage={currentPage}
               onChangePage={handlePageChange}
-              highlightOnHover
-              striped
-              noHeader
+              onRowClick={handleRowClick}
+              paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort(
+                (a, b) => a - b
+              )}
+              striped={true}
+              highlightOnHover={true}
+              noHeader={true}
             />
           </Card>
 
@@ -302,7 +308,7 @@ const UsersView = ({
                 type="password"
               />
               <Select
-                label selectableHeader="Role"
+                label="Role"
                 name="role"
                 options={roleOptions}
                 defaultValue={selectedUser.role || "user"}

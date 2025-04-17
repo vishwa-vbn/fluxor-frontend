@@ -5,7 +5,6 @@ import { bindActionCreators } from "redux";
 import connect from "react-redux/es/connect/connect";
 // import { logout } from "../../store/auth/authActions";
 import AdminSidebar from "../common/adminsidebar/adminsidebar";
-import Loader from "../common/loader/loader";
 
 
 import './MainLayout.css';
@@ -22,7 +21,6 @@ class MainLayout extends React.Component {
         
 
         <main className="h-screen w-screen overflow-auto scrollbar-hide">
-          <Loader/>
 
           {this.props.children}
         </main>

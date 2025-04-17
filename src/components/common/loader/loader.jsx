@@ -1,41 +1,33 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import clsx from 'clsx';
 
-import React from "react";
-import PropTypes from "prop-types";
-import { bindActionCreators } from "redux";
-import { connect } from "react-redux";
-import clsx from "clsx";
-import "./loaderStyles.css"; // Import the CSS file
-
-const Loader = ({ isOpen, size, message, className }) => {
-  if (!isOpen) return null;
-
+const Loader = ({ size = 'lg', message = '', className = '' }) => {
   return (
-    <div className={clsx("loader-overlay", { "pointer-events-none": !isOpen })}>
-      <div className={clsx("loader-content", className)}>
-        <span className={`loading loading-bars loading-${size}`}></span>
-        {message && <p className="loader-message">{message}</p>}
-      </div>
+    <div
+      className={clsx(
+        'flex flex-row items-center justify-center gap-2 py-4',
+        className
+      )}
+    >
+      <span className={`loading loading-bars loading-${size} text-primary`}></span>
+      {message && (
+        <p className="text-gray text-lg font-medium">{message}</p>
+      )}
     </div>
   );
 };
 
 Loader.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  size: PropTypes.oneOf(["xs", "sm", "md", "lg", "xl"]),
+  size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg']),
   message: PropTypes.string,
   className: PropTypes.string,
 };
 
 Loader.defaultProps = {
-  size: "md",
-  message: "Loading, please wait...",
-  className: "",
+  size: 'lg',
+  message: '',
+  className: '',
 };
 
-const mapStateToProps = (state) => ({
-  isOpen: state.loader.isOpen,
-});
-
-const mapDispatchToProps = (dispatch) => bindActionCreators({}, dispatch);
-
-export default connect(mapStateToProps, mapDispatchToProps)(Loader);
+export default Loader;
