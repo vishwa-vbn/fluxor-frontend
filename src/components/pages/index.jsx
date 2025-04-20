@@ -15,6 +15,7 @@ import CommentsContainer from "./admin/comments/commentsContainer.jsx";
 import TagsContainer from "./admin/tags/tagsContainer.jsx";
 import UsersContainer from "./admin/users/userContainer.jsx";
 import PostContainer from "./user/post/postContainer.jsx";
+import AdSenseManagerContainer from "./admin/adSense/AdSenseManagerContainer.jsx";
 
 
 function App({ match }) {
@@ -64,6 +65,10 @@ function App({ match }) {
     {
       component:PostContainer,
       link:"posts/:slug"
+    }
+    , {
+      component:AdSenseManagerContainer,
+      link:"adSense"
     }
     // {
     //   component: ChangePasswordContainer,

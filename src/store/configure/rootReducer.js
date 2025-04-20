@@ -10,6 +10,7 @@ import {categoryReducer} from '../categories/categoriesReducer';
 import postCategoriesReducer from '../postCategories/postCategoriesReducer';
 import postTagsReducer from '../postTags/postTagsReducer';
 import commentsReducer from "../comments/commentsReducer";
+import adsenseReducer from "../adSense/adSenseReducer";
 
 export const rootReducer = combineReducers({
   router: routerReducer,
@@ -22,4 +23,5 @@ export const rootReducer = combineReducers({
   postCategories: postCategoriesReducer,
   postTags: postTagsReducer,
   comments:commentsReducer,
+  adSense:adsenseReducer,
 });
