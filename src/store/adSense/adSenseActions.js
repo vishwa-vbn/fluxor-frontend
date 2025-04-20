@@ -46,7 +46,7 @@ export const createAdUnit = (data) => async (dispatch) => {
   const token = getState().auth?.loginUser?.token;
 
   try {
-    const res = await axios.post(`${API_URL}`, data, {
+    const res = await axios.post(`${API_URL}/ad-unit`, data, {
       headers: {
         Authorization: `${token}`,
         "Content-Type": "application/json",

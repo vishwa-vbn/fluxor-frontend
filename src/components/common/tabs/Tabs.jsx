@@ -1,11 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-export const Tabs = ({ children, defaultValue }) => {
-  const [activeTab, setActiveTab] = useState(defaultValue);
+export const Tabs = ({ children, defaultValue, value, onValueChange }) => {
+  // Use internal state for uncontrolled mode, or controlled value if provided
+  const [internalActiveTab, setInternalActiveTab] = useState(defaultValue);
+  const activeTab = value !== undefined ? value : internalActiveTab;
+
+  // Update internal state when defaultValue changes (for uncontrolled mode)
+  useEffect(() => {
+    if (value === undefined) {
+      setInternalActiveTab(defaultValue);
+    }
+  }, [defaultValue, value]);
+
+  // Handle tab change
+  const handleTabChange = (newValue) => {
+    if (value !== undefined) {
+      // Controlled mode: Call onValueChange
+      onValueChange?.(newValue);
+    } else {
+      // Uncontrolled mode: Update internal state
+      setInternalActiveTab(newValue);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {React.Children.map(children, (child) =>
-        React.cloneElement(child, { activeTab, setActiveTab })
+        React.cloneElement(child, { activeTab, setActiveTab: handleTabChange })
       )}
     </div>
   );
