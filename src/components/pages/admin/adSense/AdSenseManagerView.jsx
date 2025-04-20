@@ -379,7 +379,8 @@ const AdSenseManagerView = ({
           />
 
 
-<main className="w-[95%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<main className="flex-1 w-full mx-auto px-6 py-3 space-y-8">
+
 
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
           Ad Management
