@@ -52,6 +52,7 @@ const defaultCustomContent = {
 };
 
 const normalizeAdData = (ad) => ({
+  id: ad.id || null,
   name: ad.name || "",
   code: ad.code || "",
   ad_type: ad.ad_type || "banner",
@@ -106,6 +107,8 @@ const contentTypeOptions = {
     { value: "url", label: "YouTube URL" },
     { value: "custom_video", label: "Upload Video" },
   ],
+  native: [{ value: "text", label: "Text Content" }],
+  custom: [{ value: "code", label: "Custom Code" }],
 };
 
 const densityOptions = [
@@ -145,7 +148,7 @@ const AdSenseManagerView = ({
 }) => {
   const [editingAd, setEditingAd] = useState(null);
   const [previewAd, setPreviewAd] = useState(null);
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState("configuration");
   const [formData, setFormData] = useState(normalizeAdData({}));
   const [errors, setErrors] = useState({});
   const [configErrors, setConfigErrors] = useState({});
@@ -155,12 +158,13 @@ const AdSenseManagerView = ({
     targeting: true,
     schedule: true,
   });
-  // Local state for Configuration settings
   const [localPublisherId, setLocalPublisherId] = useState(publisherId || "");
   const [localAdClient, setLocalAdClient] = useState(adClient || "");
   const [localAdDensity, setLocalAdDensity] = useState(adDensity || "balanced");
   const [localAdFormat, setLocalAdFormat] = useState(adFormat || "responsive");
-  const [localTargetPages, setLocalTargetPages] = useState(targetPages || "all");
+  const [localTargetPages, setLocalTargetPages] = useState(
+    targetPages || "all"
+  );
 
   const defaultAd = useMemo(
     () => ({
@@ -168,34 +172,23 @@ const AdSenseManagerView = ({
       code: "",
       ad_type: "banner",
       placement: "header",
-      custom_content: {},
-      dimensions: { width: 0, height: 0 },
+      custom_content: defaultCustomContent,
+      dimensions: defaultDimensions,
       is_active: true,
-      target_pages: [],
-      target_audience: {},
-      schedule: {},
+      target_pages: { match_type: "exact", paths: [] },
+      target_audience: defaultAudience,
+      schedule: defaultSchedule,
       priority: 0,
     }),
     []
   );
 
   useEffect(() => {
-    // Set default tab to configuration on initial load
-    setActiveTab("configuration");
-  }, []);
-
-  useEffect(() => {
-    console.log("active tab is", activeTab);
-  }, [activeTab]);
-
-  useEffect(() => {
-    // Update local state when props change
     setLocalPublisherId(publisherId || "");
     setLocalAdClient(adClient || "");
     setLocalAdDensity(adDensity || "balanced");
     setLocalAdFormat(adFormat || "responsive");
     setLocalTargetPages(targetPages || "all");
-    // Clear errors when props update
     setConfigErrors({});
   }, [publisherId, adClient, adDensity, adFormat, targetPages]);
 
@@ -235,72 +228,17 @@ const AdSenseManagerView = ({
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      handleChange("file", file);
-      const previewUrl = URL.createObjectURL(file);
-      handleCustomContentChange(
-        formData.ad_type === "video" ? "youtube_url" : "image_url",
-        previewUrl
-      );
-      handleChange("custom_file_id", `file_${Date.now()}`);
+      setFormData((prev) => ({
+        ...prev,
+        file,
+        custom_content: {
+          ...prev.custom_content,
+          [formData.ad_type === "video" ? "youtube_url" : "image_url"]:
+            URL.createObjectURL(file),
+        },
+      }));
+      setErrors((prev) => ({ ...prev, file: null }));
     }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name) newErrors.name = "Ad name is required";
-    if (!formData.code) newErrors.code = "Ad code is required";
-    if (
-      formData.ad_type === "video" &&
-      formData.custom_content.content_type === "url" &&
-      !formData.custom_content.youtube_url
-    ) {
-      newErrors.youtube_url = "YouTube URL is required for video ads";
-    }
-    if (
-      formData.ad_type === "video" &&
-      formData.custom_content.content_type === "custom_video" &&
-      !formData.file
-    ) {
-      newErrors.file = "Video file is required for custom video ads";
-    }
-    if (
-      formData.ad_type === "banner" &&
-      formData.custom_content.content_type === "url" &&
-      !formData.custom_content.image_url
-    ) {
-      newErrors.image_url = "Image URL is required for banner ads";
-    }
-    if (
-      formData.ad_type === "banner" &&
-      formData.custom_content.content_type === "custom_image" &&
-      !formData.file
-    ) {
-      newErrors.file = "Image file is required for custom image ads";
-    }
-    if (
-      formData.ad_type === "custom" &&
-      !formData.custom_content.html &&
-      !formData.custom_content.css &&
-      !formData.custom_content.js
-    ) {
-      newErrors.custom_content =
-        "At least one of HTML, CSS, or JS is required for custom ads";
-    }
-    if (formData.dimensions.width <= 0 || formData.dimensions.height <= 0) {
-      newErrors.dimensions = "Valid dimensions are required";
-    }
-    if (formData.target_pages.paths.length === 0) {
-      newErrors.target_pages = "At least one target page path is required";
-    }
-    if (
-      formData.schedule.start &&
-      formData.schedule.end &&
-      new Date(formData.schedule.start) >= new Date(formData.schedule.end)
-    ) {
-      newErrors.schedule = "End time must be after start time";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const validateConfiguration = () => {
@@ -319,7 +257,7 @@ const AdSenseManagerView = ({
 
   const handleSaveAd = (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    // if (!validateForm()) return;
 
     const dataToSend = {
       name: formData.name,
@@ -332,31 +270,27 @@ const AdSenseManagerView = ({
       target_audience: formData.target_audience,
       schedule: formData.schedule,
       priority: formData.priority,
-      status: formData.status,
-      custom_file_id: formData.custom_file_id,
+      status: formData.is_active ? "active" : "draft",
       custom_content: formData.custom_content,
     };
 
     if (formData.file) {
       const formDataToSend = new FormData();
-      Object.keys(dataToSend).forEach((key) => {
-        if (typeof dataToSend[key] === "object" && key !== "file") {
-          formDataToSend.append(key, JSON.stringify(dataToSend[key]));
-        } else {
-          formDataToSend.append(key, dataToSend[key]);
-        }
-      });
       formDataToSend.append("file", formData.file);
+      formDataToSend.append("data", JSON.stringify(dataToSend));
       editingAd
-        ? onUpdateCustomAd(formDataToSend)
+        ? onUpdateCustomAd({ id: formData.id, data: formDataToSend })
         : onAddCustomAd(formDataToSend);
     } else {
-      editingAd ? onUpdateCustomAd(dataToSend) : onAddCustomAd(dataToSend);
+      editingAd
+        ? onUpdateCustomAd({ id: formData.id, data: dataToSend })
+        : onAddCustomAd(dataToSend);
     }
 
     setEditingAd(null);
-    setFormData(normalizeAdData({}));
+    setFormData(normalizeAdData(defaultAd));
     setActiveTab("custom");
+    setErrors({});
   };
 
   const handleOpenPreview = (ad) => {
@@ -380,7 +314,6 @@ const AdSenseManagerView = ({
   };
 
   const toggleSection = (section) => {
-    console.log("toggle called", section);
     setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
@@ -390,16 +323,9 @@ const AdSenseManagerView = ({
   };
 
   const handleSearch = (query) => {
-    // Placeholder for search functionality
     console.log("Search query:", query);
   };
 
-  // Handle page change (placeholder for pagination if needed)
-  const handlePageChange = (page) => {
-    console.log("Page changed to:", page);
-  };
-
-  // Handle Configuration save
   const handleSaveConfiguration = () => {
     if (!validateConfiguration()) return;
     onSaveAdSettings({
@@ -418,7 +344,7 @@ const AdSenseManagerView = ({
           userData={sampleUserData}
           onSearch={handleSearch}
           notificationCount={3}
-          toggleSidebar={() => console.log("Sidebar toggled")} // Placeholder
+          toggleSidebar={() => console.log("Sidebar toggled")}
         />
 
         <main className="flex-1 w-full mx-auto px-6 py-3 space-y-8">
@@ -431,7 +357,10 @@ const AdSenseManagerView = ({
           </p>
 
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+              role="alert"
+            >
               <span className="block sm:inline">{error}</span>
             </div>
           )}
@@ -474,7 +403,6 @@ const AdSenseManagerView = ({
                     </p>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* AdSense Account Settings */}
                     <div className="space-y-4">
                       <h3 className="text-base font-medium text-gray-800 dark:text-gray-100">
                         AdSense Account
@@ -496,7 +424,6 @@ const AdSenseManagerView = ({
                         error={configErrors.adClient}
                       />
                     </div>
-                    {/* Global Ad Settings */}
                     <div className="space-y-4">
                       <h3 className="text-base font-medium text-gray-800 dark:text-gray-100">
                         Global Ad Settings
@@ -641,7 +568,6 @@ const AdSenseManagerView = ({
                         </p>
                       </CardHeader>
                       <CardContent className="space-y-6">
-                        {/* General Settings */}
                         <Card className="shadow-sm dark:bg-gray-800 dark:border-gray-700">
                           <CardHeader
                             className="flex flex-row justify-between items-center cursor-pointer py-3"
@@ -783,7 +709,6 @@ const AdSenseManagerView = ({
                           )}
                         </Card>
 
-                        {/* Content Settings */}
                         <Card className="shadow-sm dark:bg-gray-800 dark:border-gray-700">
                           <CardHeader
                             className="flex flex-row justify-between items-center cursor-pointer py-3"
@@ -946,7 +871,6 @@ const AdSenseManagerView = ({
                           )}
                         </Card>
 
-                        {/* Targeting Settings */}
                         <Card className="shadow-sm dark:bg-gray-800 dark:border-gray-700">
                           <CardHeader
                             className="flex flex-row justify-between items-center cursor-pointer py-3"
@@ -1060,7 +984,6 @@ const AdSenseManagerView = ({
                           )}
                         </Card>
 
-                        {/* Schedule Settings */}
                         <Card className="shadow-sm dark:bg-gray-800 dark:border-gray-700">
                           <CardHeader
                             className="flex flex-row justify-between items-center cursor-pointer py-3"
@@ -1116,12 +1039,13 @@ const AdSenseManagerView = ({
                           )}
                         </Card>
 
-                        {/* Sticky Action Bar */}
                         <div className="sticky bottom-0 bg-white dark:bg-gray-900 py-4 border-t dark:border-gray-700 flex justify-end gap-4">
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => setFormData(normalizeAdData({}))}
+                            onClick={() =>
+                              setFormData(normalizeAdData(defaultAd))
+                            }
                             className="border-gray-300 dark:border-gray-600 dark:text-gray-100"
                           >
                             Reset
@@ -1132,14 +1056,13 @@ const AdSenseManagerView = ({
                             variant="outline"
                             className="border-gray-300 dark:border-gray-600 dark:text-gray-100"
                           >
-                            {formData.id ? "Update Ad" : "Create Ad"}
+                            {editingAd ? "Update Ad" : "Create Ad"}
                           </Button>
                         </div>
                       </CardContent>
                     </Card>
                   </div>
 
-                  {/* Preview Pane */}
                   <div className="col-span-1">
                     <Card className="shadow-sm dark:bg-gray-800 dark:border-gray-700 sticky top-4">
                       <CardHeader>

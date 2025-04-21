@@ -64,14 +64,21 @@ const adsenseReducer = (state = initialState, action) => {
         adUnit: action.payload,
       };
 
-    case AD_UNITS_UPDATE_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        adUnits: state.adUnits.map((unit) =>
-          unit.id === action.payload.id ? action.payload : unit
-        ),
-      };
+      case AD_UNITS_UPDATE_SUCCESS: {
+        const updatedAdUnits = [];
+        for (const unit of Array.isArray(state.adUnits) ? state.adUnits : []) {
+          if (unit.id === action.payload.data.id) {
+            updatedAdUnits.push(action.payload.data);
+          } else {
+            updatedAdUnits.push(unit);
+          }
+        }
+        return {
+          ...state,
+          loading: false,
+          adUnits: updatedAdUnits,
+        };
+      }
 
     case AD_UNITS_DELETE_SUCCESS:
       return {
