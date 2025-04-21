@@ -9,6 +9,8 @@ import { actionTypes } from "./authReducer";
 
 // API Configuration
 const API_URL = "https://fluxor-backend-production.up.railway.app"; // Use Vite env
+// const API_URL = "http://localhost:3000"; // Use Vite env
+
 
 // Initialize Socket.IO dynamically
 let socket = null;

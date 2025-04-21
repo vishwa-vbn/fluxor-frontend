@@ -25,7 +25,7 @@
 // export const POST_CATEGORIES_DELETE_SUCCESS = "POST_CATEGORIES_DELETE_SUCCESS";
 // export const POST_CATEGORIES_DELETE_ERROR = "POST_CATEGORIES_DELETE_ERROR";
 
-// // const API_URL = "https://fluxor-backend.vercel.app/api/post-categories";
+// const API_URL = "https://fluxor-backend.vercel.app/api/post-categories";
 // const API_URL = "http://localhost:3000/api/post-categories";
 
 

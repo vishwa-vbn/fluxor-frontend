@@ -177,6 +177,18 @@ export default function AdminSidebar() {
             <span>Analytics</span>
           </Link>
         </li>
+        
+        <li>
+          <Link
+            to="/adSense"
+            className={`flex items-center p-2 rounded-lg hover:bg-gray-800 hover:text-gray-300 transition-colors ${
+              isMainActive("/adSense") ? "bg-gray-800 text-blue-300" : ""
+            }`}
+          >
+            <BarChart2 className="w-5 h-5 mr-3" />
+            <span>AdSense</span>
+          </Link>
+        </li>
       </ul>
 
       {/* Footer / Logout */}
