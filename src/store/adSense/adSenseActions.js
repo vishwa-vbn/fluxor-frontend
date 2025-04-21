@@ -2,6 +2,7 @@ import axios from "axios";
 import { getState } from "../configure/configureStore";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
+import io from "socket.io-client";
 
 // Action Types
 // Ad Units
@@ -38,6 +39,82 @@ export const AD_SETTINGS_UPSERT_ERROR = "AD_SETTINGS_UPSERT_ERROR";
 const API_URL = "https://fluxor-backend-production.up.railway.app/api/ad-units";
 // const API_URL = "http://localhost:3000/api/ad-units";
 
+// Initialize Socket.IO dynamically
+let socket = null;
+
+// Initialize Socket.IO listeners for real-time ad unit updates
+export const initializeAdUnitSocket = () => (dispatch) => {
+  if (socket) {
+    console.log("Socket.IO already initialized for ad units");
+    return;
+  }
+
+  const token = getState().auth?.loginUser?.token || "";
+  socket = io(`${API_URL.replace("/api/ad-units", "")}/blog`, {
+    reconnection: true,
+    transports: ["polling", "websocket"],
+    auth: { token },
+  });
+
+  socket.on("connect", () => {
+    console.log("Connected to Socket.IO server (blog namespace) for ad units");
+  });
+
+  socket.on("ad_unit_change", (payload) => {
+    console.log("Ad unit change received:", payload);
+    switch (payload.operation) {
+      case "INSERT":
+        dispatch({
+          type: AD_UNITS_CREATE_SUCCESS,
+          payload: payload.record,
+        });
+        break;
+      case "UPDATE":
+        dispatch({
+          type: AD_UNITS_UPDATE_SUCCESS,
+          payload: payload.record,
+        });
+        break;
+      case "DELETE":
+        dispatch({
+          type: AD_UNITS_DELETE_SUCCESS,
+          payload: payload.record.id, // Use record.id for DELETE
+        });
+        break;
+      default:
+        console.warn("Unknown operation:", payload.operation);
+    }
+  });
+
+  socket.on("connect_error", (error) => {
+    console.error("Socket.IO connection error for ad units:", error.message);
+    dispatch(
+      showAlert({
+        isOpen: true,
+        title: "Real-Time Error",
+        type: "error",
+        msg: "Failed to connect to real-time ad unit updates. Please refresh.",
+      })
+    );
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Disconnected from Socket.IO server for ad units");
+  });
+};
+
+// Cleanup Socket.IO listeners
+export const cleanupAdUnitSocket = () => () => {
+  if (socket) {
+    socket.off("ad_unit_change");
+    socket.off("connect");
+    socket.off("connect_error");
+    socket.off("disconnect");
+    socket.disconnect();
+    socket = null;
+    console.log("Socket.IO cleaned up for ad units");
+  }
+};
 
 // CREATE AD UNIT
 export const createAdUnit = (data) => async (dispatch) => {
@@ -82,35 +159,35 @@ export const createAdUnit = (data) => async (dispatch) => {
 
 // GET ALL AD UNITS
 export const getAllAdUnits = () => async (dispatch) => {
-    dispatch({ type: AD_UNITS_FETCH_ALL_PENDING });
-    dispatch(showLoader());
-    const token = getState().auth?.loginUser?.token;
-  
-    try {
-      const res = await axios.get(`${API_URL}/`, {
-        headers: {
-          Authorization: `${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      dispatch({ type: AD_UNITS_FETCH_ALL_SUCCESS, payload: res.data }); // res.data is { status, message, data }
-    } catch (err) {
-      dispatch({
-        type: AD_UNITS_FETCH_ALL_ERROR,
-        payload: err.response?.data?.message || err.message,
-      });
-      dispatch(
-        showAlert({
-          isOpen: true,
-          title: "Fetch Error",
-          type: "error",
-          msg: err.response?.data?.message || err.message,
-        })
-      );
-    } finally {
-      dispatch(hideLoader());
-    }
-  };
+  dispatch({ type: AD_UNITS_FETCH_ALL_PENDING });
+  dispatch(showLoader());
+  const token = getState().auth?.loginUser?.token;
+
+  try {
+    const res = await axios.get(`${API_URL}/`, {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    dispatch({ type: AD_UNITS_FETCH_ALL_SUCCESS, payload: res.data });
+  } catch (err) {
+    dispatch({
+      type: AD_UNITS_FETCH_ALL_ERROR,
+      payload: err.response?.data?.message || err.message,
+    });
+    dispatch(
+      showAlert({
+        isOpen: true,
+        title: "Fetch Error",
+        type: "error",
+        msg: err.response?.data?.message || err.message,
+      })
+    );
+  } finally {
+    dispatch(hideLoader());
+  }
+};
 
 // GET AD UNIT BY ID
 export const getAdUnitById = (id) => async (dispatch) => {
@@ -119,15 +196,12 @@ export const getAdUnitById = (id) => async (dispatch) => {
   const token = getState().auth?.loginUser?.token;
 
   try {
-    const res = await axios.get(`${API_URL}/ad-unit/${id}`,
-        {
-            headers: {
-                Authorization: `${token}`,
-                "Content-Type": "application/json",
-              },
-
-        }
-    );
+    const res = await axios.get(`${API_URL}/ad-unit/${id}`, {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+    });
     dispatch({ type: AD_UNITS_FETCH_ONE_SUCCESS, payload: res.data });
   } catch (err) {
     dispatch({
@@ -236,14 +310,12 @@ export const getAdSettings = () => async (dispatch) => {
   const token = getState().auth?.loginUser?.token;
 
   try {
-    const res = await axios.get(`${API_URL}/ad-settings`,
-        {
-            headers: {
-                Authorization: `${token}`,
-                "Content-Type": "application/json",
-              },
-        }
-    );
+    const res = await axios.get(`${API_URL}/ad-settings`, {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+    });
     dispatch({ type: AD_SETTINGS_FETCH_SUCCESS, payload: res.data });
   } catch (err) {
     dispatch({

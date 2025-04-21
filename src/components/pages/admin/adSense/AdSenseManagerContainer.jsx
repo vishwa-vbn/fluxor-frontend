@@ -8,6 +8,8 @@ import {
   deleteAdUnit,
   getAdSettings,
   upsertAdSettings,
+  initializeAdUnitSocket,
+  cleanupAdUnitSocket,
 } from "../../../../store/adSense/adSenseActions";
 import AdSenseManagerView from "./AdSenseManagerView";
 
@@ -15,16 +17,12 @@ class AdSenseManagerContainer extends Component {
   componentDidMount() {
     this.props.getAllAdUnits();
     this.props.getAdSettings();
+    this.props.initializeAdUnitSocket();
   }
 
-  handleSaveAdSenseSettings = ({ publisherId, adClient }) => {
-    const { adSettings, upsertAdSettings } = this.props;
-    upsertAdSettings({
-      ...adSettings,
-      publisher_id: publisherId,
-      ad_client: adClient,
-    });
-  };
+  componentWillUnmount() {
+    this.props.cleanupAdUnitSocket();
+  }
 
   handleUpdatePlacement = (placement, isEnabled) => {
     const { adSettings, upsertAdSettings } = this.props;
@@ -44,7 +42,7 @@ class AdSenseManagerContainer extends Component {
       ...newAd,
       is_active: newAd.is_active !== undefined ? newAd.is_active : true,
       status: newAd.is_active ? "active" : "inactive",
-      code: newAd.code || `AD-${Date.now()}`, // Generate unique code if not provided
+      code: newAd.code || `AD-${Date.now()}`,
       priority: newAd.priority || 0,
       target_pages: newAd.target_pages || [],
       target_audience: newAd.target_audience || {},
@@ -67,13 +65,20 @@ class AdSenseManagerContainer extends Component {
     }
   };
 
-  handleSaveAdSettings = ({ adDensity, adFormat, targetPages }) => {
-    const { adSettings, upsertAdSettings } = this.props;
+  handleSaveAdSettings = ({
+    publisher_id,
+    ad_client,
+    ad_density,
+    ad_format,
+    target_pages,
+  }) => {
+    const { upsertAdSettings } = this.props;
     upsertAdSettings({
-      ...adSettings,
-      ad_density: adDensity,
-      ad_format: adFormat,
-      target_pages: targetPages,
+      publisher_id,
+      ad_client,
+      ad_density,
+      ad_format,
+      target_pages,
     });
   };
 
@@ -81,31 +86,29 @@ class AdSenseManagerContainer extends Component {
     const { adUnits, adSettings, loading, error } = this.props;
 
     return (
-    
-        <AdSenseManagerView
-          publisherId={adSettings?.publisher_id || ""}
-          adClient={adSettings?.ad_client || ""}
-          placements={adSettings?.placements || []}
-          adDensity={adSettings?.ad_density || "balanced"}
-          adFormat={adSettings?.ad_format || "responsive"}
-          targetPages={adSettings?.target_pages || "all"}
-          adUnits={adUnits || []}
-          loading={loading}
-          error={error}
-          onSaveAdSenseSettings={this.handleSaveAdSenseSettings}
-          onUpdatePlacement={this.handleUpdatePlacement}
-          onAddCustomAd={this.handleAddCustomAd}
-          onUpdateCustomAd={this.handleUpdateCustomAd}
-          onDeleteAdUnit={this.handleDeleteAdUnit}
-          onSaveAdSettings={this.handleSaveAdSettings}
-        />
+      <AdSenseManagerView
+        publisherId={adSettings?.publisher_id || ""}
+        adClient={adSettings?.ad_client || ""}
+        placements={adSettings?.placements || []}
+        adDensity={adSettings?.ad_density || "balanced"}
+        adFormat={adSettings?.ad_format || "responsive"}
+        targetPages={adSettings?.target_pages || "all"}
+        adUnits={adUnits || []}
+        loading={loading}
+        error={error}
+        onUpdatePlacement={this.handleUpdatePlacement}
+        onAddCustomAd={this.handleAddCustomAd}
+        onUpdateCustomAd={this.handleUpdateCustomAd}
+        onDeleteAdUnit={this.handleDeleteAdUnit}
+        onSaveAdSettings={this.handleSaveAdSettings}
+      />
     );
   }
 }
 
 const mapStateToProps = (state) => ({
-  adUnits: state.adSense.adUnits.data,
-  adSettings: state.adSense.adSettings.data,
+  adUnits: state.adSense?.adUnits?.data,
+  adSettings: state.adSense?.adSettings?.data,
   loading: state.adSense.loading,
   error: state.adSense.error,
 });
@@ -119,11 +122,10 @@ const mapDispatchToProps = (dispatch) =>
       deleteAdUnit,
       getAdSettings,
       upsertAdSettings,
+      initializeAdUnitSocket,
+      cleanupAdUnitSocket,
     },
     dispatch
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AdSenseManagerContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(AdSenseManagerContainer);
