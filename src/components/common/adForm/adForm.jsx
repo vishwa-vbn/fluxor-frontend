@@ -98,9 +98,9 @@ const AdForm = ({ ad = {}, onSubmit, size = "lg" }) => {
   const [errors, setErrors] = useState({});
   const [expandedSections, setExpandedSections] = useState({
     general: true,
-    content: true,
-    targeting: true,
-    schedule: true,
+    content: false,
+    targeting: false,
+    schedule: false,
   });
 
   useEffect(() => {

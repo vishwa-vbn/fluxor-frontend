@@ -33,7 +33,7 @@ const AdPreview = ({ ad }) => {
 
   const renderAdContent = useMemo(() => {
     switch (ad_type) {
-      case "display":
+      case "banner":
         if (custom_content.image_url) {
           return (
             <img

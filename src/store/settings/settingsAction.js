@@ -26,8 +26,8 @@ export const SETTINGS_DELETE_SUCCESS = "SETTINGS_DELETE_SUCCESS";
 export const SETTINGS_DELETE_ERROR = "SETTINGS_DELETE_ERROR";
 
 // API Configuration
-// const API_URL = "https://fluxor-backend-production.up.railway.app";
-const API_URL = "http://localhost:3000";
+const API_URL = "https://fluxor-backend-production.up.railway.app";
+// const API_URL = "http://localhost:3000";
 
 
 // Initialize Socket.IO dynamically
@@ -41,7 +41,7 @@ export const initializeSettingSocket = () => (dispatch) => {
   }
 
   const token = getState().auth?.loginUser?.token || "";
-  socket = io(`${API_URL}/settings`, {
+  socket = io(`${API_URL}/blog`, {
     reconnection: true,
     transports: ["polling", "websocket"],
     auth: { token },

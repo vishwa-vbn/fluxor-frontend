@@ -50,12 +50,12 @@ const adsenseReducer = (state = initialState, action) => {
         adUnits: [...state.adUnits, action.payload],
       };
 
-      case AD_UNITS_FETCH_ALL_SUCCESS:
-        return {
-          ...state,
-          loading: false,
-          adUnits: action.payload ||[], // Store the entire response object
-        };
+    case AD_UNITS_FETCH_ALL_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        adUnits: action.payload || [], // Store the entire response object
+      };
 
     case AD_UNITS_FETCH_ONE_SUCCESS:
       return {
