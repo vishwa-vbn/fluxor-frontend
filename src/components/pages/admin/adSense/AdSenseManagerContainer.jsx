@@ -38,34 +38,34 @@ class AdSenseManagerContainer extends Component {
 
   handleAddCustomAd = (data) => {
     const { createAdUnit } = this.props;
-    let adData = data;
     if (data instanceof FormData) {
-      adData = JSON.parse(data.get("data") || "{}");
-      adData.file = data.get("file");
+      // Pass FormData directly to the Redux action
+      createAdUnit(data);
+    } else {
+      createAdUnit({
+        ...data,
+        is_active: data.is_active !== undefined ? data.is_active : true,
+        status: data.is_active ? "active" : "draft",
+        code: data.code || `AD-${Date.now()}`,
+        priority: data.priority || 0,
+        target_pages: data.target_pages || { match_type: "exact", paths: [] },
+        target_audience: data.target_audience || {},
+        schedule: data.schedule || {},
+      });
     }
-    createAdUnit({
-      ...adData,
-      is_active: adData.is_active !== undefined ? adData.is_active : true,
-      status: adData.is_active ? "active" : "draft",
-      code: adData.code || `AD-${Date.now()}`,
-      priority: adData.priority || 0,
-      target_pages: adData.target_pages || { match_type: "exact", paths: [] },
-      target_audience: adData.target_audience || {},
-      schedule: adData.schedule || {},
-    });
   };
 
   handleUpdateCustomAd = ({ id, data }) => {
     const { updateAdUnit } = this.props;
-    let adData = data;
     if (data instanceof FormData) {
-      adData = JSON.parse(data.get("data") || "{}");
-      adData.file = data.get("file");
+      // Pass FormData directly to the Redux action
+      updateAdUnit(id, data);
+    } else {
+      updateAdUnit(id, {
+        ...data,
+        status: data.is_active ? "active" : "draft",
+      });
     }
-    updateAdUnit(id, {
-      ...adData,
-      status: adData.is_active ? "active" : "draft",
-    });
   };
 
   handleDeleteAdUnit = (adUnitId) => {
