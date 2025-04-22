@@ -225,16 +225,14 @@ const AdSenseManagerView = ({
     setErrors((prev) => ({ ...prev, custom_content: null }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (file) => {
     if (file) {
       setFormData((prev) => ({
         ...prev,
         file,
         custom_content: {
           ...prev.custom_content,
-          [formData.ad_type === "video" ? "youtube_url" : "image_url"]:
-            URL.createObjectURL(file),
+          [formData.ad_type === "video" ? "youtube_url" : "image_url"]: file,
         },
       }));
       setErrors((prev) => ({ ...prev, file: null }));
@@ -271,7 +269,17 @@ const AdSenseManagerView = ({
       schedule: formData.schedule,
       priority: formData.priority,
       status: formData.is_active ? "active" : "draft",
-      custom_content: formData.custom_content,
+      custom_content: {
+        ...formData.custom_content,
+        image_url:
+          formData.custom_content.image_url instanceof File
+            ? ""
+            : formData.custom_content.image_url,
+        youtube_url:
+          formData.custom_content.youtube_url instanceof File
+            ? ""
+            : formData.custom_content.youtube_url,
+      },
     };
 
     if (formData.file) {
