@@ -45,7 +45,7 @@ class AdSenseManagerContainer extends Component {
       createAdUnit({
         ...data,
         is_active: data.is_active !== undefined ? data.is_active : true,
-        status: data.is_active ? "active" : "draft",
+        status: data.is_active ? "active" : "paused",
         code: data.code || `AD-${Date.now()}`,
         priority: data.priority || 0,
         target_pages: data.target_pages || { match_type: "exact", paths: [] },
@@ -63,7 +63,7 @@ class AdSenseManagerContainer extends Component {
     } else {
       updateAdUnit(id, {
         ...data,
-        status: data.is_active ? "active" : "draft",
+        status: data.is_active ? "active" : "paused",
       });
     }
   };
