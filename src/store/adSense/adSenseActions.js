@@ -244,6 +244,7 @@ export const updateAdUnit = (id, data) => async (dispatch) => {
         msg: "Ad unit updated successfully.",
       })
     );
+    dispatch(getAllAdUnits());
   } catch (err) {
     dispatch({
       type: AD_UNITS_UPDATE_ERROR,

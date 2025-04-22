@@ -36,25 +36,35 @@ class AdSenseManagerContainer extends Component {
     });
   };
 
-  handleAddCustomAd = (newAd) => {
+  handleAddCustomAd = (data) => {
     const { createAdUnit } = this.props;
+    let adData = data;
+    if (data instanceof FormData) {
+      adData = JSON.parse(data.get("data") || "{}");
+      adData.file = data.get("file");
+    }
     createAdUnit({
-      ...newAd,
-      is_active: newAd.is_active !== undefined ? newAd.is_active : true,
-      status: newAd.is_active ? "active" : "inactive",
-      code: newAd.code || `AD-${Date.now()}`,
-      priority: newAd.priority || 0,
-      target_pages: newAd.target_pages || [],
-      target_audience: newAd.target_audience || {},
-      schedule: newAd.schedule || {},
+      ...adData,
+      is_active: adData.is_active !== undefined ? adData.is_active : true,
+      status: adData.is_active ? "active" : "draft",
+      code: adData.code || `AD-${Date.now()}`,
+      priority: adData.priority || 0,
+      target_pages: adData.target_pages || { match_type: "exact", paths: [] },
+      target_audience: adData.target_audience || {},
+      schedule: adData.schedule || {},
     });
   };
 
-  handleUpdateCustomAd = (updatedAd) => {
+  handleUpdateCustomAd = ({ id, data }) => {
     const { updateAdUnit } = this.props;
-    updateAdUnit(updatedAd.id, {
-      ...updatedAd,
-      status: updatedAd.is_active ? "active" : "inactive",
+    let adData = data;
+    if (data instanceof FormData) {
+      adData = JSON.parse(data.get("data") || "{}");
+      adData.file = data.get("file");
+    }
+    updateAdUnit(id, {
+      ...adData,
+      status: adData.is_active ? "active" : "draft",
     });
   };
 
@@ -107,10 +117,10 @@ class AdSenseManagerContainer extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  adUnits: state.adSense?.adUnits?.data,
-  adSettings: state.adSense?.adSettings?.data,
-  loading: state.adSense.loading,
-  error: state.adSense.error,
+  adUnits: state.adSense?.adUnits?.data || [],
+  adSettings: state.adSense?.adSettings?.data || {},
+  loading: state.adSense?.loading || false,
+  error: state.adSense?.error || null,
 });
 
 const mapDispatchToProps = (dispatch) =>
