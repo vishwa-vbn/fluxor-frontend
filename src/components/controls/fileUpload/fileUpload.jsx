@@ -87,7 +87,7 @@ const FileUpload = ({
             <img
               src={previewUrl}
               alt="Preview"
-              className="w-32 h-32 object-cover rounded border dark:border-gray-600"
+              className="w-32 h-32 object-contain rounded border dark:border-gray-600"
             />
           ) : accept.includes("video") ? (
             <video

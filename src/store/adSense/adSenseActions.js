@@ -36,8 +36,8 @@ export const AD_SETTINGS_UPSERT_SUCCESS = "AD_SETTINGS_UPSERT_SUCCESS";
 export const AD_SETTINGS_UPSERT_ERROR = "AD_SETTINGS_UPSERT_ERROR";
 
 // API Configuration
-// const API_URL = "https://fluxor-backend-production.up.railway.app/api/ad-units";
-const API_URL = "http://localhost:3000/api/ad-units";
+const API_URL = "https://fluxor-backend-production.up.railway.app/api/ad-units";
+// const API_URL = "http://localhost:3000/api/ad-units";
 
 // Initialize Socket.IO dynamically
 let socket = null;
