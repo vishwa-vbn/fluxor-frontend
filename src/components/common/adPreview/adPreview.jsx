@@ -2,22 +2,9 @@ import React, { useMemo } from "react";
 import DOMPurify from "dompurify";
 import PropTypes from "prop-types";
 
-// Mock LazyImage and LazyIframe components (replace with actual imports)
+// Mock LazyImage component (replace with actual import)
 const LazyImage = ({ src, alt, style, className }) => (
   <img src={src} alt={alt} style={style} className={className} />
-);
-const LazyIframe = ({ width, height, src, title, frameBorder, allow, allowFullScreen, style, className }) => (
-  <iframe
-    width={width}
-    height={height}
-    src={src}
-    title={title}
-    frameBorder={frameBorder}
-    allow={allow}
-    allowFullScreen={allowFullScreen}
-    style={style}
-    className={className}
-  />
 );
 
 // Constants for placement styles
@@ -45,6 +32,8 @@ const placementStyles = {
 };
 
 const AdPreview = ({ ad }) => {
+
+  console.log("ad is",ad)
   if (!ad) {
     return (
       <div className="text-gray-600 dark:text-gray-400 text-sm text-center" role="alert">
@@ -95,27 +84,18 @@ const AdPreview = ({ ad }) => {
         );
 
       case "video":
-        if (custom_content.youtube_url) {
-          const videoId = custom_content.youtube_url.match(
-            /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&\n?]+)/
-          )?.[1];
-          return videoId ? (
+         if (custom_content.youtube_url) {
+          return (
             <div className="overflow-hidden">
-              <LazyIframe
+              <video
                 width={dimensions.width || "100%"}
                 height={dimensions.height || "315"}
-                src={`https://www.youtube.com/embed/${videoId}`}
-                title={name || "YouTube video advertisement"}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
+                src={custom_content.youtube_url}
+                title={name || "Video advertisement"}
+                controls
                 style={{ maxWidth: "100%", maxHeight: "100%" }}
                 className="rounded-lg transition-shadow duration-300 hover:shadow-md"
               />
-            </div>
-          ) : (
-            <div className="text-red-600 dark:text-red-400 text-sm text-center" role="alert">
-              Invalid YouTube URL.
             </div>
           );
         }

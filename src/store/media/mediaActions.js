@@ -49,7 +49,7 @@ export const MEDIA_UPLOAD_SUCCESS = "MEDIA_UPLOAD_SUCCESS";
 export const MEDIA_UPLOAD_ERROR = "MEDIA_UPLOAD_ERROR";
 
 // API Configuration
-const API_URL = "http://localhost:3000/api/imagekit";
+const API_URL = "https://fluxor-backend-production.up.railway.app/api/imagekit";
 
 // LIST ASSETS
 export const listAssets = (params = {}) => async (dispatch) => {
