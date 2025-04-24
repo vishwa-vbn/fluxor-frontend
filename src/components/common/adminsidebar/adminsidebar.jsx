@@ -238,11 +238,11 @@ export default function AdminSidebar() {
   const isAnySubActive = ["/posts", "/create-post", "/categories", "/tags"].includes(location.pathname);
 
   return (
-    <div className="w-70 h-screen bg-gray-800  dark:bg-gray-800 text-gray-100 dark:text-gray-200 flex flex-col shadow-lg dark:shadow-gray-800 transition-colors duration-200">
+    <div className="w-70 h-screen border-r-1 border-gray-300 dark:border-gray-700 bg-gray-800  dark:bg-gray-800 text-gray-100 dark:text-gray-200 flex flex-col shadow-lg dark:shadow-gray-800 transition-colors duration-200">
       {/* Header */}
-      <div className="h-16 flex items-center justify-center border-b border-gray-800 dark:border-gray-700">
-        <Link to="/admin" className="text-xl font-semibold tracking-tight text-gray-100 dark:text-gray-200 hover:text-blue-300 dark:hover:text-blue-400 transition-colors">
-          {/* <img src={logo} className="p-7 mt-5" alt="logo"></img> */}
+      <div className="h-12.5 flex items-center justify-center border-b border-gray-800 dark:border-gray-700">
+        <Link to="/admin" className="text-xl flex  align-middle justify-center font-semibold tracking-tight text-gray-100 dark:text-gray-200 hover:text-blue-300 dark:hover:text-blue-400 transition-colors">
+          {/* <img src={logo} className="p-7 mt-0" alt="logo"></img> */}
         </Link>
       </div>
 
