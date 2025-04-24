@@ -978,7 +978,10 @@ const CreatePost = ({
                   </CardContent>
                 </Card>
 
-                <Tabs>
+                <Tabs 
+                value={activeTab} onValueChange={setActiveTab}
+                defaultValue="content"
+                 >
                   <TabsList className="bg-gray-100 dark:bg-gray-800">
                     <TabsTrigger
                       value="content"

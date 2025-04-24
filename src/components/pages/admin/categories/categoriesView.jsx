@@ -143,7 +143,7 @@ const CategoriesView = ({
             <Button
               variant="primary"
               onClick={() => setIsAddOpen(true)}
-              className="flex items-center bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white"
+              className="flex items-center bg-blue-600 hover:bg-blue-300 dark:bg-blue-500 dark:hover:bg-blue-300 text-blue-600 "
             >
               <PlusCircle className="w-4 h-4 mr-2" />
               Add Category
@@ -201,7 +201,7 @@ const CategoriesView = ({
               setIsAddOpen(false);
             }}
             initialData={{}}
-            className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200"
+            className="bg-white dark:bg-gray-800 text-blue-600  dark:text-gray-200"
           >
             <Input
               label="Name"

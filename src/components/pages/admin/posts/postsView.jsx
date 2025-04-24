@@ -546,7 +546,7 @@ export default function Post({ posts = [], loading, deletePost }) {
                 className={clsx(
                   "w-4 h-4 mr-2",
                   // Light theme
-                  "text-white",
+                  "text-blue-600 ",
                   // Dark theme
                   "dark:text-gray-200"
                 )}

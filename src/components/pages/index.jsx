@@ -17,7 +17,7 @@ import UsersContainer from "./admin/users/userContainer.jsx";
 import PostContainer from "./user/post/postContainer.jsx";
 import AdSenseManagerContainer from "./admin/adSense/AdSenseManagerContainer.jsx";
 import MediaContainer from "./admin/media/mediaContainer.jsx";
-
+import AnalyticsContainer from "./admin/analytics/AnalyticsContainer.jsx";
 
 function App({ match }) {
   console.log("match:", match);
@@ -74,6 +74,10 @@ function App({ match }) {
     , {
       component:MediaContainer,
       link:"media"
+    },
+     {
+      component:AnalyticsContainer,
+      link:"analytics"
     }
     // {
     //   component: ChangePasswordContainer,
