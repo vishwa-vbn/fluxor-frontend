@@ -21,6 +21,7 @@
 //   CardContent,
 // } from "../../../common/card/Card";
 // import Modal from "../../../common/modal/modal";
+// import ReusableDataTable from "../../../common/DataTable/DataTable";
 
 // const defaultAudience = {
 //   geo: [],
@@ -130,6 +131,13 @@
 //   { value: "custom", label: "Custom" },
 // ];
 
+// const statusOptions = [
+//   { value: "all", label: "All Status" },
+//   { value: "active", label: "Active" },
+//   { value: "paused", label: "Paused" },
+//   { value: "archived", label: "Archived" },
+// ];
+
 // const AdSenseManagerView = ({
 //   publisherId,
 //   adClient,
@@ -165,6 +173,9 @@
 //   const [localTargetPages, setLocalTargetPages] = useState(
 //     targetPages || "all"
 //   );
+//   const [statusFilter, setStatusFilter] = useState("all");
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [rowsPerPage, setRowsPerPage] = useState(10);
 
 //   const defaultAd = useMemo(
 //     () => ({
@@ -191,6 +202,10 @@
 //     setLocalTargetPages(targetPages || "all");
 //     setConfigErrors({});
 //   }, [publisherId, adClient, adDensity, adFormat, targetPages]);
+
+//   useEffect(() => {
+//     console.log("formData updated:", formData);
+//   }, [formData]);
 
 //   const handleTabChange = (newTab) => {
 //     setActiveTab(newTab);
@@ -226,17 +241,23 @@
 //   };
 
 //   const handleFileChange = (file) => {
-//     if (file) {
-//       setFormData((prev) => ({
-//         ...prev,
-//         file,
-//         custom_content: {
-//           ...prev.custom_content,
-//           [formData.ad_type === "video" ? "youtube_url" : "image_url"]: file,
-//         },
-//       }));
-//       setErrors((prev) => ({ ...prev, file: null }));
-//     }
+//     console.log("Selected file:", file);
+//     setFormData((prev) => ({
+//       ...prev,
+//       file: file,
+//       custom_content: {
+//         ...prev.custom_content,
+//         image_url:
+//           file && formData.ad_type === "banner"
+//             ? URL.createObjectURL(file)
+//             : prev.custom_content.image_url,
+//         youtube_url:
+//           file && formData.ad_type === "video"
+//             ? URL.createObjectURL(file)
+//             : prev.custom_content.youtube_url,
+//       },
+//     }));
+//     setErrors((prev) => ({ ...prev, file: null }));
 //   };
 
 //   const validateConfiguration = () => {
@@ -255,8 +276,30 @@
 
 //   const handleSaveAd = (e) => {
 //     e.preventDefault();
-//     // if (!validateForm()) return;
 
+//     // Validation
+//     const newErrors = {};
+//     if (!formData.name) newErrors.name = "Ad name is required";
+//     if (!formData.code) newErrors.code = "Ad code is required";
+//     if (
+//       formData.custom_content.content_type === "custom_image" &&
+//       !formData.file
+//     ) {
+//       newErrors.file = "Image file is required for custom image";
+//     }
+//     if (
+//       formData.custom_content.content_type === "custom_video" &&
+//       !formData.file
+//     ) {
+//       newErrors.file = "Video file is required for custom video";
+//     }
+//     setErrors(newErrors);
+//     if (Object.keys(newErrors).length > 0) {
+//       console.error("Validation errors:", newErrors);
+//       return;
+//     }
+
+//     // Prepare the ad data
 //     const dataToSend = {
 //       name: formData.name,
 //       code: formData.code,
@@ -271,30 +314,46 @@
 //       status: formData.is_active ? "active" : "paused",
 //       custom_content: {
 //         ...formData.custom_content,
-//         image_url:
-//           formData.custom_content.image_url instanceof File
-//             ? ""
-//             : formData.custom_content.image_url,
-//         youtube_url:
-//           formData.custom_content.youtube_url instanceof File
-//             ? ""
-//             : formData.custom_content.youtube_url,
+//         image_url: "", // Clear blob URL
+//         youtube_url: "", // Clear blob URL
 //       },
 //     };
 
+//     // Handle FormData for file uploads
 //     if (formData.file) {
+//       console.log("Preparing FormData with file:", formData.file);
 //       const formDataToSend = new FormData();
 //       formDataToSend.append("file", formData.file);
 //       formDataToSend.append("data", JSON.stringify(dataToSend));
+
+//       // Debug FormData contents
+//       for (const [key, value] of formDataToSend.entries()) {
+//         console.log(`FormData entry in handleSaveAd - ${key}:`, value);
+//       }
+
 //       editingAd
 //         ? onUpdateCustomAd({ id: formData.id, data: formDataToSend })
 //         : onAddCustomAd(formDataToSend);
 //     } else {
-//       editingAd
-//         ? onUpdateCustomAd({ id: formData.id, data: dataToSend })
-//         : onAddCustomAd(dataToSend);
+//       console.log("Sending JSON data:", dataToSend);
+//       // Only allow JSON payload for non-file content types
+//       if (
+//         formData.custom_content.content_type !== "custom_image" &&
+//         formData.custom_content.content_type !== "custom_video"
+//       ) {
+//         editingAd
+//           ? onUpdateCustomAd({ id: formData.id, data: dataToSend })
+//           : onAddCustomAd(dataToSend);
+//       } else {
+//         console.error(
+//           "Cannot create ad without file for custom_image or custom_video"
+//         );
+//         setErrors({ file: "File is required for this content type" });
+//         return;
+//       }
 //     }
 
+//     // Reset form
 //     setEditingAd(null);
 //     setFormData(normalizeAdData(defaultAd));
 //     setActiveTab("custom");
@@ -343,6 +402,90 @@
 //       ad_format: localAdFormat,
 //       target_pages: localTargetPages,
 //     });
+//   };
+
+//   const columns = useMemo(
+//     () => [
+//       {
+//         name: "Name",
+//         selector: (row) => row.name,
+//         sortable: true,
+//       },
+//       {
+//         name: "Type",
+//         selector: (row) => row.ad_type,
+//         sortable: true,
+//       },
+//       {
+//         name: "Placement",
+//         selector: (row) => row.placement,
+//         sortable: true,
+//       },
+//       {
+//         name: "Priority",
+//         selector: (row) => row.priority,
+//         sortable: true,
+//       },
+//       {
+//         name: "Status",
+//         selector: (row) => row.status,
+//         sortable: true,
+//         cell: (row) => (
+//           <span
+//             className={`capitalize px-2 py-1 rounded-full text-xs ${
+//               row.status === "active"
+//                 ? "bg-green-100 text-green-800"
+//                 : row.status === "paused"
+//                 ? "bg-yellow-100 text-yellow-800"
+//                 : "bg-gray-100 text-gray-800"
+//             }`}
+//           >
+//             {row.status}
+//           </span>
+//         ),
+//       },
+//       {
+//         name: "Actions",
+//         cell: (row) => (
+//           <div className="flex gap-2">
+//             <Button
+//               variant="outline"
+//               onClick={() => handleEditAd(row)}
+//               className="border-gray-300 dark:border-gray-600 dark:text-gray-100 text-xs px-2 py-1"
+//             >
+//               Edit
+//             </Button>
+//             <Button
+//               variant="outline"
+//               onClick={() => onDeleteAdUnit(row.id)}
+//               className="border-gray-300 dark:border-gray-600 dark:text-gray-100 text-xs px-2 py-1"
+//             >
+//               <Trash2 className="h-4 w-4" />
+//             </Button>
+//             <Button
+//               variant="outline"
+//               onClick={() => handleOpenPreview(row)}
+//               className="border-gray-300 dark:border-gray-600 dark:text-gray-100 text-xs px-2 py-1"
+//             >
+//               <Eye className="h-4 w-4" />
+//             </Button>
+//           </div>
+//         ),
+//         ignoreRowClick: true,
+//         allowOverflow: true,
+//         button: true,
+//       },
+//     ],
+//     []
+//   );
+
+//   const filteredAdUnits = useMemo(() => {
+//     if (statusFilter === "all") return adUnits;
+//     return adUnits?.filter((ad) => ad.status === statusFilter);
+//   }, [adUnits, statusFilter]);
+
+//   const handlePageChange = (page) => {
+//     setCurrentPage(page);
 //   };
 
 //   return (
@@ -509,53 +652,41 @@
 //                       </div>
 //                     ) : (
 //                       <div className="space-y-4">
-//                         {adUnits?.map((ad) => (
-//                           <div
-//                             key={ad.id}
-//                             className="border-b py-4 flex flex-col sm:flex-row sm:items-center justify-between dark:border-gray-700 gap-4"
+//                         <div className="flex justify-between items-center">
+//                           <Select
+//                             label="Filter by Status"
+//                             options={statusOptions}
+//                             value={statusFilter}
+//                             onChange={(value) => {
+//                               setStatusFilter(value);
+//                               setCurrentPage(1);
+//                             }}
+//                             className="dark:bg-gray-700 dark:text-gray-100 w-48"
+//                           />
+//                           <Button
+//                             onClick={handleAddCustomAd}
+//                             variant="outline"
+//                             className="border-gray-300 dark:border-gray-600 dark:text-gray-100"
 //                           >
-//                             <div>
-//                               <h4 className="text-base font-medium text-gray-800 dark:text-gray-100">
-//                                 {ad.name}
-//                               </h4>
-//                               <p className="text-sm text-gray-600 dark:text-gray-300">
-//                                 Type: {ad.ad_type} | Placement: {ad.placement} |
-//                                 Priority: {ad.priority}
-//                               </p>
-//                             </div>
-//                             <div className="flex gap-2 flex-wrap">
-//                               <Button
-//                                 variant="outline"
-//                                 onClick={() => handleEditAd(ad)}
-//                                 className="border-gray-300 dark:border-gray-600 dark:text-gray-100"
-//                               >
-//                                 Edit
-//                               </Button>
-//                               <Button
-//                                 variant="outline"
-//                                 onClick={() => onDeleteAdUnit(ad.id)}
-//                                 className="border-gray-300 dark:border-gray-600 dark:text-gray-100"
-//                               >
-//                                 <Trash2 className="h-4 w-4" />
-//                               </Button>
-//                               <Button
-//                                 variant="outline"
-//                                 onClick={() => handleOpenPreview(ad)}
-//                                 className="border-gray-300 dark:border-gray-600 dark:text-gray-100"
-//                               >
-//                                 <Eye className="h-4 w-4" />
-//                               </Button>
-//                             </div>
-//                           </div>
-//                         ))}
-//                         <Button
-//                           onClick={handleAddCustomAd}
-//                           variant="outline"
-//                           className="border-gray-300 dark:border-gray-600 dark:text-gray-100"
-//                         >
-//                           <Plus className="h-4 w-4 mr-2" />
-//                           Add Custom Ad
-//                         </Button>
+//                             <Plus className="h-4 w-4 mr-2" />
+//                             Add Custom Ad
+//                           </Button>
+//                         </div>
+//                         <ReusableDataTable
+//                           columns={columns}
+//                           data={filteredAdUnits || []}
+//                           loading={loading}
+//                           rowsPerPage={rowsPerPage}
+//                           currentPage={currentPage}
+//                           onChangePage={handlePageChange}
+//                           onRowClick={(row) => handleEditAd(row)}
+//                           paginationRowsPerPageOptions={[5, 10, 20, 50]}
+//                           loadingMessage="Loading ads..."
+//                           noDataMessage="No ads available"
+//                           striped={true}
+//                           highlightOnHover={true}
+//                           noHeader={true}
+//                         />
 //                       </div>
 //                     )}
 //                   </CardContent>
@@ -779,7 +910,7 @@
 //                                   "custom_image" && (
 //                                   <FileUpload
 //                                     label="Upload Image"
-//                                     value={formData.custom_content.image_url}
+//                                     value={formData.file}
 //                                     onChange={handleFileChange}
 //                                     accept="image/*"
 //                                     preview={true}
@@ -810,7 +941,7 @@
 //                                   "custom_video" && (
 //                                   <FileUpload
 //                                     label="Upload Video"
-//                                     value={formData.custom_content.youtube_url}
+//                                     value={formData.file}
 //                                     onChange={handleFileChange}
 //                                     accept="video/*"
 //                                     preview={true}
@@ -1170,6 +1301,8 @@
 
 // export default AdSenseManagerView;
 
+
+
 import React, { useState, useMemo, useEffect } from "react";
 import {
   Tabs,
@@ -1230,7 +1363,12 @@ const normalizeAdData = (ad) => ({
   code: ad.code || "",
   ad_type: ad.ad_type || "banner",
   placement: ad.placement || "header",
-  custom_content: { ...defaultCustomContent, ...ad.custom_content },
+  custom_content: {
+    ...defaultCustomContent,
+    ...ad.custom_content,
+    image_url: ad.custom_content?.image_url || "", // Preserve backend URL
+    youtube_url: ad.custom_content?.youtube_url || "", // Preserve backend URL
+  },
   dimensions: { ...defaultDimensions, ...ad.dimensions },
   is_active: ad.is_active ?? true,
   target_pages: {
@@ -1241,7 +1379,7 @@ const normalizeAdData = (ad) => ({
   schedule: { ...defaultSchedule, ...ad.schedule },
   priority: ad.priority || 0,
   status: ad.status || (ad.is_active ? "active" : "paused"),
-  file: null,
+  file: null, // File object is not stored in backend, reset to null
 });
 
 const matchTypeOptions = [
@@ -1375,6 +1513,10 @@ const AdSenseManagerView = ({
     setConfigErrors({});
   }, [publisherId, adClient, adDensity, adFormat, targetPages]);
 
+  useEffect(() => {
+    console.log("formData updated:", formData);
+  }, [formData]);
+
   const handleTabChange = (newTab) => {
     setActiveTab(newTab);
     if (newTab !== "create") {
@@ -1409,17 +1551,23 @@ const AdSenseManagerView = ({
   };
 
   const handleFileChange = (file) => {
-    if (file) {
-      setFormData((prev) => ({
-        ...prev,
-        file,
-        custom_content: {
-          ...prev.custom_content,
-          [formData.ad_type === "video" ? "youtube_url" : "image_url"]: file,
-        },
-      }));
-      setErrors((prev) => ({ ...prev, file: null }));
-    }
+    console.log("Selected file:", file);
+    setFormData((prev) => ({
+      ...prev,
+      file: file,
+      custom_content: {
+        ...prev.custom_content,
+        image_url:
+          file && formData.ad_type === "banner"
+            ? URL.createObjectURL(file)
+            : prev.custom_content.image_url,
+        youtube_url:
+          file && formData.ad_type === "video"
+            ? URL.createObjectURL(file)
+            : prev.custom_content.youtube_url,
+      },
+    }));
+    setErrors((prev) => ({ ...prev, file: null }));
   };
 
   const validateConfiguration = () => {
@@ -1438,8 +1586,32 @@ const AdSenseManagerView = ({
 
   const handleSaveAd = (e) => {
     e.preventDefault();
-    // if (!validateForm()) return;
 
+    // Validation
+    const newErrors = {};
+    if (!formData.name) newErrors.name = "Ad name is required";
+    if (!formData.code) newErrors.code = "Ad code is required";
+    if (
+      formData.custom_content.content_type === "custom_image" &&
+      !formData.file &&
+      !formData.custom_content.image_url
+    ) {
+      newErrors.file = "Image file or URL is required for custom image";
+    }
+    if (
+      formData.custom_content.content_type === "custom_video" &&
+      !formData.file &&
+      !formData.custom_content.youtube_url
+    ) {
+      newErrors.file = "Video file or URL is required for custom video";
+    }
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      console.error("Validation errors:", newErrors);
+      return;
+    }
+
+    // Prepare the ad data
     const dataToSend = {
       name: formData.name,
       code: formData.code,
@@ -1454,30 +1626,55 @@ const AdSenseManagerView = ({
       status: formData.is_active ? "active" : "paused",
       custom_content: {
         ...formData.custom_content,
-        image_url:
-          formData.custom_content.image_url instanceof File
-            ? ""
-            : formData.custom_content.image_url,
-        youtube_url:
-          formData.custom_content.youtube_url instanceof File
-            ? ""
-            : formData.custom_content.youtube_url,
+        image_url: formData.file ? "" : formData.custom_content.image_url, // Preserve backend URL if no new file
+        youtube_url: formData.file ? "" : formData.custom_content.youtube_url, // Preserve backend URL if no new file
       },
     };
 
+    // Handle FormData for file uploads
     if (formData.file) {
+      console.log("Preparing FormData with file:", formData.file);
       const formDataToSend = new FormData();
       formDataToSend.append("file", formData.file);
       formDataToSend.append("data", JSON.stringify(dataToSend));
+
+      // Debug FormData contents
+      for (const [key, value] of formDataToSend.entries()) {
+        console.log(`FormData entry in handleSaveAd - ${key}:`, value);
+      }
+
       editingAd
         ? onUpdateCustomAd({ id: formData.id, data: formDataToSend })
         : onAddCustomAd(formDataToSend);
     } else {
-      editingAd
-        ? onUpdateCustomAd({ id: formData.id, data: dataToSend })
-        : onAddCustomAd(dataToSend);
+      console.log("Sending JSON data:", dataToSend);
+      // Only allow JSON payload for non-file content types or if URL is provided
+      if (
+        formData.custom_content.content_type !== "custom_image" &&
+        formData.custom_content.content_type !== "custom_video"
+      ) {
+        editingAd
+          ? onUpdateCustomAd({ id: formData.id, data: dataToSend })
+          : onAddCustomAd(dataToSend);
+      } else if (
+        (formData.custom_content.content_type === "custom_image" &&
+          formData.custom_content.image_url) ||
+        (formData.custom_content.content_type === "custom_video" &&
+          formData.custom_content.youtube_url)
+      ) {
+        editingAd
+          ? onUpdateCustomAd({ id: formData.id, data: dataToSend })
+          : onAddCustomAd(dataToSend);
+      } else {
+        console.error(
+          "Cannot create ad without file or URL for custom_image or custom_video"
+        );
+        setErrors({ file: "File or URL is required for this content type" });
+        return;
+      }
     }
 
+    // Reset form
     setEditingAd(null);
     setFormData(normalizeAdData(defaultAd));
     setActiveTab("custom");
@@ -1528,7 +1725,6 @@ const AdSenseManagerView = ({
     });
   };
 
-  // DataTable configurations
   const columns = useMemo(
     () => [
       {
@@ -2033,16 +2229,26 @@ const AdSenseManagerView = ({
                               {formData.ad_type === "banner" &&
                                 formData.custom_content.content_type ===
                                   "custom_image" && (
-                                  <FileUpload
-                                    label="Upload Image"
-                                    value={formData.custom_content.image_url}
-                                    onChange={handleFileChange}
-                                    accept="image/*"
-                                    preview={true}
-                                    error={errors.file}
-                                    name="file"
-                                    className="dark:bg-gray-700 dark:text-gray-100"
-                                  />
+                                  <>
+                                    <FileUpload
+                                      label="Upload Image"
+                                      value={formData.file}
+                                      onChange={handleFileChange}
+                                      accept="image/*"
+                                      preview={true}
+                                      error={errors.file}
+                                      name="file"
+                                      className="dark:bg-gray-700 dark:text-gray-100"
+                                    />
+                                    {formData.custom_content.image_url && (
+                                      <Input
+                                        label="Current Image URL"
+                                        value={formData.custom_content.image_url}
+                                        readOnly
+                                        className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+                                      />
+                                    )}
+                                  </>
                                 )}
                               {formData.ad_type === "video" &&
                                 formData.custom_content.content_type ===
@@ -2064,16 +2270,28 @@ const AdSenseManagerView = ({
                               {formData.ad_type === "video" &&
                                 formData.custom_content.content_type ===
                                   "custom_video" && (
-                                  <FileUpload
-                                    label="Upload Video"
-                                    value={formData.custom_content.youtube_url}
-                                    onChange={handleFileChange}
-                                    accept="video/*"
-                                    preview={true}
-                                    error={errors.file}
-                                    name="file"
-                                    className="dark:bg-gray-700 dark:text-gray-100"
-                                  />
+                                  <>
+                                    <FileUpload
+                                      label="Upload Video"
+                                      value={formData.file}
+                                      onChange={handleFileChange}
+                                      accept="video/*"
+                                      preview={true}
+                                      error={errors.file}
+                                      name="file"
+                                      className="dark:bg-gray-700 dark:text-gray-100"
+                                    />
+                                    {formData.custom_content.youtube_url && (
+                                      <Input
+                                        label="Current Video URL"
+                                        value={
+                                          formData.custom_content.youtube_url
+                                        }
+                                        readOnly
+                                        className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+                                      />
+                                    )}
+                                  </>
                                 )}
                               {formData.ad_type === "native" && (
                                 <Textarea

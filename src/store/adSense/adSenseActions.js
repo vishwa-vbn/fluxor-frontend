@@ -36,8 +36,9 @@ export const AD_SETTINGS_UPSERT_SUCCESS = "AD_SETTINGS_UPSERT_SUCCESS";
 export const AD_SETTINGS_UPSERT_ERROR = "AD_SETTINGS_UPSERT_ERROR";
 
 // API Configuration
-const API_URL = "https://fluxor-backend-production.up.railway.app/api/ad-units";
 // const API_URL = "http://localhost:3000/api/ad-units";
+const API_URL = "https://fluxor-backend-production.up.railway.app/api/ad-units";
+
 
 // Initialize Socket.IO dynamically
 let socket = null;
@@ -62,6 +63,11 @@ export const initializeAdUnitSocket = () => (dispatch) => {
 
   socket.on("ad_unit_change", (payload) => {
     console.log("Ad unit change received:", payload);
+    if (!payload || !payload.operation || !payload.record) {
+      console.warn("Invalid socket payload:", payload);
+      return;
+    }
+
     switch (payload.operation) {
       case "INSERT":
         dispatch({
@@ -78,16 +84,16 @@ export const initializeAdUnitSocket = () => (dispatch) => {
       case "DELETE":
         dispatch({
           type: AD_UNITS_DELETE_SUCCESS,
-          payload: payload.record.id, // Use record.id for DELETE
+          payload: payload.record.id,
         });
         break;
       default:
-        console.warn("Unknown operation:", payload.operation);
+        console.warn("Unknown socket operation:", payload.operation);
     }
   });
 
   socket.on("connect_error", (error) => {
-    console.error("Socket.IO connection error for ad units:", error.message);
+    console.error("Socket.IO connection error:", error.message);
     dispatch(
       showAlert({
         isOpen: true,
@@ -118,19 +124,24 @@ export const cleanupAdUnitSocket = () => () => {
 
 // CREATE AD UNIT
 export const createAdUnit = (data) => async (dispatch) => {
+  console.log("Creating ad unit with data:", data);
   dispatch({ type: AD_UNITS_CREATE_PENDING });
   dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
-    const res = await axios.post(`${API_URL}/ad-unit`, data, {
-      headers: {
-        Authorization: `${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const headers = {
+      Authorization: `${token}`,
+    };
 
-    dispatch({ type: AD_UNITS_CREATE_SUCCESS, payload: res.data });
+    if (!(data instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
+
+    const res = await axios.post(`${API_URL}/ad-unit`, data, { headers });
+    const adUnit = res.data?.data || res.data; // Normalize response
+
+    dispatch({ type: AD_UNITS_CREATE_SUCCESS, payload: adUnit });
     dispatch(
       showAlert({
         isOpen: true,
@@ -139,17 +150,22 @@ export const createAdUnit = (data) => async (dispatch) => {
         msg: "New ad unit has been created successfully.",
       })
     );
+
+    // Refresh ad units list
+    await dispatch(getAllAdUnits());
   } catch (err) {
+    console.error("Error creating ad unit:", err);
+    const errorMsg = err.response?.data?.message || err.message;
     dispatch({
       type: AD_UNITS_CREATE_ERROR,
-      payload: err.response?.data?.message || err.message,
+      payload: errorMsg,
     });
     dispatch(
       showAlert({
         isOpen: true,
         title: "Creation Failed",
         type: "error",
-        msg: err.response?.data?.message || err.message,
+        msg: errorMsg,
       })
     );
   } finally {
@@ -170,18 +186,20 @@ export const getAllAdUnits = () => async (dispatch) => {
         "Content-Type": "application/json",
       },
     });
-    dispatch({ type: AD_UNITS_FETCH_ALL_SUCCESS, payload: res.data });
+    const adUnits = res.data?.data || res.data; // Normalize response
+    dispatch({ type: AD_UNITS_FETCH_ALL_SUCCESS, payload: adUnits });
   } catch (err) {
+    const errorMsg = err.response?.data?.message || err.message;
     dispatch({
       type: AD_UNITS_FETCH_ALL_ERROR,
-      payload: err.response?.data?.message || err.message,
+      payload: errorMsg,
     });
     dispatch(
       showAlert({
         isOpen: true,
         title: "Fetch Error",
         type: "error",
-        msg: err.response?.data?.message || err.message,
+        msg: errorMsg,
       })
     );
   } finally {
@@ -202,18 +220,20 @@ export const getAdUnitById = (id) => async (dispatch) => {
         "Content-Type": "application/json",
       },
     });
-    dispatch({ type: AD_UNITS_FETCH_ONE_SUCCESS, payload: res.data });
+    const adUnit = res.data?.data || res.data; // Normalize response
+    dispatch({ type: AD_UNITS_FETCH_ONE_SUCCESS, payload: adUnit });
   } catch (err) {
+    const errorMsg = err.response?.data?.message || err.message;
     dispatch({
       type: AD_UNITS_FETCH_ONE_ERROR,
-      payload: err.response?.data?.message || err.message,
+      payload: errorMsg,
     });
     dispatch(
       showAlert({
         isOpen: true,
         title: "Fetch Error",
         type: "error",
-        msg: err.response?.data?.message || err.message,
+        msg: errorMsg,
       })
     );
   } finally {
@@ -223,19 +243,24 @@ export const getAdUnitById = (id) => async (dispatch) => {
 
 // UPDATE AD UNIT
 export const updateAdUnit = (id, data) => async (dispatch) => {
+  console.log("Updating ad unit with ID:", id, "and data:", data);
   dispatch({ type: AD_UNITS_UPDATE_PENDING });
   dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
 
   try {
-    const res = await axios.put(`${API_URL}/ad-unit/${id}`, data, {
-      headers: {
-        Authorization: `${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const headers = {
+      Authorization: `${token}`,
+    };
 
-    dispatch({ type: AD_UNITS_UPDATE_SUCCESS, payload: res.data });
+    if (!(data instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
+
+    const res = await axios.put(`${API_URL}/ad-unit/${id}`, data, { headers });
+    const adUnit = res.data?.data || res.data; // Normalize response
+
+    dispatch({ type: AD_UNITS_UPDATE_SUCCESS, payload: adUnit });
     dispatch(
       showAlert({
         isOpen: true,
@@ -244,18 +269,22 @@ export const updateAdUnit = (id, data) => async (dispatch) => {
         msg: "Ad unit updated successfully.",
       })
     );
-    dispatch(getAllAdUnits());
+
+    // Refresh ad units list
+    await dispatch(getAllAdUnits());
   } catch (err) {
+    console.error("Error updating ad unit:", err);
+    const errorMsg = err.response?.data?.message || err.message;
     dispatch({
       type: AD_UNITS_UPDATE_ERROR,
-      payload: err.response?.data?.message || err.message,
+      payload: errorMsg,
     });
     dispatch(
       showAlert({
         isOpen: true,
         title: "Update Failed",
         type: "error",
-        msg: err.response?.data?.message || err.message,
+        msg: errorMsg,
       })
     );
   } finally {
@@ -265,6 +294,7 @@ export const updateAdUnit = (id, data) => async (dispatch) => {
 
 // DELETE AD UNIT
 export const deleteAdUnit = (id) => async (dispatch) => {
+  console.log("Deleting ad unit with ID:", id);
   dispatch({ type: AD_UNITS_DELETE_PENDING });
   dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
@@ -286,17 +316,22 @@ export const deleteAdUnit = (id) => async (dispatch) => {
         msg: "Ad unit has been deleted successfully.",
       })
     );
+
+    // Refresh ad units list
+    await dispatch(getAllAdUnits());
   } catch (err) {
+    console.error("Error deleting ad unit:", err);
+    const errorMsg = err.response?.data?.message || err.message;
     dispatch({
       type: AD_UNITS_DELETE_ERROR,
-      payload: err.response?.data?.message || err.message,
+      payload: errorMsg,
     });
     dispatch(
       showAlert({
         isOpen: true,
         title: "Deletion Failed",
         type: "error",
-        msg: err.response?.data?.message || err.message,
+        msg: errorMsg,
       })
     );
   } finally {
@@ -317,18 +352,20 @@ export const getAdSettings = () => async (dispatch) => {
         "Content-Type": "application/json",
       },
     });
-    dispatch({ type: AD_SETTINGS_FETCH_SUCCESS, payload: res.data });
+    const settings = res.data?.data || res.data; // Normalize response
+    dispatch({ type: AD_SETTINGS_FETCH_SUCCESS, payload: settings });
   } catch (err) {
+    const errorMsg = err.response?.data?.message || err.message;
     dispatch({
       type: AD_SETTINGS_FETCH_ERROR,
-      payload: err.response?.data?.message || err.message,
+      payload: errorMsg,
     });
     dispatch(
       showAlert({
         isOpen: true,
         title: "Fetch Error",
         type: "error",
-        msg: err.response?.data?.message || err.message,
+        msg: errorMsg,
       })
     );
   } finally {
@@ -338,6 +375,7 @@ export const getAdSettings = () => async (dispatch) => {
 
 // UPSERT AD SETTINGS
 export const upsertAdSettings = (data) => async (dispatch) => {
+  console.log("Upserting ad settings with data:", data);
   dispatch({ type: AD_SETTINGS_UPSERT_PENDING });
   dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
@@ -349,8 +387,8 @@ export const upsertAdSettings = (data) => async (dispatch) => {
         "Content-Type": "application/json",
       },
     });
-
-    dispatch({ type: AD_SETTINGS_UPSERT_SUCCESS, payload: res.data });
+    const settings = res.data?.data || res.data; // Normalize response
+    dispatch({ type: AD_SETTINGS_UPSERT_SUCCESS, payload: settings });
     dispatch(
       showAlert({
         isOpen: true,
@@ -360,16 +398,18 @@ export const upsertAdSettings = (data) => async (dispatch) => {
       })
     );
   } catch (err) {
+    console.error("Error upserting ad settings:", err);
+    const errorMsg = err.response?.data?.message || err.message;
     dispatch({
       type: AD_SETTINGS_UPSERT_ERROR,
-      payload: err.response?.data?.message || err.message,
+      payload: errorMsg,
     });
     dispatch(
       showAlert({
         isOpen: true,
         title: "Update Failed",
         type: "error",
-        msg: err.response?.data?.message || err.message,
+        msg: errorMsg,
       })
     );
   } finally {

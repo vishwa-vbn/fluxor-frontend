@@ -1,12 +1,10 @@
 import React, { useState, useMemo } from "react";
 import { ArrowLeft, Folder, Upload, FolderPlus, Edit, Trash2 } from "lucide-react";
+import TopNavbar from "../../../common/topNavbar/topNavbar";
 import { Card, CardContent } from "../../../common/card/Card";
 import Input from "../../../controls/input/inputView";
 import Button from "../../../controls/button/buttonView";
 import Modal from "../../../common/modal/modal";
-import TopNavbar from "../../../common/topNavbar/topNavbar";
-import SearchBar from "../../../controls/searchbar/searchbar";
-import "./MediaView.css";
 
 const MediaView = ({
   assets,
@@ -40,19 +38,24 @@ const MediaView = ({
     const parts = currentPath.split("/").filter(Boolean);
     let path = "";
     return (
-      <div className="breadcrumbs flex items-center space-x-1 text-gray-600">
+      <div className="flex items-center space-x-2 text-gray-500 text-sm">
+        <span
+          className="cursor-pointer hover:text-blue-600 transition-colors"
+          onClick={() => onPathChange("/")}
+        >
+          Home
+        </span>
         {parts.map((part, index) => {
           path += `/${part}`;
           return (
             <span key={index} className="flex items-center">
-              {index > 0 && <span className="mx-1">/</span>}
-              <Button
-                variant="ghost"
-                className="text-sm hover:text-blue-600"
+              <span className="mx-2">/</span>
+              <span
+                className="cursor-pointer hover:text-blue-600 transition-colors"
                 onClick={() => onPathChange(path)}
               >
                 {part}
-              </Button>
+              </span>
             </span>
           );
         })}
@@ -67,158 +70,191 @@ const MediaView = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-0 py-0 space-y-6">
-      <div className="flex-1 flex flex-col">
-        <TopNavbar
-          userData={sampleUserData}
-          onSearch={(query) => setSearchQuery(query)}
-          notificationCount={3}
-          toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-        />
-        <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-3 space-y-8">
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-gray-800">Media Manager</h1>
-              {renderBreadcrumbs()}
-            </div>
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                onClick={onGoBack}
-                disabled={currentPath === "/"}
-                className="flex items-center text-black"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowUploadModal(true)}
-                className="flex items-center text-black"
-              >
-                <Upload className="mr-2 h-4 w-4" /> Upload File
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowCreateFolderModal(true)}
-                className="flex items-center text-black"
-              >
-                <FolderPlus className="mr-2 h-4 w-4" /> Create Folder
-              </Button>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-100">
+      {/* Top Navbar */}
+      <TopNavbar
+        userData={sampleUserData}
+        onSearch={(query) => setSearchQuery(query)}
+        notificationCount={3}
+        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+      />
 
-          <div className="flex justify-end mb-2">
-            <SearchBar
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              placeholder="Search assets..."
-              className="w-full max-w-sm"
-            />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-semibold">Media Manager</h1>
+            {renderBreadcrumbs()}
           </div>
+          <div className="flex space-x-3">
+            <Button
+              onClick={onGoBack}
+              disabled={currentPath === "/"}
+              className="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+            </Button>
+            <Button
+              onClick={() => setShowUploadModal(true)}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            >
+              <Upload className="mr-2 h-4 w-4" /> Upload File
+            </Button>
+            <Button
+              onClick={() => setShowCreateFolderModal(true)}
+              className="flex items-center px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition-colors"
+            >
+              <FolderPlus className="mr-2 h-4 w-4" /> Create Folder
+            </Button>
+          </div>
+        </div>
 
-          {loading ? (
-            <div className="flex justify-center p-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
-            </div>
-          ) : filteredAssets.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center text-gray-500">
-                No assets found.
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredAssets.map((asset) => (
-                <Card
-                  key={asset.fileId || asset.folderId}
-                  className={`relative group cursor-pointer transition-shadow hover:shadow-lg ${
-                    selectedFileId === asset.fileId ? "border-2 border-blue-500" : ""
-                  }`}
-                  onDoubleClick={() =>
-                    asset.type === "folder" && onOpenFolder(asset.folderPath)
-                  }
-                >
-                  <CardContent className="p-4">
-                    {asset.type === "folder" ? (
-                      <div className="flex flex-col items-center">
-                        <Folder size={64} className="text-yellow-500 mb-2" />
-                        <p className="text-sm text-gray-700 truncate w-full text-center">
-                          {asset.name}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center">
-                        <div className="relative w-full h-32">
+        {loading ? (
+          <div className="flex justify-center p-8">
+            <div className="animate-spin h-12 w-12 border-t-4 border-blue-600"></div>
+          </div>
+        ) : filteredAssets.length === 0 ? (
+          <Card className="border-none">
+            <CardContent className="p-8 text-center text-gray-500">
+              No assets found.
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredAssets.map((asset) => (
+              <Card
+                key={asset.fileId || asset.folderId}
+                className={`border-none hover:shadow-md transition-all duration-300 ${
+                  selectedFileId === asset.fileId ? "ring-2 ring-blue-500" : ""
+                }`}
+                onDoubleClick={() =>
+                  asset.type === "folder" && onOpenFolder(asset.folderPath)
+                }
+              >
+                <CardContent className="p-6">
+                  {asset.type === "folder" ? (
+                    <div className="flex flex-col items-center">
+                      <Folder size={64} className="text-yellow-500 mb-3" />
+                      <p className="text-sm font-medium text-gray-700 truncate w-full text-center">
+                        {asset.name}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="relative group">
+                      <div className="aspect-w-16 aspect-h-9">
+                        {asset.type === "video" ? (
+                          <video
+                            src={asset.url}
+                            className="w-full h-48 object-cover"
+                            muted
+                          />
+                        ) : (
                           <img
                             src={asset.url}
                             alt={asset.name}
-                            className="w-full h-full object-cover rounded-md"
+                            className="w-full h-48 object-cover"
                           />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity flex items-center justify-center space-x-2 opacity-0 group-hover:opacity-100">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="p-2 bg-white bg-opacity-80 hover:bg-opacity-100"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onSelectFile(asset.fileId);
-                              }}
-                            >
-                              <Edit className="h-4 w-4 text-blue-600" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="p-2 bg-white bg-opacity-80 hover:bg-opacity-100"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onDeleteFile(asset.fileId);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 text-red-600" />
-                            </Button>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-700 truncate w-full text-center mt-2">
+                        )}
+                      </div>
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100">
+                        <Button
+            variant="outline"
+
+                          className="p-2 bg-white hover:bg-gray-100 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectFile(asset.fileId);
+                          }}
+                        >
+                          <Edit className="h-5 w-5 text-blue-600" />
+                        </Button>
+                        <Button
+            variant="outline"
+
+                          className="p-2 bg-white hover:bg-gray-100 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteFile(asset.fileId);
+                          }}
+                        >
+                          <Trash2 className="h-5 w-5 text-red-600" />
+                        </Button>
+                      </div>
+                      <div className="p-4">
+                        <p className="text-sm font-medium text-gray-700 truncate">
                           {asset.name}
                         </p>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
-          {/* Upload Modal */}
-          <Modal
-            title="Upload File"
-            isOpen={showUploadModal}
-            onClose={() => setShowUploadModal(false)}
-            onSubmit={() => setShowUploadModal(false)}
-          >
-            <Input
-              type="file"
-              onChange={(e) => onUploadFile(e.target.files[0])}
-              className="w-full"
-            />
-          </Modal>
+        {/* Upload Modal */}
+        <Modal
+          title="Upload File"
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          onSubmit={() => setShowUploadModal(false)}
+        >
+          <Input
+            type="file"
+            accept="image/*,video/*"
+            onChange={(e) => {
+              onUploadFile(e.target.files[0]);
+              setShowUploadModal(false);
+            }}
+            className="w-full p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <div className="mt-4 flex justify-end space-x-3">
+            <Button
+              onClick={() => setShowUploadModal(false)}
+              className="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => setShowUploadModal(false)}
+              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700"
+            >
+              Upload
+            </Button>
+          </div>
+        </Modal>
 
-          {/* Create Folder Modal */}
-          <Modal
-            title="Create Folder"
-            isOpen={showCreateFolderModal}
-            onClose={() => setShowCreateFolderModal(false)}
-            onSubmit={() => setShowCreateFolderModal(false)}
-          >
-            <Input
-              placeholder="Folder Name"
-              onChange={(e) => onCreateFolder(e.target.value)}
-              className="w-full"
-            />
-          </Modal>
-        </main>
-      </div>
+        {/* Create Folder Modal */}
+        <Modal
+          title="Create Folder"
+          isOpen={showCreateFolderModal}
+          onClose={() => setShowCreateFolderModal(false)}
+          onSubmit={() => setShowCreateFolderModal(false)}
+        >
+          <Input
+            placeholder="Folder Name"
+            onChange={(e) => onCreateFolder(e.target.value)}
+            className="w-full p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <div className="mt-4 flex justify-end space-x-3">
+            <Button
+            variant="outline"
+              onClick={() => setShowCreateFolderModal(false)}
+              className="text-black"
+            >
+              Cancel
+            </Button>
+            <Button
+            variant="outline"
+
+              onClick={() => setShowCreateFolderModal(false)}
+              className="text-black"
+            >
+              Create
+            </Button>
+          </div>
+        </Modal>
+      </main>
     </div>
   );
 };
