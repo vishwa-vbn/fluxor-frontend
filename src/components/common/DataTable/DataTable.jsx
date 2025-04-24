@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import DataTable from 'react-data-table-component';
+import DataTable, { createTheme } from 'react-data-table-component';
 import Loader from '../loader/loader';
 
 const ReusableDataTable = ({
@@ -21,8 +21,97 @@ const ReusableDataTable = ({
   // Ensure unique key for re-rendering when rowsPerPage changes
   const tableKey = `datatable-${rowsPerPage}`;
 
+  // Create custom dark theme (non-greenish aesthetic)
+  createTheme('customDark', {
+    text: {
+      primary: '#60a5fa', // Soft sky blue
+      secondary: '#a3bffa', // Light lavender blue
+    },
+    background: {
+      default: '#1e293b', // Deep slate gray (matches sidebar/nav)
+    },
+    context: {
+      background: '#3b82f6', // Vibrant blue
+      text: '#ffffff',
+    },
+    divider: {
+      default: '#4b5563', // Medium gray
+    },
+    action: {
+      button: 'rgba(96, 165, 250, 0.54)', // Soft sky blue with opacity
+      hover: 'rgba(59, 130, 246, 0.1)', // Vibrant blue with low opacity
+      disabled: 'rgba(75, 85, 99, 0.3)', // Medium gray with opacity
+    },
+  }, 'dark');
+
+  // Detect browser theme preference
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDarkMode(mediaQuery.matches);
+    const handleChange = (e) => setIsDarkMode(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Custom styles with theme-aware CSS variables
+  const customStyles = {
+    table: {
+      style: {
+        backgroundColor: 'var(--table-bg, #ffffff)',
+      },
+    },
+    tableWrapper: {
+      style: {
+        backgroundColor: 'var(--table-bg, #ffffff)',
+      },
+    },
+    headCells: {
+      style: {
+        backgroundColor: 'var(--header-bg, #f9fafb)',
+        color: 'var(--header-text, #111827)',
+        fontWeight: '600',
+      },
+    },
+    cells: {
+      style: {
+        color: 'var(--cell-text, #111827)',
+      },
+    },
+    rows: {
+      style: {
+        backgroundColor: 'var(--row-bg, #ffffff)',
+        '&:hover': {
+          backgroundColor: 'var(--row-hover-bg, #f3f4f6)',
+        },
+      },
+      stripedStyle: {
+        backgroundColor: 'var(--row-striped-bg, #f9fafb)',
+      },
+    },
+    pagination: {
+      style: {
+        backgroundColor: 'var(--pagination-bg, #ffffff)',
+        color: 'var(--pagination-text, #111827)',
+      },
+    },
+  };
+
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      style={{
+        '--table-bg': isDarkMode ? '#1e293b' : 'white',
+        '--header-bg': isDarkMode ? '#2d3748' : '#f9fafb',
+        '--header-text': isDarkMode ? '#60a5fa' : '#111827',
+        '--cell-text': isDarkMode ? '#a3bffa' : '#111827',
+        '--row-bg': isDarkMode ? '#1e293b' : 'white',
+        '--row-hover-bg': isDarkMode ? '#3b82f6' : '#f3f4f6',
+        '--row-striped-bg': isDarkMode ? '#2d3748' : '#f9fafb',
+        '--pagination-bg': isDarkMode ? '#1e293b' : 'white',
+        '--pagination-text': isDarkMode ? '#60a5fa' : '#111827',
+      }}
+    >
       <DataTable
         key={tableKey}
         columns={columns}
@@ -32,7 +121,9 @@ const ReusableDataTable = ({
         noDataComponent={<Loader message={noDataMessage} />}
         pagination
         paginationPerPage={rowsPerPage}
-        paginationRowsPerPageOptions={paginationRowsPerPageOptions || [5, 10, 20, rowsPerPage].sort((a, b) => a - b)}
+        paginationRowsPerPageOptions={
+          paginationRowsPerPageOptions || [5, 10, 20, rowsPerPage].sort((a, b) => a - b)
+        }
         paginationDefaultPage={currentPage}
         onChangePage={onChangePage}
         onRowClicked={onRowClick}
@@ -40,6 +131,8 @@ const ReusableDataTable = ({
         striped={striped}
         noHeader={noHeader}
         className="relative"
+        customStyles={customStyles}
+        theme={isDarkMode ? 'customDark' : 'default'}
       />
     </div>
   );

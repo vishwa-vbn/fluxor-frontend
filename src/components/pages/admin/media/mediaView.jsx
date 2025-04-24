@@ -1,260 +1,237 @@
-import React, { useState, useMemo } from "react";
-import { ArrowLeft, Folder, Upload, FolderPlus, Edit, Trash2 } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Folder, Upload, FolderPlus, Trash2, Image as ImageIcon, Video, Play, Eye } from "lucide-react";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
-import { Card, CardContent } from "../../../common/card/Card";
-import Input from "../../../controls/input/inputView";
 import Button from "../../../controls/button/buttonView";
-import Modal from "../../../common/modal/modal";
+import Modal from "../../../common/modal/modal"; // Adjust the import path to match your project structure
 
 const MediaView = ({
-  assets,
-  folders,
-  loading,
-  currentPath,
-  selectedFileId,
-  onPathChange,
-  onGoBack,
-  onSelectFile,
-  onOpenFolder,
-  onUploadFile,
-  onCreateFolder,
-  onDeleteFile,
+  assets = [],
+  loading = false,
+  currentPath = "/",
+  onGoBack = () => {},
+  onOpenFolder = () => {},
+  onUploadFile = () => {},
+  onCreateFolder = () => {},
+  onDeleteFile = () => {},
 }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState(null);
 
-  // Filter assets based on search query
-  const filteredAssets = useMemo(() => {
-    if (!searchQuery) return assets;
-    return assets.filter((asset) =>
-      asset.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [assets, searchQuery]);
+  const filteredFolders = useMemo(() => {
+    return assets.filter((asset) => asset.type === "folder");
+  }, [assets]);
 
-  // Breadcrumbs rendering
-  const renderBreadcrumbs = () => {
-    const parts = currentPath.split("/").filter(Boolean);
-    let path = "";
-    return (
-      <div className="flex items-center space-x-2 text-gray-500 text-sm">
-        <span
-          className="cursor-pointer hover:text-blue-600 transition-colors"
-          onClick={() => onPathChange("/")}
-        >
-          Home
-        </span>
-        {parts.map((part, index) => {
-          path += `/${part}`;
-          return (
-            <span key={index} className="flex items-center">
-              <span className="mx-2">/</span>
-              <span
-                className="cursor-pointer hover:text-blue-600 transition-colors"
-                onClick={() => onPathChange(path)}
-              >
-                {part}
-              </span>
-            </span>
-          );
-        })}
-      </div>
-    );
+  useEffect(() => {
+    console.log("assets", assets);
+  }, [assets]);
+
+  const mediaAssets = useMemo(() => {
+    return assets.filter((asset) => asset.type !== "folder");
+  }, [assets]);
+
+  const renderAssetIcon = (asset) => {
+    if (asset.type === "folder") return <Folder size={20} className="text-yellow-400" />;
+    if (asset.fileType === "non-image") return <Video size={20} className="text-blue-400" />;
+    return <ImageIcon size={20} className="text-blue-400" />;
   };
 
-  // Sample user data for TopNavbar
-  const sampleUserData = {
-    name: "John Doe",
-    email: "john@example.com",
+  const getVideoThumbnail = (asset) => {
+    return asset.thumbnail || "/video-placeholder.png";
+  };
+
+  // Open modal with selected asset for preview
+  const handlePreview = (asset) => {
+    setSelectedAsset(asset);
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedAsset(null);
+  };
+
+  // Render preview content for modal
+  const renderPreviewContent = () => {
+    if (!selectedAsset) return null;
+
+    return selectedAsset.fileType === "non-image" ? (
+      <video
+        src={selectedAsset.url}
+        controls
+        className="w-full h-auto max-h-[50vh] object-contain"
+        autoPlay
+      >
+        <source src={selectedAsset.url} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    ) : (
+      <img
+        src={selectedAsset.url}
+        alt={selectedAsset.name}
+        className="w-full h-auto max-h-[50vh] object-contain"
+      />
+    );
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Top Navbar */}
       <TopNavbar
-        userData={sampleUserData}
-        onSearch={(query) => setSearchQuery(query)}
+        userData={{ name: "John Doe", email: "john@example.com" }}
+        onSearch={() => {}}
         notificationCount={3}
-        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        title="Media"
       />
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-semibold">Media Manager</h1>
-            {renderBreadcrumbs()}
-          </div>
-          <div className="flex space-x-3">
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-xl font-semibold text-gray-800">Media</h1>
+          <div className="flex space-x-2">
             <Button
-              onClick={onGoBack}
-              disabled={currentPath === "/"}
-              className="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              onClick={() => {
+                document.getElementById("file-upload").click();
+              }}
+              className="p-2 flex items-center space-x-1 text-gray-600 hover:bg-gray-200 rounded-md"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+              <Upload size={16} />
+              <span className="text-sm">Upload</span>
+              <input
+                id="file-upload"
+                type="file"
+                accept="image/*,video/*"
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files[0]) {
+                    onUploadFile(e.target.files[0]);
+                  }
+                }}
+              />
             </Button>
             <Button
-              onClick={() => setShowUploadModal(true)}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              onClick={() => {
+                const folderName = prompt("Enter folder name:");
+                if (folderName) onCreateFolder(folderName);
+              }}
+              className="p-2 flex items-center space-x-1 text-gray-600 hover:bg-gray-200 rounded-md"
             >
-              <Upload className="mr-2 h-4 w-4" /> Upload File
-            </Button>
-            <Button
-              onClick={() => setShowCreateFolderModal(true)}
-              className="flex items-center px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition-colors"
-            >
-              <FolderPlus className="mr-2 h-4 w-4" /> Create Folder
+              <FolderPlus size={16} />
+              <span className="text-sm">Folder</span>
             </Button>
           </div>
         </div>
 
         {loading ? (
           <div className="flex justify-center p-8">
-            <div className="animate-spin h-12 w-12 border-t-4 border-blue-600"></div>
+            <div className="animate-spin h-8 w-8 border-t-2 border-blue-500 rounded-full"></div>
           </div>
-        ) : filteredAssets.length === 0 ? (
-          <Card className="border-none">
-            <CardContent className="p-8 text-center text-gray-500">
-              No assets found.
-            </CardContent>
-          </Card>
+        ) : assets.length === 0 ? (
+          <div className="text-center text-gray-500 p-8">No assets found</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredAssets.map((asset) => (
-              <Card
-                key={asset.fileId || asset.folderId}
-                className={`border-none hover:shadow-md transition-all duration-300 ${
-                  selectedFileId === asset.fileId ? "ring-2 ring-blue-500" : ""
-                }`}
-                onDoubleClick={() =>
-                  asset.type === "folder" && onOpenFolder(asset.folderPath)
-                }
-              >
-                <CardContent className="p-6">
-                  {asset.type === "folder" ? (
-                    <div className="flex flex-col items-center">
-                      <Folder size={64} className="text-yellow-500 mb-3" />
-                      <p className="text-sm font-medium text-gray-700 truncate w-full text-center">
-                        {asset.name}
-                      </p>
+          <div>
+            {filteredFolders.length > 0 && (
+              <div className="mb-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {filteredFolders.map((folder) => (
+                    <div
+                      key={folder.folderId}
+                      className="p-4 bg-white rounded-lg shadow-sm cursor-pointer hover:bg-gray-50"
+                      onDoubleClick={() => onOpenFolder(folder.folderPath)}
+                    >
+                      <div className="flex items-center space-x-2">
+                        {renderAssetIcon(folder)}
+                        <span className="text-sm text-gray-700 truncate">{folder.name}</span>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="relative group">
-                      <div className="aspect-w-16 aspect-h-9">
-                        {asset.type === "video" ? (
-                          <video
-                            src={asset.url}
-                            className="w-full h-48 object-cover"
-                            muted
-                          />
+                  ))}
+                </div>
+              </div>
+            )}
+            {mediaAssets.length > 0 && (
+              <div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {mediaAssets.map((asset) => (
+                    <div
+                      key={asset.fileId}
+                      className="relative rounded-lg overflow-hidden bg-white shadow-sm cursor-pointer"
+                    >
+                      <div className="relative aspect-square">
+                        {asset.fileType === "non-image" && asset.url ? (
+                          <div className="relative w-full h-full">
+                            <img
+                              src={getVideoThumbnail(asset)}
+                              alt="Video thumbnail"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.src = "/video-placeholder.png";
+                              }}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Play size={32} className="text-white opacity-75" />
+                            </div>
+                            <video
+                              src={asset.url}
+                              className="w-full h-full object-cover hidden"
+                              muted
+                              loop
+                              preload="metadata"
+                              onError={(e) => {
+                                console.error("Video load error:", asset.url);
+                              }}
+                            >
+                              <source src={asset.url} type="video/mp4" />
+                              Your browser does not support the video tag.
+                            </video>
+                          </div>
                         ) : (
                           <img
-                            src={asset.url}
+                            src={asset.url || "/image-placeholder.png"}
                             alt={asset.name}
-                            className="w-full h-48 object-cover"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.src = "/image-placeholder.png";
+                            }}
                           />
                         )}
                       </div>
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100">
+                      <div className="absolute top-2 right-2 flex space-x-1">
                         <Button
-            variant="outline"
-
-                          className="p-2 bg-white hover:bg-gray-100 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onSelectFile(asset.fileId);
+                            handlePreview(asset);
                           }}
+                          className="p-1 bg-white rounded-full text-blue-500 hover:bg-gray-100 shadow-sm"
                         >
-                          <Edit className="h-5 w-5 text-blue-600" />
+                          <Eye size={12} />
                         </Button>
                         <Button
-            variant="outline"
-
-                          className="p-2 bg-white hover:bg-gray-100 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             onDeleteFile(asset.fileId);
                           }}
+                          className="p-1 bg-white rounded-full text-red-500 hover:bg-gray-100 shadow-sm"
                         >
-                          <Trash2 className="h-5 w-5 text-red-600" />
+                          <Trash2 size={12} />
                         </Button>
                       </div>
-                      <div className="p-4">
-                        <p className="text-sm font-medium text-gray-700 truncate">
-                          {asset.name}
-                        </p>
+                      <div className="p-2">
+                        <p className="text-xs text-gray-600 truncate">{asset.name}</p>
                       </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
-
-        {/* Upload Modal */}
-        <Modal
-          title="Upload File"
-          isOpen={showUploadModal}
-          onClose={() => setShowUploadModal(false)}
-          onSubmit={() => setShowUploadModal(false)}
-        >
-          <Input
-            type="file"
-            accept="image/*,video/*"
-            onChange={(e) => {
-              onUploadFile(e.target.files[0]);
-              setShowUploadModal(false);
-            }}
-            className="w-full p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <div className="mt-4 flex justify-end space-x-3">
-            <Button
-              onClick={() => setShowUploadModal(false)}
-              className="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => setShowUploadModal(false)}
-              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700"
-            >
-              Upload
-            </Button>
-          </div>
-        </Modal>
-
-        {/* Create Folder Modal */}
-        <Modal
-          title="Create Folder"
-          isOpen={showCreateFolderModal}
-          onClose={() => setShowCreateFolderModal(false)}
-          onSubmit={() => setShowCreateFolderModal(false)}
-        >
-          <Input
-            placeholder="Folder Name"
-            onChange={(e) => onCreateFolder(e.target.value)}
-            className="w-full p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <div className="mt-4 flex justify-end space-x-3">
-            <Button
-            variant="outline"
-              onClick={() => setShowCreateFolderModal(false)}
-              className="text-black"
-            >
-              Cancel
-            </Button>
-            <Button
-            variant="outline"
-
-              onClick={() => setShowCreateFolderModal(false)}
-              className="text-black"
-            >
-              Create
-            </Button>
-          </div>
-        </Modal>
       </main>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title="Asset Preview"
+        mode="view"
+        size="large"
+      >
+        {renderPreviewContent()}
+      </Modal>
     </div>
   );
 };
