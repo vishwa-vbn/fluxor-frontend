@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   FileText,
@@ -59,12 +58,14 @@ export default function DashboardView({
         position: "top",
         labels: {
           font: { size: 12, family: "'Inter', sans-serif" },
-          color: "#4B5563",
+          color: (context) =>
+            context.chart.canvas.classList.contains("dark") ? "#D1D5DB" : "#4B5563", // gray-300 in dark, gray-600 in light
           padding: 16,
         },
       },
       tooltip: {
-        backgroundColor: "#1F2937",
+        backgroundColor: (context) =>
+          context.chart.canvas.classList.contains("dark") ? "#374151" : "#1F2937", // gray-700 in dark, gray-800 in light
         bodyFont: { size: 12, family: "'Inter', sans-serif" },
         titleFont: { size: 13, family: "'Inter', sans-serif" },
         padding: 10,
@@ -74,17 +75,22 @@ export default function DashboardView({
     scales: {
       y: {
         beginAtZero: true,
-        grid: { color: "#E5E7EB" },
+        grid: {
+          color: (context) =>
+            context.chart.canvas.classList.contains("dark") ? "#4B5563" : "#E5E7EB", // gray-600 in dark, gray-200 in light
+        },
         ticks: {
           font: { size: 12, family: "'Inter', sans-serif" },
-          color: "#4B5563",
+          color: (context) =>
+            context.chart.canvas.classList.contains("dark") ? "#D1D5DB" : "#4B5563", // gray-300 in dark, gray-600 in light
         },
       },
       x: {
         grid: { display: false },
         ticks: {
           font: { size: 12, family: "'Inter', sans-serif" },
-          color: "#4B5563",
+          color: (context) =>
+            context.chart.canvas.classList.contains("dark") ? "#D1D5DB" : "#4B5563", // gray-300 in dark, gray-600 in light
         },
       },
     },
@@ -108,22 +114,23 @@ export default function DashboardView({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100 font-inter text-gray-900">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 font-inter text-gray-900 dark:text-gray-100 transition-colors duration-200">
       <div className="flex flex-col min-h-screen">
         <TopNavbar
           userData={userData}
           onSearch={handleSearch}
           notificationCount={3}
+          className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
         />
 
-        <main className="w-[95%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Header */}
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
                 Dashboard
               </h1>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 Monitor key metrics and manage your platform effectively.
               </p>
             </div>
@@ -133,49 +140,49 @@ export default function DashboardView({
               <StatCard
                 title="Total Posts"
                 value={stats.postsCount}
-                icon={<FileText className="w-6 h-6 text-blue-600" />}
+                icon={<FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />}
                 trend={trends.postsCount}
               />
               <StatCard
                 title="Total Users"
                 value={stats.usersCount}
-                icon={<Users className="w-6 h-6 text-purple-600" />}
+                icon={<Users className="w-6 h-6 text-purple-600 dark:text-purple-400" />}
                 trend={trends.usersCount}
               />
               <StatCard
                 title="Total Views"
                 value={stats.viewsCount}
-                icon={<Eye className="w-6 h-6 text-green-600" />}
+                icon={<Eye className="w-6 h-6 text-green-600 dark:text-green-400" />}
                 trend={trends.viewsCount}
               />
               <StatCard
                 title="Active Users"
                 value={stats.usersCount}
-                icon={<Users className="w-6 h-6 text-amber-600" />}
+                icon={<Users className="w-6 h-6 text-amber-600 dark:text-amber-400" />}
                 trend={trends.activeVisitors}
               />
             </section>
 
             {/* Quick Actions Section */}
-            <section className="bg-white shadow-sm rounded-lg p-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
+            <section className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
                 Quick Actions
               </h2>
               <div className="flex flex-wrap gap-4">
                 <Link to="/create-post">
-                  <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors text-sm font-medium">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white rounded-md hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors text-sm font-medium">
                     <PlusCircle className="w-4 h-4" />
                     New Post
                   </button>
                 </Link>
                 <Link to="/admin/media">
-                  <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors text-sm font-medium">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white rounded-md hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors text-sm font-medium">
                     <Upload className="w-4 h-4" />
                     Upload Media
                   </button>
                 </Link>
                 <Link to="/users">
-                  <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors text-sm font-medium">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white rounded-md hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors text-sm font-medium">
                     <UserPlus className="w-4 h-4" />
                     Add User
                   </button>
@@ -186,12 +193,13 @@ export default function DashboardView({
             {/* Charts Section 1 */}
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ChartCard title="Weekly Traffic">
-                <Bar data={barData} options={chartOptions} />
+                <Bar data={barData} options={chartOptions} className="dark" />
               </ChartCard>
               <ChartCard title="Post Status">
                 <Doughnut
                   data={doughnutData}
                   options={{ ...chartOptions, cutout: "70%" }}
+                  className="dark"
                 />
               </ChartCard>
             </section>
@@ -199,7 +207,7 @@ export default function DashboardView({
             {/* Charts Section 2 */}
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ChartCard title="User Growth">
-                <Line data={lineData} options={chartOptions} />
+                <Line data={lineData} options={chartOptions} className="dark" />
               </ChartCard>
               <RecentActivityCard recentPosts={recentPosts} />
             </section>
@@ -213,21 +221,23 @@ export default function DashboardView({
 function StatCard({ title, value, icon, trend }) {
   const isPositive = trend.startsWith("+");
   return (
-    <div className="bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700">
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-gray-100 rounded-md">{icon}</div>
+        <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-md">{icon}</div>
         <div>
-          <h4 className="text-sm text-gray-600">{title}</h4>
-          <p className="text-2xl font-semibold text-gray-900 mt-1">{value}</p>
+          <h4 className="text-sm text-gray-600 dark:text-gray-400">{title}</h4>
+          <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mt-1">
+            {value}
+          </p>
           <div className="flex items-center gap-1">
             {isPositive ? (
-              <ArrowUp className="h-4 w-4 text-green-600" />
+              <ArrowUp className="h-4 w-4 text-green-600 dark:text-green-400" />
             ) : (
-              <ArrowDown className="h-4 w-4 text-red-600" />
+              <ArrowDown className="h-4 w-4 text-red-600 dark:text-red-400" />
             )}
             <span
               className={`text-xs font-medium ${
-                isPositive ? "text-green-600" : "text-red-600"
+                isPositive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
               }`}
             >
               {trend}
@@ -241,8 +251,10 @@ function StatCard({ title, value, icon, trend }) {
 
 function ChartCard({ title, children }) {
   return (
-    <div className="bg-white shadow-sm rounded-lg p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">{title}</h3>
+    <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+        {title}
+      </h3>
       <div className="h-80">{children}</div>
     </div>
   );
@@ -250,31 +262,51 @@ function ChartCard({ title, children }) {
 
 function RecentActivityCard({ recentPosts }) {
   return (
-    <div className="bg-white shadow-sm rounded-lg p-6">
+    <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 border border-gray-200 dark:border-gray-700">
       <div className="mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
-        <p className="text-sm text-muted-foreground">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+          Recent Activity
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
           Latest activities and updates on your blog
         </p>
       </div>
-      <Tabs defaultValue="posts">
-        <TabsList>
-          <TabsTrigger value="posts">Recent Posts</TabsTrigger>
-          <TabsTrigger value="comments">Recent Comments</TabsTrigger>
+      <Tabs defaultValue="posts" className="text-gray-900 dark:text-gray-100">
+        <TabsList className="bg-gray-100 dark:bg-gray-700">
+          <TabsTrigger
+            value="posts"
+            className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+          >
+            Recent Posts
+          </TabsTrigger>
+          <TabsTrigger
+            value="comments"
+            className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+          >
+            Recent Comments
+          </TabsTrigger>
         </TabsList>
-        <TabsContent value="posts">
+        <TabsContent
+          value="posts"
+          className="border-t border-gray-200 dark:border-gray-700 pt-2"
+        >
           {recentPosts.map((post) => (
             <div
               key={post.id}
-              className="flex items-center border-b py-2 last:border-none"
+              className="flex items-center border-b border-gray-200 dark:border-gray-700 py-2 last:border-none"
             >
-              <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
-              <p className="text-sm font-medium text-gray-900">{post.title}</p>
+              <FileText className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {post.title}
+              </p>
             </div>
           ))}
         </TabsContent>
-        <TabsContent value="comments">
-          <p className="text-sm text-muted-foreground">
+        <TabsContent
+          value="comments"
+          className="border-t border-gray-200 dark:border-gray-700 pt-2"
+        >
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             No recent comments found.
           </p>
         </TabsContent>

@@ -10,9 +10,10 @@ import Button from "../../../controls/button/buttonView";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
 import FileUpload from "../../../controls/fileUpload/fileUpload";
 import SearchBar from "../../../controls/searchbar/searchbar";
-import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage"; // Adjust path as needed
+import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage";
 import ReusableDataTable from "../../../common/DataTable/DataTable";
 import { getCategoryInfoByKey } from "../../../../utils";
+
 const CategoriesView = ({
   categories,
   allCategories = [],
@@ -31,20 +32,17 @@ const CategoriesView = ({
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
 
-  // Use the responsive rows per page hook
-  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage(
-    {
-      rowHeight: 60, // Same as Post component; adjust if rows differ
-      navbarHeight: 60,
-      controlsHeight: 120, // Accounts for search bar, filter, and margins
-      extraPadding: 50,
-      minRows: 5,
-      maxRowsMobile: 5,
-      maxRowsTablet: 10,
-      maxRowsDesktop: 20,
-      debounceDelay: 200,
-    }
-  );
+  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage({
+    rowHeight: 60,
+    navbarHeight: 60,
+    controlsHeight: 120,
+    extraPadding: 50,
+    minRows: 5,
+    maxRowsMobile: 5,
+    maxRowsTablet: 10,
+    maxRowsDesktop: 20,
+    debounceDelay: 200,
+  });
 
   useEffect(() => {
     let filteredData = categories || [];
@@ -55,17 +53,15 @@ const CategoriesView = ({
         cat.name?.toLowerCase().includes(query) || cat.slug?.toLowerCase().includes(query)
       );
     }
-    
 
     if (parentFilter !== "all") {
       filteredData = filteredData.filter(
         (cat) => String(cat.parentid) === String(parentFilter)
       );
     }
-    
 
     setFiltered(filteredData);
-    setCurrentPage(1); // Reset page when data changes
+    setCurrentPage(1);
   }, [search, parentFilter, categories, setCurrentPage]);
 
   const columns = [
@@ -73,13 +69,13 @@ const CategoriesView = ({
       name: "Name",
       selector: (row) => row.name,
       sortable: true,
-      cell: (row) => <div className="text-center">{row.name}</div>,
+      cell: (row) => <div className="text-center dark:text-gray-200">{row.name}</div>,
     },
     {
       name: "Slug",
       selector: (row) => row.slug,
       sortable: true,
-      cell: (row) => <div className="text-center">{row.slug}</div>,
+      cell: (row) => <div className="text-center dark:text-gray-200">{row.slug}</div>,
     },
     {
       name: "Parent",
@@ -88,12 +84,9 @@ const CategoriesView = ({
         return parent ? parent : "";
       },
       cell: (row) => (
-        console.log("row is", row),
-        (
-          <div className="text-center">
-            {getCategoryInfoByKey(row.parentid, "name")}
-          </div>
-        )
+        <div className="text-center dark:text-gray-200">
+          {getCategoryInfoByKey(row.parentid, "name")}
+        </div>
       ),
     },
     {
@@ -108,10 +101,10 @@ const CategoriesView = ({
               setIsEditOpen(true);
             }}
           >
-            <Edit className="w-4 h-4 text-blue-600" />
+            <Edit className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => onDelete(row.id)}>
-            <Trash2 className="w-4 h-4 text-red-600" />
+            <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
           </Button>
         </div>
       ),
@@ -128,29 +121,29 @@ const CategoriesView = ({
     onSearchChange(query);
   };
 
-  // Handle page change
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-0 py-0 space-y-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-0 py-0 space-y-6 transition-colors duration-200">
       <div className="flex-1 flex flex-col">
         <TopNavbar
           userData={sampleUserData}
           onSearch={handleSearch}
           notificationCount={3}
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+          className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
         />
         <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-3 space-y-8">
           <div className="flex justify-between items-center mb-2">
-            <h1 className="text-2xl font-bold text-gray-800 ">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
               All Categories
             </h1>
             <Button
               variant="primary"
               onClick={() => setIsAddOpen(true)}
-              className="flex items-center"
+              className="flex items-center bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white"
             >
               <PlusCircle className="w-4 h-4 mr-2" />
               Add Category
@@ -162,6 +155,7 @@ const CategoriesView = ({
               searchQuery={search}
               setSearchQuery={handleSearch}
               placeholder="Search categories..."
+              className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             />
             <div className="w-[200px]">
               <Select
@@ -175,11 +169,12 @@ const CategoriesView = ({
                     label: c.name,
                   })),
                 ]}
+                className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
               />
             </div>
           </div>
 
-          <Card>
+          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <ReusableDataTable
               columns={columns}
               data={Array.isArray(filtered) ? filtered : []}
@@ -193,6 +188,7 @@ const CategoriesView = ({
               striped={true}
               highlightOnHover={true}
               noHeader={true}
+              className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200"
             />
           </Card>
 
@@ -205,10 +201,25 @@ const CategoriesView = ({
               setIsAddOpen(false);
             }}
             initialData={{}}
+            className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200"
           >
-            <Input label="Name" name="name" required />
-            <Input label="Slug" name="slug" required />
-            <FileUpload label="Featured Image" name="featuredImage" />
+            <Input
+              label="Name"
+              name="name"
+              required
+              className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+            />
+            <Input
+              label="Slug"
+              name="slug"
+              required
+              className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+            />
+            <FileUpload
+              label="Featured Image"
+              name="featuredImage"
+              className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+            />
             <Select
               label="Parent Category"
               name="parentId"
@@ -217,6 +228,7 @@ const CategoriesView = ({
                 label: c.name,
               }))}
               allowEmpty
+              className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             />
           </Modal>
 
@@ -234,13 +246,25 @@ const CategoriesView = ({
                 setEditCategory(null);
               }}
               initialData={editCategory}
+              className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200"
             >
-              <Input label="Name" name="name" required />
-              <Input label="Slug" name="slug" required />
+              <Input
+                label="Name"
+                name="name"
+                required
+                className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+              />
+              <Input
+                label="Slug"
+                name="slug"
+                required
+                className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+              />
               <FileUpload
                 label="Featured Image"
                 name="featuredImage"
                 value={editCategory.featuredImage}
+                className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
               />
               <Select
                 label="Parent Category"
@@ -249,6 +273,7 @@ const CategoriesView = ({
                   .filter((c) => c.id !== editCategory.id)
                   .map((c) => ({ value: c.id, label: c.name }))}
                 allowEmpty
+                className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
               />
             </Modal>
           )}

@@ -60,9 +60,9 @@ export default function TopNavbar({ onSearch, notificationCount = 0, toggleSideb
         <img
           src={userData.avatar}
           alt="Profile"
-          className="w-7 h-7 rounded-full object-cover"
+          className="w-7 h-7 rounded-full object-cover border border-gray-200 dark:border-gray-600"
           onError={(e) =>
-            (e.target.outerHTML = `<div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm">${getInitials(
+            (e.target.outerHTML = `<div className="w-7 h-7 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-medium text-sm">${getInitials(
               userData.name
             )}</div>`)
           }
@@ -70,25 +70,25 @@ export default function TopNavbar({ onSearch, notificationCount = 0, toggleSideb
       );
     }
     return (
-      <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm">
+      <div className="w-7 h-7 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-medium text-sm">
         {getInitials(userData.name)}
       </div>
     );
   };
 
   return (
-    <nav className="bg-white h-[50px] sticky top-0 z-50 shadow-sm hidden md:flex items-center backdrop-blur-md supports-[backdrop-filter]:backdrop-blur-md">
-      <div className="max-w-[100%] mx-auto px-2    flex justify-between items-center w-full h-full">
+    <nav className="bg-white dark:bg-gray-800 h-[50px] sticky top-0 z-50 shadow-sm hidden md:flex items-center backdrop-blur-md supports-[backdrop-filter]:backdrop-blur-md border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+      <div className="max-w-[100%] mx-auto px-2 flex justify-between items-center w-full h-full">
         {/* Left: Burger Menu and Route Name */}
         <div className="flex items-center gap-3">
           <button
             onClick={toggleSidebar}
-            className="p-1 text-gray-600 hover:text-gray-800 focus:outline-none"
+            className="p-1 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 focus:outline-none"
             aria-label="Toggle Sidebar"
           >
             <Menu className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold text-gray-800">
+          <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
             {routeName === "Dashboard" ? "Blog Dashboard" : `${routeName}`}
           </h1>
         </div>
@@ -101,16 +101,16 @@ export default function TopNavbar({ onSearch, notificationCount = 0, toggleSideb
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               placeholder="Search posts, users..."
-              className="h-7 w-48 text-sm rounded-md"
+              className="h-7 w-48 text-sm rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
           </form>
 
           {/* Notifications */}
           <div className="relative">
-            <button className="p-1 text-gray-600 hover:text-gray-800 relative focus:outline-none">
+            <button className="p-1 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 relative focus:outline-none">
               <Bell className="w-4 h-4" />
               {notificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 text-white text-[9px] rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 dark:bg-red-400 text-white text-[9px] rounded-full flex items-center justify-center">
                   {notificationCount > 9 ? "9+" : notificationCount}
                 </span>
               )}
@@ -118,7 +118,7 @@ export default function TopNavbar({ onSearch, notificationCount = 0, toggleSideb
           </div>
 
           {/* Settings */}
-          <button className="p-1 text-gray-600 hover:text-gray-800 focus:outline-none">
+          <button className="p-1 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 focus:outline-none">
             <Settings className="w-4 h-4" />
           </button>
 
@@ -129,25 +129,25 @@ export default function TopNavbar({ onSearch, notificationCount = 0, toggleSideb
               className="flex items-center gap-2 focus:outline-none"
             >
               {renderProfileImage()}
-              {/* <span className="text-sm font-medium text-gray-700 hidden lg:block">
+              {/* <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden lg:block">
                 {userData.name || userData.username || "User"}
               </span> */}
             </button>
 
             {/* Dropdown Menu */}
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-100 z-10">
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-600 z-10">
                 <div className="py-1">
                   <Link
                     to="/admin/profile"
-                    className="block px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                    className="block px-3 py-1.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
                     onClick={() => setIsDropdownOpen(false)}
                   >
                     Profile
                   </Link>
                   <Link
                     to="/admin/settings"
-                    className="block px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                    className="block px-3 py-1.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
                     onClick={() => setIsDropdownOpen(false)}
                   >
                     Settings
@@ -157,7 +157,7 @@ export default function TopNavbar({ onSearch, notificationCount = 0, toggleSideb
                       console.log("Logout clicked");
                       setIsDropdownOpen(false);
                     }}
-                    className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    className="w-full text-left px-3 py-1.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
                   >
                     <LogOut className="w-3 h-3" /> Logout
                   </button>
