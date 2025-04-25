@@ -67,6 +67,7 @@
 
 import React from "react";
 import ReactSelect from "react-select";
+import clsx from "clsx";
 
 export default function Select({
   label,
@@ -79,97 +80,98 @@ export default function Select({
   const getSingleValue = () => options.find((opt) => opt.value === value);
   const getMultiValue = () => options.filter((opt) => value?.includes(opt.value));
 
+  // Define custom styles for react-select components
   const customStyles = {
     control: (base, state) => ({
       ...base,
-      backgroundColor: state.isFocused
-        ? document.documentElement.classList.contains("dark")
-          ? "#1f2937" /* gray-800 */
-          : "#ffffff" /* white */
-        : document.documentElement.classList.contains("dark")
-        ? "#374151" /* gray-700 */
-        : "#ffffff" /* white */,
-      borderColor: state.isFocused
-        ? document.documentElement.classList.contains("dark")
-          ? "#3b82f6" /* blue-500 */
-          : "#3b82f6" /* blue-600 */
-        : document.documentElement.classList.contains("dark")
-        ? "#4b5563" /* gray-600 */
-        : "#d1d5db" /* gray-300 */,
-      boxShadow: state.isFocused
-        ? document.documentElement.classList.contains("dark")
-          ? "0 0 0 1px #3b82f6" /* blue-500 */
-          : "0 0 0 1px #3b82f6" /* blue-600 */
-        : "none",
+      background: "transparent", // Let Tailwind handle background
+      border: "none", // Tailwind handles border
+      boxShadow: state.isFocused ? "0 0 0 2px rgba(59, 130, 246, 0.5)" : "none", // Match focus:ring-2
       "&:hover": {
-        borderColor: document.documentElement.classList.contains("dark")
-          ? "#3b82f6" /* blue-500 */
-          : "#3b82f6" /* blue-600 */,
+        border: "none",
       },
-      fontSize: "0.875rem",
-      borderRadius: "5px",
+      fontSize: "0.875rem", // text-sm
+      borderRadius: "0.375rem", // rounded-md
+      minHeight: "38px", // Match typical input height
     }),
     singleValue: (base) => ({
       ...base,
-      color: document.documentElement.classList.contains("dark")
-        ? "#f3f4f6" /* gray-100 */
-        : "#1f2937" /* gray-900 */,
+      color: "inherit", // Inherit from Tailwind text color
+    }),
+    multiValue: (base) => ({
+      ...base,
+      backgroundColor: document.documentElement.classList.contains("dark")
+        ? "#4b5563" // gray-600
+        : "#e5e7eb", // gray-200
+      borderRadius: "0.25rem", // rounded
     }),
     multiValueLabel: (base) => ({
       ...base,
       color: document.documentElement.classList.contains("dark")
-        ? "#f3f4f6" /* gray-100 */
-        : "#1f2937" /* gray-900 */,
+        ? "#e5e7eb" // gray-200
+        : "#1f2937", // gray-900
+      padding: "0.25rem 0.5rem", // px-2 py-1
+    }),
+    multiValueRemove: (base) => ({
+      ...base,
+      color: document.documentElement.classList.contains("dark")
+        ? "#9ca3af" // gray-400
+        : "#6b7280", // gray-500
+      "&:hover": {
+        backgroundColor: document.documentElement.classList.contains("dark")
+          ? "#374151" // gray-700
+          : "#d1d5db", // gray-300
+        color: document.documentElement.classList.contains("dark")
+          ? "#e5e7eb" // gray-200
+          : "#1f2937", // gray-900
+      },
     }),
     input: (base) => ({
       ...base,
-      color: document.documentElement.classList.contains("dark")
-        ? "#f3f4f6" /* gray-100 */
-        : "#1f2937" /* gray-900 */,
+      color: "inherit",
     }),
     placeholder: (base) => ({
       ...base,
-      color: document.documentElement.classList.contains("dark")
-        ? "#6b7280" /* gray-500 */
-        : "#6b7280" /* gray-400 */,
+      color: "inherit",
     }),
     menu: (base) => ({
       ...base,
       zIndex: 100,
       backgroundColor: document.documentElement.classList.contains("dark")
-        ? "#1f2937" /* gray-800 */
-        : "#ffffff" /* white */,
+        ? "#1f2937" // gray-800
+        : "#ffffff", // white
       border: document.documentElement.classList.contains("dark")
-        ? "1px solid #4b5563" /* gray-600 */
-        : "1px solid #e5e7eb" /* gray-200 */,
-      borderRadius: "5px",
+        ? "1px solid #4b5563" // gray-600
+        : "1px solid #e5e7eb", // gray-200
+      borderRadius: "0.375rem", // rounded-md
+      marginTop: "0.25rem", // mt-1
     }),
     menuList: (base) => ({
       ...base,
-      backgroundColor: document.documentElement.classList.contains("dark")
-        ? "#1f2937" /* gray-800 */
-        : "#ffffff" /* white */,
+      padding: "0.25rem", // p-1
+      backgroundColor: "transparent", // Inherit from menu
     }),
     option: (base, { isFocused, isSelected }) => ({
       ...base,
       backgroundColor: isSelected
         ? document.documentElement.classList.contains("dark")
-          ? "#4b5563" /* gray-600 */
-          : "#e5e7eb" /* gray-200 */
+          ? "#4b5563" // gray-600
+          : "#e5e7eb" // gray-200
         : isFocused
         ? document.documentElement.classList.contains("dark")
-          ? "#374151" /* gray-700 */
-          : "#f3f4f6" /* gray-100 */
-        : document.documentElement.classList.contains("dark")
-        ? "#1f2937" /* gray-800 */
-        : "#ffffff" /* white */,
+          ? "#374151" // gray-700
+          : "#f3f4f6" // gray-100
+        : "transparent",
       color: document.documentElement.classList.contains("dark")
-        ? "#f3f4f6" /* gray-100 */
-        : "#1f2937" /* gray-900 */,
+        ? "#e5e7eb" // gray-200
+        : "#1f2937", // gray-900
+      borderRadius: "0.25rem", // rounded
+      padding: "0.5rem 0.75rem", // px-3 py-2
+      cursor: "pointer",
       "&:active": {
         backgroundColor: document.documentElement.classList.contains("dark")
-          ? "#4b5563" /* gray-600 */
-          : "#e5e7eb" /* gray-200 */,
+          ? "#4b5563" // gray-600
+          : "#e5e7eb", // gray-200
       },
     }),
   };
@@ -194,7 +196,17 @@ export default function Select({
         options={options}
         placeholder={placeholder}
         styles={customStyles}
-        className="text-sm"
+        className={clsx(
+          "text-sm",
+          // Light theme
+          "bg-white text-gray-900 border-gray-300 focus:ring-blue-600",
+          // Dark theme
+          "dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:focus:ring-blue-500",
+          // General styles
+          "border rounded-md focus:ring-2",
+          // Placeholder
+          "placeholder-gray-400 dark:placeholder-gray-500"
+        )}
         classNamePrefix="react-select"
       />
     </div>

@@ -541,9 +541,9 @@ const UsersView = ({
               <Button
                 variant="primary"
                 onClick={onAddClick}
-                className="flex items-center bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white"
+                className="flex items-center bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-blue-600 "
               >
-                <PlusCircle className="w-4 h-4 mr-2" />
+                <PlusCircle className="w-4 text-blue-600 dark:text-white  h-4 mr-2" />
                 Add User
               </Button>
             </div>
