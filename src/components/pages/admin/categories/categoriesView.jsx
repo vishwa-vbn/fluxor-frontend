@@ -32,25 +32,29 @@ const CategoriesView = ({
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
 
-  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage({
-    rowHeight: 60,
-    navbarHeight: 60,
-    controlsHeight: 120,
-    extraPadding: 50,
-    minRows: 5,
-    maxRowsMobile: 5,
-    maxRowsTablet: 10,
-    maxRowsDesktop: 20,
-    debounceDelay: 200,
-  });
+  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage(
+    {
+      rowHeight: 60,
+      navbarHeight: 60,
+      controlsHeight: 120,
+      extraPadding: 50,
+      minRows: 5,
+      maxRowsMobile: 5,
+      maxRowsTablet: 10,
+      maxRowsDesktop: 20,
+      debounceDelay: 200,
+    }
+  );
 
   useEffect(() => {
     let filteredData = categories || [];
 
     if (search) {
       const query = search.toLowerCase();
-      filteredData = filteredData.filter((cat) =>
-        cat.name?.toLowerCase().includes(query) || cat.slug?.toLowerCase().includes(query)
+      filteredData = filteredData.filter(
+        (cat) =>
+          cat.name?.toLowerCase().includes(query) ||
+          cat.slug?.toLowerCase().includes(query)
       );
     }
 
@@ -69,13 +73,17 @@ const CategoriesView = ({
       name: "Name",
       selector: (row) => row.name,
       sortable: true,
-      cell: (row) => <div className="text-center dark:text-gray-200">{row.name}</div>,
+      cell: (row) => (
+        <div className="text-center dark:text-gray-200">{row.name}</div>
+      ),
     },
     {
       name: "Slug",
       selector: (row) => row.slug,
       sortable: true,
-      cell: (row) => <div className="text-center dark:text-gray-200">{row.slug}</div>,
+      cell: (row) => (
+        <div className="text-center dark:text-gray-200">{row.slug}</div>
+      ),
     },
     {
       name: "Parent",
@@ -141,7 +149,7 @@ const CategoriesView = ({
               All Categories
             </h1>
             <Button
-              variant="primary"
+              variant="outline"
               onClick={() => setIsAddOpen(true)}
               className="flex items-center bg-blue-600 hover:bg-blue-300 dark:bg-blue-500 dark:hover:bg-blue-300 text-blue-600 "
             >

@@ -214,7 +214,8 @@ import {
   BarChart2,
   LogOut,
   Image,
-  ChevronDown
+  ChevronDown,
+  GalleryHorizontalEnd,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import './adminSidebarStyles.css';
@@ -390,7 +391,7 @@ export default function AdminSidebar() {
               isMainActive("/adSense") ? "bg-gray-800 dark:bg-gray-900 text-blue-300 dark:text-blue-400" : ""
             }`}
           >
-            <BarChart2 className="w-5 h-5 mr-3" />
+            <GalleryHorizontalEnd className="w-5 h-5 mr-3" />
             <span>AdSense</span>
           </Link>
         </li>

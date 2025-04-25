@@ -139,8 +139,8 @@ export const getWeeklyTrafficData = () => {
       {
         label: "Page Views",
         data: viewData,
-        backgroundColor: "rgba(59, 130, 246, 0.8)",
-        borderColor: "rgba(59, 130, 246, 1)",
+        backgroundColor: "#1e40af",
+        borderColor: "#1e40af33",
         borderWidth: 1,
         borderRadius: 6,
         hoverBackgroundColor: "rgba(59, 130, 246, 1)",

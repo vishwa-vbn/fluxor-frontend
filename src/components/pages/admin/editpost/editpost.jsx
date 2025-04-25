@@ -153,7 +153,7 @@
 //                   Save as Draft
 //                 </Button>
 //                 <Button
-//                   variant="primary"
+//                  variant="outline"
 //                   size="sm"
 //                   onClick={() => handleSubmit("published")}
 //                   disabled={loading}
@@ -418,7 +418,7 @@
 //                   </CardContent>
 //                   <CardFooter>
 //                     <Button
-//                       variant="primary"
+//                      variant="outline"
 //                       className="w-full"
 //                       onClick={() => handleSubmit()}
 //                       disabled={loading}
@@ -440,7 +440,6 @@
 // };
 
 // export default EditPost;
-
 
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
@@ -597,7 +596,7 @@ const EditPost = ({
                   Save as Draft
                 </Button>
                 <Button
-                  variant="primary"
+                  variant="outline"
                   size="sm"
                   onClick={() => handleSubmit("published")}
                   disabled={loading}
@@ -880,7 +879,7 @@ const EditPost = ({
                   </CardContent>
                   <CardFooter>
                     <Button
-                      variant="primary"
+                      variant="outline"
                       className="w-full"
                       onClick={() => handleSubmit()}
                       disabled={loading}
