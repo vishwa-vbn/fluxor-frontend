@@ -116,7 +116,7 @@
 // //           <div className="flex justify-between items-center mb-2">
 // //             <h1 className="text-2xl font-bold text-gray-800">All Tags</h1>
 // //             <Button
-// //               variant="primary"
+// //              variant="outline"
 // //               onClick={onAddClick}
 // //               className="flex items-center"
 // //             >
@@ -203,7 +203,6 @@
 // // };
 
 // // export default TagsView;
-
 
 // import React, { useState, useEffect } from "react";
 // import { PlusCircle, Search, Edit, Trash2 } from "lucide-react";
@@ -321,7 +320,7 @@
 //           <div className="flex justify-between items-center mb-2">
 //             <h1 className="text-2xl font-bold text-gray-800">All Tags</h1>
 //             <Button
-//               variant="primary"
+//              variant="outline"
 //               onClick={onAddClick}
 //               className="flex items-center"
 //             >
@@ -407,8 +406,6 @@
 
 // export default TagsView;
 
-
-
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
 import { Card } from "../../../common/card/Card";
@@ -441,17 +438,19 @@ const TagsView = ({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Use the responsive rows per page hook
-  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage({
-    rowHeight: 60,
-    navbarHeight: 60,
-    controlsHeight: 120,
-    extraPadding: 50,
-    minRows: 5,
-    maxRowsMobile: 5,
-    maxRowsTablet: 10,
-    maxRowsDesktop: 20,
-    debounceDelay: 200,
-  });
+  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage(
+    {
+      rowHeight: 60,
+      navbarHeight: 60,
+      controlsHeight: 120,
+      extraPadding: 50,
+      minRows: 5,
+      maxRowsMobile: 5,
+      maxRowsTablet: 10,
+      maxRowsDesktop: 20,
+      debounceDelay: 200,
+    }
+  );
 
   // Reset page when search or tags change
   useEffect(() => {
@@ -592,7 +591,7 @@ const TagsView = ({
               All Tags
             </h1>
             <Button
-              variant="primary"
+              variant="outline"
               onClick={onAddClick}
               className="flex items-center"
             >
@@ -600,9 +599,9 @@ const TagsView = ({
                 className={clsx(
                   "w-4 h-4 mr-2",
                   // Light theme
-                  "text-blue-600",
+                  "text-dark-800",
                   // Dark theme
-                  "dark:text-blue-400"
+                  "dark:text-white"
                 )}
               />
               Add Tag

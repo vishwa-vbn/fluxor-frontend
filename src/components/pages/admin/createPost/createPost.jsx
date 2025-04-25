@@ -108,7 +108,7 @@
 //                   Save as Draft
 //                 </Button>
 //                 <Button
-//                   variant="primary"
+//                  variant="outline"
 //                   size="sm"
 //                   onClick={() => handleSubmit("published")}
 //                 >
@@ -354,7 +354,7 @@
 //                   </CardContent>
 //                   <CardFooter>
 //                     <Button
-//                       variant="primary"
+//                      variant="outline"
 //                       className="w-full"
 //                       onClick={() => handleSubmit()}
 //                     >
@@ -489,7 +489,7 @@
 //                   Save as Draft
 //                 </Button>
 //                 <Button
-//                   variant="primary"
+//                  variant="outline"
 //                   size="sm"
 //                   onClick={() => handleSubmit("published")}
 //                   disabled={loading}
@@ -754,7 +754,7 @@
 //                   </CardContent>
 //                   <CardFooter>
 //                     <Button
-//                       variant="primary"
+//                      variant="outline"
 //                       className="w-full"
 //                       onClick={() => handleSubmit()}
 //                       disabled={loading}
@@ -776,9 +776,6 @@
 // };
 
 // export default CreatePost;
-
-
-
 
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -807,6 +804,7 @@ import Select from "../../../controls/selection/selection";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
 
 import { ArrowLeft, ImagePlus, Loader2 } from "lucide-react";
+import clsx from 'clsx';
 
 const CreatePost = ({
   tags = [],
@@ -881,9 +879,34 @@ const CreatePost = ({
           className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
         />
 
-        <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-8 space-y-8">
-          <div className="border-0 mb-0 border-gray-200 dark:border-gray-700">
-            <div className="px-0 py-1 flex justify-end items-end">
+        <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-8 space-y-1">
+
+        <div className="px-0 py-1 flex justify-between">
+           
+        <Button
+            variant="outline"
+            size="md"
+            onClick={() => navigate.goBack()}
+            className={clsx(
+              "flex items-center",
+              // Light theme
+              "text-gray-800 hover:text-blue-600",
+              // Dark theme
+              "dark:text-gray-200 dark:hover:text-blue-400"
+            )}
+          >
+            <ArrowLeft
+              className={clsx(
+                "w-5 h-5 mr-2",
+                // Light theme
+                "text-gray-800",
+                // Dark theme
+                "dark:text-gray-200"
+              )}
+            />
+            Back
+          </Button>
+              
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -898,7 +921,7 @@ const CreatePost = ({
                   Save as Draft
                 </Button>
                 <Button
-                  variant="primary"
+                  variant="outline"
                   size="sm"
                   onClick={() => handleSubmit("published")}
                   disabled={loading}
@@ -911,6 +934,8 @@ const CreatePost = ({
                 </Button>
               </div>
             </div>
+          <div className="border-0 mb-0 border-gray-200 dark:border-gray-700">
+            
           </div>
 
           {error && (
@@ -978,10 +1003,11 @@ const CreatePost = ({
                   </CardContent>
                 </Card>
 
-                <Tabs 
-                value={activeTab} onValueChange={setActiveTab}
-                defaultValue="content"
-                 >
+                <Tabs
+                  value={activeTab}
+                  onValueChange={setActiveTab}
+                  defaultValue="content"
+                >
                   <TabsList className="bg-gray-100 dark:bg-gray-800">
                     <TabsTrigger
                       value="content"
@@ -1196,7 +1222,7 @@ const CreatePost = ({
                   </CardContent>
                   <CardFooter>
                     <Button
-                      variant="primary"
+                      variant="outline"
                       className="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white"
                       onClick={() => handleSubmit()}
                       disabled={loading}

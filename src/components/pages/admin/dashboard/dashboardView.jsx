@@ -170,7 +170,7 @@ export default function DashboardView({
               </h2>
               <div className="flex flex-wrap gap-4">
                 <Link to="/create-post">
-                  <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white rounded-md hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors text-sm font-medium">
+                  <button  className="flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white rounded-md hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors text-sm font-medium">
                     <PlusCircle className="w-4 h-4" />
                     New Post
                   </button>

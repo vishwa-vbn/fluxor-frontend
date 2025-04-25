@@ -188,7 +188,7 @@
 //             <h1 className="text-2xl font-bold text-gray-800">All Users</h1>
 //             <div className="flex space-x-2">
 //               <Button
-//                 variant="primary"
+//                variant="outline"
 //                 onClick={onAddClick}
 //                 className="flex items-center"
 //               >
@@ -208,7 +208,7 @@
 //             />
 //             {selectedUserIds.length > 0 && (
 //               <Button
-//                 variant="primary"
+//                variant="outline"
 //                 onClick={onBulkDeleteClick}
 //                 className="flex items-center"
 //               >
@@ -369,17 +369,19 @@ const UsersView = ({
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage({
-    rowHeight: 60,
-    navbarHeight: 60,
-    controlsHeight: 120,
-    extraPadding: 50,
-    minRows: 5,
-    maxRowsMobile: 5,
-    maxRowsTablet: 10,
-    maxRowsDesktop: 20,
-    debounceDelay: 200,
-  });
+  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage(
+    {
+      rowHeight: 60,
+      navbarHeight: 60,
+      controlsHeight: 120,
+      extraPadding: 50,
+      minRows: 5,
+      maxRowsMobile: 5,
+      maxRowsTablet: 10,
+      maxRowsDesktop: 20,
+      debounceDelay: 200,
+    }
+  );
 
   useEffect(() => {
     setCurrentPage(1);
@@ -399,7 +401,7 @@ const UsersView = ({
           onChange={(e) => {
             if (e.target.checked) {
               setSelectedUserIds(users.map((user) => user.id));
-            administrator
+              administrator;
               setSelectedUserIds([]);
             }
           }}
@@ -539,7 +541,7 @@ const UsersView = ({
             </h1>
             <div className="flex space-x-2">
               <Button
-                variant="primary"
+                variant="outline"
                 onClick={onAddClick}
                 className="flex items-center bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-blue-600 "
               >
@@ -560,7 +562,7 @@ const UsersView = ({
             />
             {selectedUserIds.length > 0 && (
               <Button
-                variant="primary"
+                variant="outline"
                 onClick={onBulkDeleteClick}
                 className="flex items-center bg-red-600 dark:bg-red-500 hover:bg-red-700 dark:hover:bg-red-600 text-white"
               >

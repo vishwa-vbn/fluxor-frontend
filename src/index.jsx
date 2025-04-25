@@ -7,6 +7,7 @@ import Alert from "./components/common/alert/alert";
 import 'react-toastify/dist/ReactToastify.css';
 import "react-notifications-component/dist/theme.css";
 import { ReactNotifications } from "react-notifications-component";
+import { ThemeProvider } from "./utils/ThemeContext";
 
 import App from "./components/pages/index";
 import "./index.css";
@@ -20,6 +21,7 @@ export const { store, persistor } = configureStore();
 ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
+    <ThemeProvider>
         <ReactNotifications />
       <Router history={history}>
         <Switch>
@@ -28,6 +30,7 @@ ReactDOM.render(
        <Alert/>
 
       </Router>
+      </ThemeProvider>
     </PersistGate>
   </Provider>,
   document.getElementById("root")

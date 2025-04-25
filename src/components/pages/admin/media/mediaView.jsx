@@ -242,6 +242,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Folder, Upload, FolderPlus, Trash2, Image as ImageIcon, Video, Play, Eye } from "lucide-react";
+
 import TopNavbar from "../../../common/topNavbar/topNavbar";
 import Button from "../../../controls/button/buttonView";
 import Modal from "../../../common/modal/modal";
@@ -396,7 +397,7 @@ const MediaView = ({
                   {mediaAssets.map((asset) => (
                     <div
                       key={asset.fileId}
-                      className="relative  overflow-hidden bg-white dark:bg-gray-800  cursor-pointer"
+                      className="relative   rounded-[5px] overflow-hidden bg-white dark:bg-gray-800  cursor-pointer"
                     >
                       <div className="relative aspect-square">
                         {asset.fileType === "non-image" && asset.url ? (
@@ -443,7 +444,7 @@ const MediaView = ({
                             e.stopPropagation();
                             handlePreview(asset);
                           }}
-                          className="p-1 bg-white dark:bg-gray-800 rounded-full text-blue-500 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm"
+                          className="p-1 bg-white dark:bg-gray-800 rounded-[5px] text-blue-500 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm"
                         >
                           <Eye size={12} />
                         </Button>
@@ -452,7 +453,7 @@ const MediaView = ({
                             e.stopPropagation();
                             onDeleteFile(asset.fileId);
                           }}
-                          className="p-1 bg-white dark:bg-gray-800 rounded-full text-red-500 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm"
+                          className="p-1 bg-white dark:bg-gray-800 rounded-[5px] text-red-500 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm"
                         >
                           <Trash2 size={12} />
                         </Button>

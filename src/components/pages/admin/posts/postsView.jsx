@@ -166,7 +166,7 @@
 //             Back
 //           </Button>
 //           <Link to="/create-post">
-//             <Button variant="primary" size="md" className="flex items-center">
+//             <Buttonvariant="outline" size="md" className="flex items-center">
 //               <PlusCircle className="w-4 h-4 mr-2" /> New Post
 //             </Button>
 //           </Link>
@@ -244,7 +244,6 @@
 //     </div>
 //   );
 // }
-
 
 import React, { useState, useEffect, useRef } from "react";
 import { Eye, Edit, Trash2, PlusCircle, ArrowLeft } from "lucide-react";
@@ -422,11 +421,7 @@ const columns = (onDeleteClick) => [
             />
           </Button>
         </Link>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onDeleteClick(row)}
-        >
+        <Button variant="ghost" size="sm" onClick={() => onDeleteClick(row)}>
           <Trash2
             className={clsx(
               "w-4 h-4",
@@ -453,17 +448,19 @@ export default function Post({ posts = [], loading, deletePost }) {
   const containerRef = useRef(null);
 
   // Use the custom hook for responsive rows per page
-  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage({
-    rowHeight: 60,
-    navbarHeight: 60,
-    controlsHeight: 120,
-    extraPadding: 50,
-    minRows: 5,
-    maxRowsMobile: 5,
-    maxRowsTablet: 10,
-    maxRowsDesktop: 20,
-    debounceDelay: 200,
-  });
+  const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage(
+    {
+      rowHeight: 60,
+      navbarHeight: 60,
+      controlsHeight: 120,
+      extraPadding: 50,
+      minRows: 5,
+      maxRowsMobile: 5,
+      maxRowsTablet: 10,
+      maxRowsDesktop: 20,
+      debounceDelay: 200,
+    }
+  );
 
   // Update filtered posts based on search text and status filter
   useEffect(() => {
@@ -474,7 +471,8 @@ export default function Post({ posts = [], loading, deletePost }) {
           getUserInfoByKey(post.authorid, "username")
             .toLowerCase()
             .includes(search.toLowerCase()));
-      const matchesStatus = statusFilter === "all" || post.status === statusFilter;
+      const matchesStatus =
+        statusFilter === "all" || post.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
     setFilteredPosts(filtered);
@@ -504,12 +502,21 @@ export default function Post({ posts = [], loading, deletePost }) {
       )}
       ref={containerRef}
     >
-      <TopNavbar
+      {/* <TopNavbar
         userData={sampleUserData}
         onSearch={(q) => setSearch(q)}
         notificationCount={3}
         toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-      />
+      /> */}
+      <TopNavbar
+         userData={sampleUserData}
+
+  onSearch={(q) => setSearch(q)}
+  notificationCount={3}
+  toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+
+  className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+/>
 
       <main className="flex-1 w-full mx-auto px-6 py-3 space-y-8">
         <div className="flex justify-between items-center mb-2">
@@ -537,16 +544,12 @@ export default function Post({ posts = [], loading, deletePost }) {
             Back
           </Button>
           <Link to="/create-post">
-            <Button
-              variant="primary"
-              size="md"
-              className="flex items-center"
-            >
+            <Button variant="outline" size="md" className="flex items-center">
               <PlusCircle
                 className={clsx(
                   "w-4 h-4 mr-2",
                   // Light theme
-                  "text-blue-600 ",
+                  "text-gray-800 ",
                   // Dark theme
                   "dark:text-gray-200"
                 )}
@@ -598,7 +601,9 @@ export default function Post({ posts = [], loading, deletePost }) {
             rowsPerPage={rowsPerPage}
             currentPage={currentPage}
             onChangePage={handlePageChange}
-            paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort((a, b) => a - b)}
+            paginationRowsPerPageOptions={[5, 10, 20, rowsPerPage].sort(
+              (a, b) => a - b
+            )}
             highlightOnHover
             striped
             noHeader

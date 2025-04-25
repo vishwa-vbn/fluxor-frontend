@@ -124,7 +124,7 @@
 //               >
 //                 Cancel
 //               </Button>
-//               <Button type="submit" variant="primary" size="md">
+//               <Button type="submit"variant="outline" size="md">
 //                 Submit
 //               </Button>
 //             </div>
@@ -171,13 +171,12 @@
 
 // export default Modal;
 
-
-import React, { useEffect, useState, useMemo } from 'react';
-import { createPortal } from 'react-dom';
-import Button from '../../controls/button/buttonView';
-import './modalStyles.css';
-import PropTypes from 'prop-types';
-import isEqual from 'lodash/isEqual';
+import React, { useEffect, useState, useMemo } from "react";
+import { createPortal } from "react-dom";
+import Button from "../../controls/button/buttonView";
+import "./modalStyles.css";
+import PropTypes from "prop-types";
+import isEqual from "lodash/isEqual";
 
 const Modal = ({
   isOpen,
@@ -185,16 +184,17 @@ const Modal = ({
   title,
   onSubmit,
   children,
-  mode = 'form',
+  mode = "form",
   initialData = {},
-  size = 'medium',
-  className = '', // Added to allow custom classes from parent
+  size = "medium",
+  className = "", // Added to allow custom classes from parent
 }) => {
   const [formData, setFormData] = useState({});
 
-  const stableInitialData = useMemo(() => initialData || {}, [
-    JSON.stringify(initialData),
-  ]);
+  const stableInitialData = useMemo(
+    () => initialData || {},
+    [JSON.stringify(initialData)]
+  );
 
   useEffect(() => {
     if (isOpen && !isEqual(formData, stableInitialData)) {
@@ -214,13 +214,14 @@ const Modal = ({
   if (!isOpen) return null;
 
   const enhancedChildren =
-    mode === 'form'
+    mode === "form"
       ? React.Children.map(children, (child) => {
           if (React.isValidElement(child) && child.props.name) {
             return React.cloneElement(child, {
-              value: formData[child.props.name] ?? '',
+              value: formData[child.props.name] ?? "",
               onChange: (e) => {
-                const value = e.target?.value !== undefined ? e.target.value : e;
+                const value =
+                  e.target?.value !== undefined ? e.target.value : e;
                 handleChange(child.props.name, value);
               },
             });
@@ -236,8 +237,8 @@ const Modal = ({
         return (
           <div key={index} className="mb-2 last:mb-0">
             {React.cloneElement(child, {
-              className: `${child.props.className || ''} ${
-                isLink ? 'text-blue-600 dark:text-blue-400 hover:underline' : ''
+              className: `${child.props.className || ""} ${
+                isLink ? "text-blue-600 dark:text-blue-400 hover:underline" : ""
               }`,
             })}
           </div>
@@ -246,11 +247,12 @@ const Modal = ({
       return child;
     });
 
-  const sizeClasses = {
-    small: 'max-w-sm',
-    medium: 'max-w-lg',
-    large: 'max-w-2xl',
-  }[size] || 'max-w-lg';
+  const sizeClasses =
+    {
+      small: "max-w-sm",
+      medium: "max-w-lg",
+      large: "max-w-2xl",
+    }[size] || "max-w-lg";
 
   return createPortal(
     <dialog
@@ -262,7 +264,7 @@ const Modal = ({
     >
       <div
         className={`modal-box bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${sizeClasses} w-full px-4 py-3 ${className}`}
-        style={{ borderRadius: '4px' }}
+        style={{ borderRadius: "4px" }}
       >
         <div className="flex justify-between items-center border-b border-gray-300 dark:border-gray-600 pb-2 mb-3">
           <h3 id="modal-title" className="text-lg font-medium">
@@ -276,7 +278,7 @@ const Modal = ({
             ✕
           </button>
         </div>
-        {mode === 'form' ? (
+        {mode === "form" ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
               <div className="grid grid-cols-1 gap-4">{enhancedChildren}</div>
@@ -293,7 +295,7 @@ const Modal = ({
               </Button>
               <Button
                 type="submit"
-                variant="primary"
+                variant="outline"
                 size="md"
                 className="bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600"
               >
@@ -320,7 +322,10 @@ const Modal = ({
           </div>
         )}
       </div>
-      <form method="dialog" className="modal-backdrop bg-black/30 dark:bg-black/50">
+      <form
+        method="dialog"
+        className="modal-backdrop bg-black/30 dark:bg-black/50"
+      >
         <button onClick={onClose} aria-label="Close modal by clicking backdrop">
           close
         </button>
@@ -336,9 +341,9 @@ Modal.propTypes = {
   title: PropTypes.string,
   onSubmit: PropTypes.func,
   children: PropTypes.node,
-  mode: PropTypes.oneOf(['form', 'view']),
+  mode: PropTypes.oneOf(["form", "view"]),
   initialData: PropTypes.object,
-  size: PropTypes.oneOf(['small', 'medium', 'large']),
+  size: PropTypes.oneOf(["small", "medium", "large"]),
   className: PropTypes.string,
 };
 
