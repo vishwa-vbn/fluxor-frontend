@@ -5,7 +5,6 @@ export function useRedirect() {
 
   const handleRedirection = (roleId, roleName) => {
 
-    console.log("role id",roleId,"role name",roleName)
     if (roleName === 'admin' || roleId === 'admin_role_id') {
       history.push('/dashboard');
     } else if (roleName === 'user' || roleId === 'user_role_id') {

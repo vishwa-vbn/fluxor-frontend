@@ -188,6 +188,8 @@ import { getState } from "../configure/configureStore";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
 import io from "socket.io-client";
+import { DOMAIN } from "../../constants/env";
+
 
 export const POST_CATEGORIES_CREATE_PENDING = "POST_CATEGORIES_CREATE_PENDING";
 export const POST_CATEGORIES_CREATE_SUCCESS = "POST_CATEGORIES_CREATE_SUCCESS";
@@ -212,9 +214,9 @@ export const POST_CATEGORIES_DELETE_SUCCESS = "POST_CATEGORIES_DELETE_SUCCESS";
 export const POST_CATEGORIES_DELETE_ERROR = "POST_CATEGORIES_DELETE_ERROR";
 
 // const API_URL = "https://fluxor-backend.vercel.app/api/post-categories";
-const API_URL = "https://fluxor-backend-production.up.railway.app/api/post-categories";
+const API_URL = `${DOMAIN}/api/post-categories`;
 
-const SOCKRT_API_URL = "https://fluxor-backend-production.up.railway.app";
+const SOCKRT_API_URL = `${DOMAIN}`;
 
 // Initialize Socket.IO dynamically
 let socket = null;
@@ -222,7 +224,6 @@ let socket = null;
 // Initialize Socket.IO listeners for real-time post category updates
 export const initializePostCategorySocket = () => (dispatch) => {
   if (socket) {
-    console.log("Socket.IO already initialized");
     return;
   }
 
@@ -237,11 +238,9 @@ export const initializePostCategorySocket = () => (dispatch) => {
 
 
   socket.on("connect", () => {
-    console.log("Connected to Socket.IO server (blog namespace)");
   });
 
   socket.on("post_category_change", (payload) => {
-    console.log("Post category change received:", payload);
     switch (payload.operation) {
       case "INSERT":
         dispatch({
@@ -279,7 +278,6 @@ export const initializePostCategorySocket = () => (dispatch) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Disconnected from Socket.IO server");
   });
 };
 
@@ -292,7 +290,6 @@ export const cleanupPostCategorySocket = () => () => {
     socket.off("disconnect");
     socket.disconnect();
     socket = null;
-    console.log("Socket.IO cleaned up");
   }
 };
 

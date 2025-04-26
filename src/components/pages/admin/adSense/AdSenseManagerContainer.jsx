@@ -237,17 +237,13 @@ class AdSenseManagerContainer extends Component {
   };
 
   handleAddCustomAd = (data) => {
-    console.log("handleAddCustomAd received data:", data);
     const { createAdUnit } = this.props;
 
     if (data instanceof FormData) {
-      console.log("Processing FormData in handleAddCustomAd");
       for (const [key, value] of data.entries()) {
-        console.log(`FormData entry - ${key}:`, value);
       }
       createAdUnit(data);
     } else {
-      console.log("Processing JSON data in handleAddCustomAd:", data);
       if (
         data.custom_content?.content_type === "custom_image" &&
         !data.custom_content.image_url
@@ -293,17 +289,13 @@ class AdSenseManagerContainer extends Component {
   };
 
   handleUpdateCustomAd = ({ id, data }) => {
-    console.log("handleUpdateCustomAd received ID:", id, "data:", data);
     const { updateAdUnit } = this.props;
 
     if (data instanceof FormData) {
-      console.log("Processing FormData in handleUpdateCustomAd");
       for (const [key, value] of data.entries()) {
-        console.log(`FormData entry - ${key}:`, value);
       }
       updateAdUnit(id, data);
     } else {
-      console.log("Processing JSON data in handleUpdateCustomAd:", data);
       const normalizedData = {
         ...data,
         status: data.is_active ? "active" : "paused",

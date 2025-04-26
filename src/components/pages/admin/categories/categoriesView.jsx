@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { PlusCircle, Search, Edit, Trash2 } from "lucide-react";
+import { PlusCircle, Search, Edit, Trash2 ,ArrowLeft} from "lucide-react";
 import { Card } from "../../../common/card/Card";
 import Input from "../../../controls/input/inputView";
 import Select from "../../../controls/selection/selection";
@@ -145,9 +145,16 @@ const CategoriesView = ({
         />
         <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-3 space-y-8">
           <div className="flex justify-between items-center mb-2">
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-              All Categories
-            </h1>
+
+          <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => navigate.push("/posts")}
+              >
+                <ArrowLeft className="h-4.5 w-4.5 mr-1 text-gray-600 dark:text-gray-400" />
+                Back
+              </Button>
+           
             <Button
               variant="outline"
               onClick={() => setIsAddOpen(true)}

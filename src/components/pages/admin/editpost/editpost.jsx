@@ -500,7 +500,6 @@ const EditPost = ({
 
   // Fetch post data when component mounts or slug changes
   useEffect(() => {
-    console.log("slug", slug);
     if (slug) {
       onFetchPost(slug);
     }
@@ -559,7 +558,6 @@ const EditPost = ({
   };
 
   const handleSearch = (query) => {
-    console.log("Searching for:", query);
   };
 
   return (
@@ -572,16 +570,16 @@ const EditPost = ({
           toggleSidebar={() => setSidebarOpen?.((prev) => !prev)}
         />
 
-        <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-8 space-y-8">
+        <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-8 space-y-1">
           <div className="border-0 mb-0 border-gray-200 dark:border-gray-600">
-            <div className="px-0 py-1 flex justify-between items-end">
+            <div className="px-0 py-2 flex justify-between items-end">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 onClick={() => navigate.push("/posts")}
               >
-                <ArrowLeft className="h-4 w-4 mr-2 text-gray-600 dark:text-gray-400" />
-                Back to Posts
+                <ArrowLeft className="h-4.5 w-4.5 mr-1 text-gray-600 dark:text-gray-400" />
+                Back
               </Button>
               <div className="flex gap-2">
                 <Button
@@ -638,7 +636,7 @@ const EditPost = ({
                       disabled={loading}
                     />
 
-                    <div className="flex flex-col sm:flex-row items-center gap-2 mb-2">
+                    <div className="w-full flex-col sm:flex-col items-center gap-2 mb-2">
                       <Input
                         label="Slug"
                         value={formData.slug}

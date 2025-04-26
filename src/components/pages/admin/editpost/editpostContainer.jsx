@@ -10,7 +10,6 @@ class EditPostContainer extends Component {
   };
 
   handleFetchPost = (slug) => {
-    console.log("slug is", slug);
     this.props.getPostBySlug(slug);
   };
 
@@ -41,7 +40,6 @@ class EditPostContainer extends Component {
 }
 
 const mapStateToProps = (state) => (
-  console.log("current post", state.post.currentPost),
   {
     tags: state.tags?.tags || [], // Assuming there's a tags reducer
     categories: state.category?.categories || {},

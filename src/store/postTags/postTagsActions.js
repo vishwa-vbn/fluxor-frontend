@@ -177,6 +177,8 @@ import { getState } from "../configure/configureStore";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
 import io from "socket.io-client";
+import { DOMAIN } from "../../constants/env";
+
 
 export const POST_TAGS_CREATE_PENDING = "POST_TAGS_CREATE_PENDING";
 export const POST_TAGS_CREATE_SUCCESS = "POST_TAGS_CREATE_SUCCESS";
@@ -196,9 +198,9 @@ export const POST_TAGS_DELETE_PENDING = "POST_TAGS_DELETE_PENDING";
 export const POST_TAGS_DELETE_SUCCESS = "POST_TAGS_DELETE_SUCCESS";
 export const POST_TAGS_DELETE_ERROR = "POST_TAGS_DELETE_ERROR";
 
-const API_URL = "https://fluxor-backend-production.up.railway.app/api/post-tags";
+const API_URL = `${DOMAIN}/api/post-tags`;
 
-const SOCKET_API_URL = "https://fluxor-backend-production.up.railway.app";
+const SOCKET_API_URL = `${DOMAIN}`;
 
 // const API_URL = "https://fluxor-backend.vercel.app/api/post-tags";
 
@@ -208,7 +210,6 @@ let socket = null;
 // Initialize Socket.IO listeners for real-time post tag updates
 export const initializePostTagSocket = () => (dispatch) => {
   if (socket) {
-    console.log("Socket.IO already initialized");
     return;
   }
 
@@ -223,11 +224,9 @@ export const initializePostTagSocket = () => (dispatch) => {
 
 
   socket.on("connect", () => {
-    console.log("Connected to Socket.IO server (blog namespace)");
   });
 
   socket.on("post_tag_change", (payload) => {
-    console.log("Post tag change received:", payload);
     switch (payload.operation) {
       case "INSERT":
         dispatch({
@@ -265,7 +264,6 @@ export const initializePostTagSocket = () => (dispatch) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Disconnected from Socket.IO server");
   });
 };
 
@@ -278,7 +276,6 @@ export const cleanupPostTagSocket = () => () => {
     socket.off("disconnect");
     socket.disconnect();
     socket = null;
-    console.log("Socket.IO cleaned up");
   }
 };
 

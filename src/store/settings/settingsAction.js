@@ -3,6 +3,8 @@ import { getState } from "../configure/configureStore";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
 import io from "socket.io-client";
+import { DOMAIN } from "../../constants/env";
+
 
 // Action Types
 export const SETTINGS_CREATE_PENDING = "SETTINGS_CREATE_PENDING";
@@ -26,7 +28,7 @@ export const SETTINGS_DELETE_SUCCESS = "SETTINGS_DELETE_SUCCESS";
 export const SETTINGS_DELETE_ERROR = "SETTINGS_DELETE_ERROR";
 
 // API Configuration
-const API_URL = "https://fluxor-backend-production.up.railway.app";
+const API_URL = `${DOMAIN}`;
 // const API_URL = "http://localhost:3000";
 
 
@@ -36,7 +38,6 @@ let socket = null;
 // Initialize Socket.IO listeners for real-time setting updates
 export const initializeSettingSocket = () => (dispatch) => {
   if (socket) {
-    console.log("Socket.IO already initialized");
     return;
   }
 
@@ -48,11 +49,9 @@ export const initializeSettingSocket = () => (dispatch) => {
   });
 
   socket.on("connect", () => {
-    console.log("Connected to Socket.IO server (settings namespace)");
   });
 
   socket.on("setting_change", (payload) => {
-    console.log("Setting change received:", payload);
     switch (payload.operation) {
       case "INSERT":
         dispatch({
@@ -90,7 +89,6 @@ export const initializeSettingSocket = () => (dispatch) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Disconnected from Socket.IO server");
   });
 };
 
@@ -103,7 +101,6 @@ export const cleanupSettingSocket = () => () => {
     socket.off("disconnect");
     socket.disconnect();
     socket = null;
-    console.log("Socket.IO cleaned up");
   }
 };
 

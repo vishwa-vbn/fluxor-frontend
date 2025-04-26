@@ -4,7 +4,6 @@ export const actionTypes = {
 };
 
 export function showAlert(payload) {
-  console.log("show alert is called",payload)
   return (dispatch) => {
     dispatch({
       type: actionTypes.SHOW_ALERT,

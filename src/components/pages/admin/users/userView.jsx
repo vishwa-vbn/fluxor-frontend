@@ -521,7 +521,6 @@ const UsersView = ({
   };
 
   const handleRowClick = (row) => {
-    console.log("Row clicked:", row);
   };
 
   return (
@@ -534,7 +533,7 @@ const UsersView = ({
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
         />
-        <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-3 space-y-8">
+        <main className="flex-1 max-w-[100%] w-full mx-auto px-6 py-8 space-y-1">
           <div className="flex justify-between items-center mb-2">
             <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
               All Users

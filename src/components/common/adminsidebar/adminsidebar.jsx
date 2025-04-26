@@ -219,9 +219,9 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import './adminSidebarStyles.css';
-import logo from '../../../assets/orpus.png';
+import logo from '../../../assets/orpus-w.png';
 
-export default function AdminSidebar() {
+export default function AdminSidebar({logout}) {
   const [openSection, setOpenSection] = useState({
     posts: false,
   });
@@ -238,12 +238,17 @@ export default function AdminSidebar() {
   const isSubActive = (path) => location.pathname === path;
   const isAnySubActive = ["/posts", "/create-post", "/categories", "/tags"].includes(location.pathname);
 
+  const handleLogout =() =>
+  {
+    logout()
+
+  }
   return (
     <div className="w-70 h-screen border-r-1 border-gray-300 dark:border-gray-700 bg-gray-800  dark:bg-gray-800 text-gray-100 dark:text-gray-200 flex flex-col shadow-lg dark:shadow-gray-800 transition-colors duration-200">
       {/* Header */}
       <div className="h-12.5 flex items-center justify-center border-b border-gray-800 dark:border-gray-700">
         <Link to="/admin" className="text-xl flex  align-middle justify-center font-semibold tracking-tight text-gray-100 dark:text-gray-200 hover:text-blue-300 dark:hover:text-blue-400 transition-colors">
-          {/* <img src={logo} className="p-7 mt-0" alt="logo"></img> */}
+          <img src={logo} className="p-7 mt-0" alt="logo"></img>
         </Link>
       </div>
 
@@ -399,7 +404,7 @@ export default function AdminSidebar() {
 
       {/* Footer / Logout */}
       <div className="p-3 border-t border-gray-800 dark:border-gray-700">
-        <button className="w-full flex items-center p-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-900 hover:text-gray-300 dark:hover:text-gray-100 transition-colors">
+        <button onClick={()=>handleLogout()} className="w-full flex items-center p-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-900 hover:text-gray-300 dark:hover:text-gray-100 transition-colors">
           <LogOut className="w-5 h-5 mr-3" />
           <span>Logout</span>
         </button>

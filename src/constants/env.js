@@ -1,1 +1,1 @@
-export const DOMAIN = "https://fluxor-backend.vercel.app/api";
+export const DOMAIN = "https://fluxor-backend.onrender.com";

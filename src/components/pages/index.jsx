@@ -20,7 +20,6 @@ import MediaContainer from "./admin/media/mediaContainer.jsx";
 import AnalyticsContainer from "./admin/analytics/AnalyticsContainer.jsx";
 
 function App({ match }) {
-  console.log("match:", match);
 //   var defaultRedirection = (
 //     // <Redirect exact from={`${match.url}/`} to={`${match.url}home`} />
 //   );

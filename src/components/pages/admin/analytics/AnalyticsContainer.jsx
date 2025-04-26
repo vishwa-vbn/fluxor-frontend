@@ -28,7 +28,6 @@ const AnalyticsContainer = ({ auth, posts, initializeAnalyticsSocket, cleanupAna
 
   // Fetch data on mount
   useEffect(() => {
-    console.log("AnalyticsContainer: Mounting - Fetching analytics data");
     try {
       const statsData = getDashboardStats() || {};
       const trafficData = getWeeklyTrafficData() || { labels: [], datasets: [] };
@@ -86,7 +85,6 @@ const AnalyticsContainer = ({ auth, posts, initializeAnalyticsSocket, cleanupAna
 
     // Cleanup on unmount
     return () => {
-      console.log("AnalyticsContainer: Unmounting - Cleaning up socket");
       cleanupAnalyticsSocket();
     };
   }, [initializeAnalyticsSocket, cleanupAnalyticsSocket]);

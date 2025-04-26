@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useContext ,useMemo}from "react";
 import {
   FileText,
   Users,
@@ -29,6 +29,7 @@ import {
   TabsTrigger,
   TabsContent,
 } from "../../../common/tabs/Tabs";
+import { ThemeContext } from "../../../../utils/ThemeContext";
 
 ChartJS.register(
   CategoryScale,
@@ -50,55 +51,54 @@ export default function DashboardView({
   userData,
   handleSearch,
 }) {
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          font: { size: 12, family: "'Inter', sans-serif" },
-          color: (context) =>
-            context.chart.canvas.classList.contains("dark") ? "#D1D5DB" : "#4B5563", // gray-300 in dark, gray-600 in light
-          padding: 16,
+  const { theme } = useContext(ThemeContext);
+  const chartOptions = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top",
+          labels: {
+            font: { size: 12, family: "'Inter', sans-serif" },
+            color: theme === "dark" ? "#D1D5DB" : "#4B5563",
+            padding: 16,
+          },
+        },
+        tooltip: {
+          backgroundColor: theme === "dark" ? "#374151" : "#1F2937",
+          bodyFont: { size: 12, family: "'Inter', sans-serif" },
+          titleFont: { size: 13, family: "'Inter', sans-serif" },
+          padding: 10,
+          cornerRadius: 4,
         },
       },
-      tooltip: {
-        backgroundColor: (context) =>
-          context.chart.canvas.classList.contains("dark") ? "#374151" : "#1F2937", // gray-700 in dark, gray-800 in light
-        bodyFont: { size: 12, family: "'Inter', sans-serif" },
-        titleFont: { size: 13, family: "'Inter', sans-serif" },
-        padding: 10,
-        cornerRadius: 4,
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        grid: {
-          color: (context) =>
-            context.chart.canvas.classList.contains("dark") ? "#4B5563" : "#E5E7EB", // gray-600 in dark, gray-200 in light
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: theme === "dark" ? "#4B5563" : "#E5E7EB",
+          },
+          ticks: {
+            font: { size: 12, family: "'Inter', sans-serif" },
+            color: theme === "dark" ? "#D1D5DB" : "#4B5563",
+          },
         },
-        ticks: {
-          font: { size: 12, family: "'Inter', sans-serif" },
-          color: (context) =>
-            context.chart.canvas.classList.contains("dark") ? "#D1D5DB" : "#4B5563", // gray-300 in dark, gray-600 in light
+        x: {
+          grid: { display: false },
+          ticks: {
+            font: { size: 12, family: "'Inter', sans-serif" },
+            color: theme === "dark" ? "#D1D5DB" : "#4B5563",
+          },
         },
       },
-      x: {
-        grid: { display: false },
-        ticks: {
-          font: { size: 12, family: "'Inter', sans-serif" },
-          color: (context) =>
-            context.chart.canvas.classList.contains("dark") ? "#D1D5DB" : "#4B5563", // gray-300 in dark, gray-600 in light
-        },
+      animation: {
+        duration: 800,
+        easing: "easeOutQuad",
       },
-    },
-    animation: {
-      duration: 800,
-      easing: "easeOutQuad",
-    },
-  };
+    }),
+    [theme]
+  );
 
   const trends = {
     postsCount: "+5%",
@@ -192,8 +192,8 @@ export default function DashboardView({
 
             {/* Charts Section 1 */}
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ChartCard title="Weekly Traffic">
-                <Bar data={barData} options={chartOptions} className="dark" />
+              <ChartCard title="Weekly Traffic" theme={theme}>
+                <Bar data={barData} options={chartOptions} key={`bar-${theme}`} />
               </ChartCard>
               <ChartCard title="Post Status">
                 <Doughnut
@@ -206,8 +206,8 @@ export default function DashboardView({
 
             {/* Charts Section 2 */}
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ChartCard title="User Growth">
-                <Line data={lineData} options={chartOptions} className="dark" />
+              <ChartCard title="User Growth" theme={theme}>
+                <Line data={lineData} options={chartOptions} key={`line-${theme}`} />
               </ChartCard>
               <RecentActivityCard recentPosts={recentPosts} />
             </section>

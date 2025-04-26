@@ -5,7 +5,6 @@ export const actionTypes = {
 
 export function showLoader() {
 
-  console.log("show loader is called")
   return (dispatch) => {
     dispatch({
       type: actionTypes.SHOW_LOADER,

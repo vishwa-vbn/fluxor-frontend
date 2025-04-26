@@ -25,7 +25,7 @@
 // export const CATEGORY_DELETE_ERROR = "CATEGORY_DELETE_ERROR";
 
 // // Base API URL
-// const API_URL = "https://fluxor-backend-production.up.railway.app/api/categories";
+// const API_URL = "{DOMAIN_URL}/api/categories";
 
 // // CREATE CATEGORY
 // export const createCategory = (data) => async (dispatch) => {
@@ -218,6 +218,7 @@
 import axios from "axios";
 import { getState } from "../configure/configureStore";
 import io from "socket.io-client";
+import { DOMAIN } from "../../constants/env";
 
 // Action Types
 export const CATEGORY_CREATE_PENDING = "CATEGORY_CREATE_PENDING";
@@ -241,7 +242,7 @@ export const CATEGORY_DELETE_SUCCESS = "CATEGORY_DELETE_SUCCESS";
 export const CATEGORY_DELETE_ERROR = "CATEGORY_DELETE_ERROR";
 
 // API Configuration
-const API_URL = "https://fluxor-backend-production.up.railway.app";
+const API_URL = `${DOMAIN}`;
 
 // Initialize Socket.IO dynamically
 let socket = null;
@@ -249,7 +250,6 @@ let socket = null;
 // Initialize Socket.IO listeners for real-time category updates
 export const initializeCategorySocket = () => (dispatch) => {
   if (socket) {
-    console.log("Socket.IO already initialized for categories");
     return;
   }
 
@@ -258,16 +258,16 @@ export const initializeCategorySocket = () => (dispatch) => {
     reconnection: true,
     transports: ["polling", "websocket"],
     auth: { token },
+    perMessageDeflate: {
+      threshold: 1024, // Compress messages larger than 1KB
+    },
   });
 
   socket.on("connect", () => {
-    console.log(
-      "Connected to Socket.IO server (blog namespace for categories)"
-    );
+   
   });
 
   socket.on("category_change", (payload) => {
-    console.log("Category change received:", payload);
     switch (payload.operation) {
       case "create":
         dispatch({
@@ -297,7 +297,6 @@ export const initializeCategorySocket = () => (dispatch) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Disconnected from Socket.IO server");
   });
 };
 
@@ -310,7 +309,6 @@ export const cleanupCategorySocket = () => () => {
     socket.off("disconnect");
     socket.disconnect();
     socket = null;
-    console.log("Socket.IO cleaned up for categories");
   }
 };
 

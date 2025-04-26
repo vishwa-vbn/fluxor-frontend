@@ -339,7 +339,6 @@ export default function TopNavbar({ onSearch, notificationCount = 0, toggleSideb
                   </Link>
                   <button
                     onClick={() => {
-                      console.log("Logout clicked");
                       setIsDropdownOpen(false);
                     }}
                     className="w-full text-left px-3 py-1.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"

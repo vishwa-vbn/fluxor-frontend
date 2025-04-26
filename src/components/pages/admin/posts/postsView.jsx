@@ -518,10 +518,10 @@ export default function Post({ posts = [], loading, deletePost }) {
   className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
 />
 
-      <main className="flex-1 w-full mx-auto px-6 py-3 space-y-8">
+      <main className="flex-1 w-full mx-auto px-6 py-8 space-y-1">
         <div className="flex justify-between items-center mb-2">
           <Button
-            variant="outline"
+            variant="secondary"
             size="md"
             onClick={() => navigate.goBack()}
             className={clsx(
@@ -534,7 +534,7 @@ export default function Post({ posts = [], loading, deletePost }) {
           >
             <ArrowLeft
               className={clsx(
-                "w-5 h-5 mr-2",
+                "w-4.5 h-4.5 mr-1",
                 // Light theme
                 "text-gray-800",
                 // Dark theme
