@@ -466,6 +466,7 @@ import Checkbox from "../../../controls/checkbox/Checkbox";
 import Button from "../../../controls/button/buttonView";
 import Select from "../../../controls/selection/selection";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
+import DateTimePicker from "../../../controls/dateTimePicker/DateTimePicker"; // Import the DateTimePicker component
 
 import { ArrowLeft, ImagePlus, Loader2 } from "lucide-react";
 
@@ -503,7 +504,7 @@ const EditPost = ({
     if (slug) {
       onFetchPost(slug);
     }
-  }, [slug]);
+  }, [slug, onFetchPost]);
 
   // Populate form data when post is fetched
   useEffect(() => {
@@ -543,13 +544,20 @@ const EditPost = ({
   };
 
   const handleSubmit = (status = formData.status) => {
-    const dataToSubmit = {
+    // Prepare data to submit
+    const updatedFormData = {
       ...formData,
       status,
       categoryId: formData.selectedCategory,
       tags: formData.selectedTags,
     };
-    onUpdatePost(post.data.id, dataToSubmit); // Pass post ID and updated data
+
+    // If status is "published" and publishedAt is empty, set to current date
+    if (status === "published" && !updatedFormData.publishedAt) {
+      updatedFormData.publishedAt = moment().format("YYYY-MM-DD HH:mm:ss");
+    }
+
+    onUpdatePost(post.data.id, updatedFormData); // Pass post ID and updated data
   };
 
   const sampleUserData = {
@@ -558,6 +566,7 @@ const EditPost = ({
   };
 
   const handleSearch = (query) => {
+    // Implement search logic if needed
   };
 
   return (
@@ -588,7 +597,7 @@ const EditPost = ({
                   onClick={() => handleSubmit("draft")}
                   disabled={loading}
                 >
-                  {loading && status === "draft" ? (
+                  {loading && formData.status === "draft" ? (
                     <Loader2 className="animate-spin h-4 w-4 mr-2 text-gray-600 dark:text-gray-400" />
                   ) : null}
                   Save as Draft
@@ -596,10 +605,10 @@ const EditPost = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleSubmit("published")}
+                  onClick={() => handleSubmit("-published")}
                   disabled={loading}
                 >
-                  {loading && status === "published" ? (
+                  {loading && formData.status === "published" ? (
                     <Loader2 className="animate-spin h-4 w-4 mr-2 text-gray-600 dark:text-gray-400" />
                   ) : null}
                   Update & Publish
@@ -723,7 +732,7 @@ const EditPost = ({
                           label="Meta Description"
                           value={formData.metaDescription}
                           onChange={(e) =>
-                            handleChange("metaDescription", e.target.value)
+                            handleChange("yntheticDescription", e.target.value)
                           }
                           placeholder="SEO description"
                           className="h-20 resize-none"
@@ -757,22 +766,13 @@ const EditPost = ({
                     />
 
                     {formData.status === "scheduled" && (
-                      <Input
+                      <DateTimePicker
                         label="Publish Date"
-                        type="datetime-local"
-                        value={
-                          formData.publishedAt
-                            ? moment(formData.publishedAt).format(
-                                "YYYY-MM-DDTHH:mm"
-                              )
-                            : ""
+                        value={formData.publishedAt}
+                        onChange={(value) =>
+                          handleChange("publishedAt", value)
                         }
-                        onChange={(e) =>
-                          handleChange(
-                            "publishedAt",
-                            moment(e.target.value).format("YYYY-MM-DD HH:mm:ss")
-                          )
-                        }
+                        name="publishedAt"
                         disabled={loading}
                       />
                     )}

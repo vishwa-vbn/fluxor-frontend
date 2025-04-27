@@ -150,6 +150,8 @@ const CategoriesView = ({
                 variant="secondary"
                 size="sm"
                 onClick={() => navigate.push("/posts")}
+              className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs px-2 py-1"
+
               >
                 <ArrowLeft className="h-4.5 w-4.5 mr-1 text-gray-600 dark:text-gray-400" />
                 Back
