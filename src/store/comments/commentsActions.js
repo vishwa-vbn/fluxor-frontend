@@ -3,6 +3,7 @@ import axios from "axios";
 import { getState } from "../configure/configureStore";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
+import { DOMAIN } from "../../constants/env";
 
 export const COMMENTS_CREATE_PENDING = "COMMENTS_CREATE_PENDING";
 export const COMMENTS_CREATE_SUCCESS = "COMMENTS_CREATE_SUCCESS";
@@ -28,7 +29,7 @@ export const COMMENTS_DELETE_PENDING = "COMMENTS_DELETE_PENDING";
 export const COMMENTS_DELETE_SUCCESS = "COMMENTS_DELETE_SUCCESS";
 export const COMMENTS_DELETE_ERROR = "COMMENTS_DELETE_ERROR";
 
-const API_URL = "https://fluxor-backend-production.up.railway.app/api/comments";
+const API_URL = `${DOMAIN}/api/comments`;
 
 
 // CREATE COMMENT

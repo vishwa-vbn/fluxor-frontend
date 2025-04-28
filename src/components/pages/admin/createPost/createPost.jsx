@@ -865,7 +865,6 @@ const CreatePost = ({
   };
 
   const handleSearch = (query) => {
-    console.log("Searching for:", query);
   };
 
   return (
@@ -884,7 +883,7 @@ const CreatePost = ({
         <div className="px-0 py-1 flex justify-between">
            
         <Button
-            variant="outline"
+            variant="secondary"
             size="md"
             onClick={() => navigate.goBack()}
             className={clsx(
@@ -897,7 +896,7 @@ const CreatePost = ({
           >
             <ArrowLeft
               className={clsx(
-                "w-5 h-5 mr-2",
+                "w-4.5 h-4.5 mr-1",
                 // Light theme
                 "text-gray-800",
                 // Dark theme
@@ -925,7 +924,7 @@ const CreatePost = ({
                   size="sm"
                   onClick={() => handleSubmit("published")}
                   disabled={loading}
-                  className="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white"
+                  className="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-black dark:text-white"
                 >
                   {loading && status === "published" ? (
                     <Loader2 className="animate-spin h-4 w-4 mr-2 text-white" />

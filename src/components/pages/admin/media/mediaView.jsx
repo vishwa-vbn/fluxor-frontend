@@ -264,9 +264,7 @@ const MediaView = ({
     return assets.filter((asset) => asset.type === "folder");
   }, [assets]);
 
-  useEffect(() => {
-    console.log("assets", assets);
-  }, [assets]);
+
 
   const mediaAssets = useMemo(() => {
     return assets.filter((asset) => asset.type !== "folder");

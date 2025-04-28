@@ -28,21 +28,16 @@ const TagsContainer = ({
 
   // Fetch tags and initialize socket on mount
   useEffect(() => {
-    console.log("TagsContainer: Mounting - Fetching tags and initializing socket");
     getAllTags();
     initializeTagSocket(); // Initialize Socket.IO
 
     // Cleanup socket on unmount
     return () => {
-      console.log("TagsContainer: Unmounting - Cleaning up socket");
       cleanupTagSocket(); // Cleanup Socket.IO
     };
   }, [getAllTags, initializeTagSocket, cleanupTagSocket]);
 
-  // Log selectedTag changes for debugging
-  useEffect(() => {
-    console.log("selected tag", selectedTag);
-  }, [selectedTag]);
+
 
   // Handle search input
   const handleSearchChange = (e) => {

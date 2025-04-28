@@ -483,6 +483,8 @@ import {
   deletePostTag,
 } from "../postTags/postTagsActions";
 import io from "socket.io-client";
+import { DOMAIN } from "../../constants/env";
+
 
 // Action Types
 export const POST_CREATE_PENDING = "POST_CREATE_PENDING";
@@ -509,18 +511,21 @@ export const POST_DELETE_PENDING = "POST_DELETE_PENDING";
 export const POST_DELETE_SUCCESS = "POST_DELETE_SUCCESS";
 export const POST_DELETE_ERROR = "POST_DELETE_ERROR";
 
-// Base API URL
-const API_URL = "https://fluxor-backend-production.up.railway.app/api/posts";
+// // Base API URL
+const API_URL = `${DOMAIN}/api/posts`;
 
-// Socket.IO Configuration
-const SOCKET_URL = "https://fluxor-backend-production.up.railway.app/blog";
+// // Socket.IO Configuration
+const SOCKET_URL = `${DOMAIN}/blog`;
+
+
+
+
 
 let socket = null;
 
 // Initialize Socket.IO listeners for real-time post updates
 export const initializePostSocket = () => (dispatch) => {
   if (socket) {
-    console.log("Socket.IO already initialized for posts");
     return;
   }
 
@@ -532,11 +537,9 @@ export const initializePostSocket = () => (dispatch) => {
   });
 
   socket.on("connect", () => {
-    console.log("Connected to Socket.IO server (blog namespace) for posts");
   });
 
   socket.on("post_change", (payload) => {
-    console.log("Post change received:", payload);
     switch (payload.operation) {
       case "INSERT":
         dispatch({
@@ -568,7 +571,6 @@ export const initializePostSocket = () => (dispatch) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Disconnected from Socket.IO server for posts");
   });
 };
 
@@ -581,7 +583,6 @@ export const cleanupPostSocket = () => () => {
     socket.off("disconnect");
     socket.disconnect();
     socket = null;
-    console.log("Socket.IO cleaned up for posts");
   }
 };
 
@@ -648,6 +649,7 @@ export const getAllPosts = (page = 1, limit = 10) => async (dispatch) => {
     const res = await axios.get(`${API_URL}?page=${page}&limit=${limit}`, {
       headers: {
         Authorization: `Bearer ${token}`,
+
       },
     });
 

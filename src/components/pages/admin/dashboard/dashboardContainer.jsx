@@ -47,7 +47,6 @@ export class DashboardContainer extends Component {
   }
 
   handleSearch = (query) => {
-    console.log("Searching for:", query);
   };
 }
 

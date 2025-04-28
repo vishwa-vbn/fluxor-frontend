@@ -3,6 +3,7 @@ import { getState } from "../configure/configureStore";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
 import io from "socket.io-client";
+import { DOMAIN } from "../../constants/env";
 
 // Action Types
 // Ad Units
@@ -37,7 +38,7 @@ export const AD_SETTINGS_UPSERT_ERROR = "AD_SETTINGS_UPSERT_ERROR";
 
 // API Configuration
 // const API_URL = "http://localhost:3000/api/ad-units";
-const API_URL = "https://fluxor-backend-production.up.railway.app/api/ad-units";
+const API_URL = `${DOMAIN}/api/ad-units`;
 
 
 // Initialize Socket.IO dynamically
@@ -46,7 +47,6 @@ let socket = null;
 // Initialize Socket.IO listeners for real-time ad unit updates
 export const initializeAdUnitSocket = () => (dispatch) => {
   if (socket) {
-    console.log("Socket.IO already initialized for ad units");
     return;
   }
 
@@ -55,14 +55,15 @@ export const initializeAdUnitSocket = () => (dispatch) => {
     reconnection: true,
     transports: ["polling", "websocket"],
     auth: { token },
+    perMessageDeflate: {
+      threshold: 1024, // Compress messages larger than 1KB
+    },
   });
 
   socket.on("connect", () => {
-    console.log("Connected to Socket.IO server (blog namespace) for ad units");
   });
 
   socket.on("ad_unit_change", (payload) => {
-    console.log("Ad unit change received:", payload);
     if (!payload || !payload.operation || !payload.record) {
       console.warn("Invalid socket payload:", payload);
       return;
@@ -105,7 +106,6 @@ export const initializeAdUnitSocket = () => (dispatch) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Disconnected from Socket.IO server for ad units");
   });
 };
 
@@ -118,13 +118,11 @@ export const cleanupAdUnitSocket = () => () => {
     socket.off("disconnect");
     socket.disconnect();
     socket = null;
-    console.log("Socket.IO cleaned up for ad units");
   }
 };
 
 // CREATE AD UNIT
 export const createAdUnit = (data) => async (dispatch) => {
-  console.log("Creating ad unit with data:", data);
   dispatch({ type: AD_UNITS_CREATE_PENDING });
   dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
@@ -243,7 +241,6 @@ export const getAdUnitById = (id) => async (dispatch) => {
 
 // UPDATE AD UNIT
 export const updateAdUnit = (id, data) => async (dispatch) => {
-  console.log("Updating ad unit with ID:", id, "and data:", data);
   dispatch({ type: AD_UNITS_UPDATE_PENDING });
   dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
@@ -294,7 +291,6 @@ export const updateAdUnit = (id, data) => async (dispatch) => {
 
 // DELETE AD UNIT
 export const deleteAdUnit = (id) => async (dispatch) => {
-  console.log("Deleting ad unit with ID:", id);
   dispatch({ type: AD_UNITS_DELETE_PENDING });
   dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;
@@ -375,7 +371,6 @@ export const getAdSettings = () => async (dispatch) => {
 
 // UPSERT AD SETTINGS
 export const upsertAdSettings = (data) => async (dispatch) => {
-  console.log("Upserting ad settings with data:", data);
   dispatch({ type: AD_SETTINGS_UPSERT_PENDING });
   dispatch(showLoader());
   const token = getState().auth?.loginUser?.token;

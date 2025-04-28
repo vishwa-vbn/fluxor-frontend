@@ -12,13 +12,9 @@ export const splitStringMainLetter = (str, separator = "_") => {
 };
 
 export const getUserInfoByKey = (id, key) => {
-  console.log("id and key", id, key);
   const state = getState();
   const users = state.auth?.users || [];
 
-  // Log for debugging (optional, remove in production)
-  console.log("Users in state:", users);
-  console.log("Searching for id:", id, "with key:", key);
 
   const user = users.find((u) => u.id === id);
   if (user) {
@@ -37,8 +33,6 @@ export const getCategoryInfoByKey = (id, key) => {
   const categories = state.category?.categories?.data || [];
 
   // Optional logs for debugging
-  console.log("Categories in state:", categories);
-  console.log("Searching for id:", id, "with key:", key);
 
   const category = categories.find((cat) => cat.id === id);
 
@@ -58,9 +52,7 @@ export const getInfoByTags = (id, key) => {
   const state = getState(); // Assumes getState is imported from Redux or defined elsewhere
   const tags = state.tags?.tags || [];
 
-  // Optional logs for debugging
-  console.log("Tags in state:", tags);
-  console.log("Searching for id:", id, "with key:", key);
+
 
   const tag = tags.find((tag) => tag.id === id);
 
@@ -80,9 +72,7 @@ export const getPostInfoByKey = (id, key) => {
   const state = getState();
   const posts = state.post?.posts?.data || []; // Adjust path based on your Redux state structure
 
-  // Log for debugging (optional, remove in production)
-  console.log("Posts in state:", posts);
-  console.log("Searching for id:", id, "with key:", key);
+
 
   const post = posts.find((p) => p.id === id);
   if (post) {

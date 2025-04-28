@@ -2,6 +2,8 @@ import axios from "axios";
 import { getState } from "../configure/configureStore";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
+import { DOMAIN } from "../../constants/env";
+
 
 // Action Types
 export const MEDIA_LIST_PENDING = "MEDIA_LIST_PENDING";
@@ -49,7 +51,7 @@ export const MEDIA_UPLOAD_SUCCESS = "MEDIA_UPLOAD_SUCCESS";
 export const MEDIA_UPLOAD_ERROR = "MEDIA_UPLOAD_ERROR";
 
 // API Configuration
-const API_URL = "https://fluxor-backend-production.up.railway.app/api/imagekit";
+const API_URL = `${DOMAIN}/api/imagekit`;
 
 // LIST ASSETS
 export const listAssets = (params = {}) => async (dispatch) => {
@@ -66,7 +68,6 @@ export const listAssets = (params = {}) => async (dispatch) => {
       },
     });
 
-    console.log("listAssets response:", res.data);
     dispatch({ type: MEDIA_LIST_SUCCESS, payload: res.data.data });
     dispatch(
       showAlert({
@@ -109,7 +110,6 @@ export const listFolders = () => async (dispatch) => {
       },
     });
 
-    console.log("listFolders response:", res.data);
     dispatch({ type: MEDIA_FOLDERS_SUCCESS, payload: res.data.data || [] });
     dispatch(
       showAlert({

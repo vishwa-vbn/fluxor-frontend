@@ -4,7 +4,6 @@ export const trimFormData = (data) => {
     if (typeof data[field] === "string") {
       newData[field] = data[field].trim();
     } else {
-      console.log(newData[field]);
       newData[field] = data[field];
     }
   }

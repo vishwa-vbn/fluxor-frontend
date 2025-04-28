@@ -2864,9 +2864,6 @@ const AdSenseManagerView = ({
     setConfigErrors({});
   }, [publisherId, adClient, adDensity, adFormat, targetPages]);
 
-  useEffect(() => {
-    console.log("formData updated:", formData);
-  }, [formData]);
 
   const handleTabChange = (newTab) => {
     setActiveTab(newTab);
@@ -2902,7 +2899,6 @@ const AdSenseManagerView = ({
   };
 
   const handleFileChange = (file) => {
-    console.log("Selected file:", file);
     setFormData((prev) => ({
       ...prev,
       file: file,
@@ -2981,20 +2977,16 @@ const AdSenseManagerView = ({
     };
 
     if (formData.file) {
-      console.log("Preparing FormData with file:", formData.file);
       const formDataToSend = new FormData();
       formDataToSend.append("file", formData.file);
       formDataToSend.append("data", JSON.stringify(dataToSend));
 
-      for (const [key, value] of formDataToSend.entries()) {
-        console.log(`FormData entry in handleSaveAd - ${key}:`, value);
-      }
+   
 
       editingAd
         ? onUpdateCustomAd({ id: formData.id, data: formDataToSend })
         : onAddCustomAd(formDataToSend);
     } else {
-      console.log("Sending JSON data:", dataToSend);
       if (
         formData.custom_content.content_type !== "custom_image" &&
         formData.custom_content.content_type !== "custom_video"
@@ -3056,7 +3048,6 @@ const AdSenseManagerView = ({
   };
 
   const handleSearch = (query) => {
-    console.log("Search query:", query);
   };
 
   const handleSaveConfiguration = () => {

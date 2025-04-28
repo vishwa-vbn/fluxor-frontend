@@ -4,6 +4,8 @@ import { getState } from "../configure/configureStore";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
 import io from "socket.io-client";
+import { DOMAIN } from "../../constants/env";
+
 
 // Action Types
 export const TAGS_CREATE_PENDING = "TAGS_CREATE_PENDING";
@@ -27,7 +29,7 @@ export const TAGS_DELETE_SUCCESS = "TAGS_DELETE_SUCCESS";
 export const TAGS_DELETE_ERROR = "TAGS_DELETE_ERROR";
 
 // API Configuration
-const API_URL = "https://fluxor-backend-production.up.railway.app";
+const API_URL = `${DOMAIN}`;
 
 // Initialize Socket.IO dynamically
 let socket = null;
@@ -35,7 +37,6 @@ let socket = null;
 // Initialize Socket.IO listeners for real-time tag updates
 export const initializeTagSocket = () => (dispatch) => {
   if (socket) {
-    console.log("Socket.IO already initialized");
     return;
   }
 
@@ -47,11 +48,9 @@ export const initializeTagSocket = () => (dispatch) => {
   });
 
   socket.on("connect", () => {
-    console.log("Connected to Socket.IO server (blog namespace)");
   });
 
   socket.on("tag_change", (payload) => {
-    console.log("Tag change received:", payload);
     switch (payload.operation) {
       case "INSERT":
         dispatch({
@@ -89,7 +88,6 @@ export const initializeTagSocket = () => (dispatch) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Disconnected from Socket.IO server");
   });
 };
 
@@ -102,7 +100,6 @@ export const cleanupTagSocket = () => () => {
     socket.off("disconnect");
     socket.disconnect();
     socket = null;
-    console.log("Socket.IO cleaned up");
   }
 };
 

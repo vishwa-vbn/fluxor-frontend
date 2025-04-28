@@ -33,7 +33,6 @@ const placementStyles = {
 
 const AdPreview = ({ ad }) => {
 
-  console.log("ad is",ad)
   if (!ad) {
     return (
       <div className="text-gray-600 dark:text-gray-400 text-sm text-center" role="alert">

@@ -2,6 +2,7 @@ import axios from "axios";
 import { getState } from "../configure/configureStore";
 import { showAlert } from "../alert/alertActions";
 import { showLoader, hideLoader } from "../loader/loaderActions";
+import { DOMAIN } from "../../constants/env";
 
 // Action Types
 export const CATEGORY_CREATE_PENDING = "CATEGORY_CREATE_PENDING";
@@ -25,7 +26,7 @@ export const CATEGORY_DELETE_SUCCESS = "CATEGORY_DELETE_SUCCESS";
 export const CATEGORY_DELETE_ERROR = "CATEGORY_DELETE_ERROR";
 
 // API Base
-const API_URL = "https://fluxor-backend-production.up.railway.app/api/categories";
+const API_URL = `${DOMAIN}/api/categories`;
 
 // CREATE
 export const createCategory = (data) => async (dispatch) => {
@@ -70,7 +71,6 @@ export const createCategory = (data) => async (dispatch) => {
 
 // FETCH ALL
 export const getAllCategories = () => async (dispatch) => {
-  console.log("fetch categories called");
 
   dispatch({ type: CATEGORY_FETCH_ALL_PENDING });
   dispatch(showLoader());
@@ -83,7 +83,6 @@ export const getAllCategories = () => async (dispatch) => {
       },
     });
 
-    console.log("fetch categories", res);
 
     dispatch({ type: CATEGORY_FETCH_ALL_SUCCESS, payload: res.data });
   } catch (err) {

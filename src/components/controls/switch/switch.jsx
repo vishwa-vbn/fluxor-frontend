@@ -77,7 +77,6 @@ const Switch = ({
 }) => {
   const handleChange = (event) => {
     if (!disabled) {
-      console.log(`Switch ${id} toggled to: ${event.target.checked}`);
       onChange(event.target.checked);
     }
   };

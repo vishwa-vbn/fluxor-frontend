@@ -29,7 +29,6 @@ class UsersContainer extends Component {
   }
 
   componentDidMount() {
-    console.log("UsersContainer: Mounting - Fetching users and initializing socket");
     this.props.fetchAllUsers();
     this.props.initializeUserSocket(); // Initialize Socket.IO
     this.props.initializePostCategorySocket()
@@ -37,7 +36,6 @@ class UsersContainer extends Component {
   }
 
   componentWillUnmount() {
-    console.log("UsersContainer: Unmounting - Cleaning up socket");
     this.props.cleanupUserSocket(); // Cleanup Socket.IO
     this.props.cleanupPostCategorySocket()
     this.props.cleanupPostTagSocket()
@@ -45,7 +43,6 @@ class UsersContainer extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.selectedUser !== this.state.selectedUser) {
-      console.log("selected user", this.state.selectedUser);
     }
   }
 
@@ -103,7 +100,6 @@ class UsersContainer extends Component {
 
     registerPromise
       .then(() => {
-        console.log("User added successfully:", userData);
         this.props.fetchAllUsers();
         this.closeAddModal();
       })

@@ -25,7 +25,7 @@ const Checkbox = ({ checked, onChange, label }) => {
     <label className="cursor-pointer flex items-center space-x-2">
       <input
         type="checkbox"
-        className="checkbox checkbox-primary text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-blue-400 rounded-sm h-4 w-4 transition-colors duration-200"
+        className="checkbox checkbox-primary text-white dark:text-blue-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-blue-400 rounded-sm h-4 w-4 transition-colors duration-200"
         checked={checked}
         onChange={onChange}
       />

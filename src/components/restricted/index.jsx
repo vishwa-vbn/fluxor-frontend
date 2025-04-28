@@ -6,16 +6,15 @@ import { hasRoutePermission } from "../../utils/authUtils";
 import auth from "./auth";
 
 const RestrictedRoute = ({ component: Component, path, ...rest }) => {
-  console.log("permissions",useSelector((state) => state.auth.loginUser))
-  const { permissions } = useSelector((state) => state.auth.loginUser);
 
-  console.log("permissions",permissions)
   const isAuthenticated = auth.isAuthenticated();
   
-  console.log("is authenticated",isAuthenticated)
+
+  const { permissions } = useSelector((state) => state.auth.loginUser);
   const isAuthorized = hasRoutePermission(permissions, path);
 
-  console.log("is authorized",isAuthorized)
+
+
 
   return (
     <Route

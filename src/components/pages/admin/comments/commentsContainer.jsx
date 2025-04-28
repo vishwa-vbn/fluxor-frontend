@@ -43,9 +43,7 @@ const CommentsContainer = ({
     }
   }, [selectedPostId, getCommentsByPost, getApprovedComments]);
 
-  useEffect(() => {
-    console.log("posts:", posts); console.log("postsLoading:", loading);
-  }, [posts, loading]);
+
 
   const handlePostChange = (postId) => {
     setSelectedPostId(postId);
@@ -130,7 +128,6 @@ const CommentsContainer = ({
       }))
     : [];
 
-  console.log("postOptions:", postOptions);
 
   return (
     <CommentsView

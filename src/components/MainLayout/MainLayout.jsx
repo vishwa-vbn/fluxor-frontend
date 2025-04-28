@@ -6,22 +6,18 @@ import connect from "react-redux/es/connect/connect";
 // import { logout } from "../../store/auth/authActions";
 import AdminSidebar from "../common/adminsidebar/adminsidebar";
 
-
-import './MainLayout.css';
+import "./MainLayout.css";
+import { logout } from "../../store/auth/authActions";
 
 class MainLayout extends React.Component {
-  componentDidMount() {
-
-  }
+  componentDidMount() {}
 
   render() {
     return (
       <div className=" w-screen h-screen flex flex-row items-center min-h-screen bg-gray-100">
-        <AdminSidebar />
-        
+        <AdminSidebar logout={this.props.logout} />
 
         <main className="h-screen w-screen overflow-auto scrollbar-hide">
-
           {this.props.children}
         </main>
       </div>
@@ -33,9 +29,7 @@ MainLayout.propTypes = {
   children: PropTypes.object.isRequired,
 };
 
-const mapDispatchToProps = (dispatch) => bindActionCreators({}, dispatch);
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators({ logout }, dispatch);
 
-const mapStateToProps = (state) => (
-  console.log("redux state",state),{});
-
-export default connect(mapStateToProps, mapDispatchToProps)(MainLayout);
+export default connect(null, mapDispatchToProps)(MainLayout);

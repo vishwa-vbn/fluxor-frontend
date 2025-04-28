@@ -1,6 +1,5 @@
 import { getState } from "../../store/configure/configureStore";
-import { globals } from "../../store/globals";
-
+import { isTokenExpired } from "../../utils/authUtils"; // Adjust path to your utils.js
 
 class Auth {
   constructor() {
@@ -8,10 +7,10 @@ class Auth {
   }
 
   isAuthenticated() {
-    // if (!localStorage.getItem("temp_token") ) {
-    if (!getState().auth?.loginUser?.token) {
-      console.log("inside auth check",getState().auth.accessToken)
+    const token = getState().auth?.loginUser?.token;
+    if (!token || isTokenExpired(token)) {
       this.authenticated = false;
+      window.location.href = "/admin/login"; // Redirect to login
     } else {
       this.authenticated = true;
     }

@@ -34,6 +34,8 @@ export const actionTypes = {
   FETCH_TARGETED_USER_PENDING: "FETCH_TARGETED_USER_PENDING",
   FETCH_TARGETED_USER_SUCCESS: "FETCH_TARGETED_USER_SUCCESS",
   FETCH_TARGETED_USER_ERROR: "FETCH_TARGETED_USER_ERROR",
+
+  AUTH_LOGOUT:"AUTH_LOGOUT",
   };
   
   const initialState = {
@@ -98,7 +100,6 @@ export const actionTypes = {
       case actionTypes.LOGOUT_PENDING:
       case actionTypes.LOGOUT_ERROR:
       case actionTypes.LOGOUT_SUCCESS:
-        console.log("Logout Payload:", payload);
         return Object.assign({}, state, payload);
   
       case actionTypes.FETCH_USERS_PENDING:
@@ -132,6 +133,9 @@ export const actionTypes = {
       case actionTypes.FETCH_TARGETED_USER_SUCCESS:
       case actionTypes.FETCH_TARGETED_USER_ERROR:
         return Object.assign({}, state, payload);
+
+      case actionTypes.AUTH_LOGOUT:
+        return Object.assign({},state,payload);
   
       default:
         return state;
