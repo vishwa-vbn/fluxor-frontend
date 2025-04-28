@@ -543,21 +543,45 @@ const EditPost = ({
     }, 500);
   };
 
+  // const handleSubmit = (status = formData.status) => {
+  //   // Prepare data to submit
+  //   const updatedFormData = {
+  //     ...formData,
+  //     status,
+  //     categoryId: formData.selectedCategory,
+  //     tags: formData.selectedTags,
+  //   };
+
+  //   // If status is "published" and publishedAt is empty, set to current date
+  //   if (status === "published" && !updatedFormData.publishedAt) {
+  //     updatedFormData.publishedAt = moment().format("YYYY-MM-DD HH:mm:ss");
+  //   }
+
+  //   onUpdatePost(post.data.id, updatedFormData); // Pass post ID and updated data
+  // };
+
   const handleSubmit = (status = formData.status) => {
-    // Prepare data to submit
+    // Validate scheduled posts
+    if (status === "scheduled" && !formData.publishedAt) {
+      alert("Please select a publish date for scheduling.");
+      return;
+    }
+
+    // Ensure publishedAt is formatted correctly
     const updatedFormData = {
       ...formData,
       status,
       categoryId: formData.selectedCategory,
       tags: formData.selectedTags,
+      publishedAt:
+        status === "scheduled"
+          ? moment(formData.publishedAt).format("YYYY-MM-DD HH:mm:ss")
+          : status === "published" && !formData.publishedAt
+          ? moment().format("YYYY-MM-DD HH:mm:ss")
+          : formData.publishedAt || null,
     };
 
-    // If status is "published" and publishedAt is empty, set to current date
-    if (status === "published" && !updatedFormData.publishedAt) {
-      updatedFormData.publishedAt = moment().format("YYYY-MM-DD HH:mm:ss");
-    }
-
-    onUpdatePost(post.data.id, updatedFormData); // Pass post ID and updated data
+    onUpdatePost(post.data.id, updatedFormData);
   };
 
   const sampleUserData = {
@@ -605,13 +629,23 @@ const EditPost = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleSubmit("-published")}
+                  onClick={() =>
+                    handleSubmit(
+                      formData.status === "scheduled"
+                        ? "scheduled"
+                        : "published"
+                    )
+                  }
                   disabled={loading}
                 >
-                  {loading && formData.status === "published" ? (
+                  {loading &&
+                  (formData.status === "published" ||
+                    formData.status === "scheduled") ? (
                     <Loader2 className="animate-spin h-4 w-4 mr-2 text-gray-600 dark:text-gray-400" />
                   ) : null}
-                  Update & Publish
+                  {formData.status === "scheduled"
+                    ? "Schedule Post"
+                    : "Update & Publish"}
                 </Button>
               </div>
             </div>
@@ -767,11 +801,9 @@ const EditPost = ({
 
                     {formData.status === "scheduled" && (
                       <DateTimePicker
-                        label="Publish Date"
+                        label={`${formData.status === "scheduled"?"Scheduled Date":"Published Date"}`}
                         value={formData.publishedAt}
-                        onChange={(value) =>
-                          handleChange("publishedAt", value)
-                        }
+                        onChange={(value) => handleChange("publishedAt", value)}
                         name="publishedAt"
                         disabled={loading}
                       />
