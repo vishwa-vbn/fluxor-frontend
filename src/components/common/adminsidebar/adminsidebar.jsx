@@ -248,7 +248,7 @@ export default function AdminSidebar({logout}) {
       {/* Header */}
       <div className="h-12.5 flex items-center justify-center border-b border-gray-800 dark:border-gray-700">
         <Link to="/admin" className="text-xl flex  align-middle justify-center font-semibold tracking-tight text-gray-100 dark:text-gray-200 hover:text-blue-300 dark:hover:text-blue-400 transition-colors">
-          <img src={logo} className="p-7 mt-0" alt="logo"></img>
+          {/* <img src={logo} className="p-7 mt-0" alt="logo"></img> */}
         </Link>
       </div>
 

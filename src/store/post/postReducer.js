@@ -57,10 +57,10 @@ export const postReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        posts: state.posts.map((post) =>
+        posts: state.posts?.data?.map((post) =>
           post.id === action.payload.id ? action.payload : post
         ),
-        publishedPosts: state.publishedPosts.map((post) =>
+        publishedPosts: state.publishedPosts?.data?.map((post) =>
           post.id === action.payload.id ? action.payload : post
         ),
       };
@@ -69,8 +69,8 @@ export const postReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        posts: state.posts.filter((post) => post.id !== action.payload.id),
-        publishedPosts: state.publishedPosts.filter((post) => post.id !== action.payload.id),
+        posts: state.posts.data.filter((post) => post.id !== action.payload.id),
+        publishedPosts: state.publishedPosts.data.filter((post) => post.id !== action.payload.id),
       };
 
     case POST_CREATE_ERROR:

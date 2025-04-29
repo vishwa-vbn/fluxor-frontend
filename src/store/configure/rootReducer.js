@@ -13,6 +13,7 @@ import commentsReducer from "../comments/commentsReducer";
 import adsenseReducer from "../adSense/adSenseReducer";
 import settingsReducer from "../settings/settingsReducer";
 import mediaReducer from "../media/mediaReducer";
+import fileReducer from "../file/fileReducer";
 
 export const rootReducer = combineReducers({
   router: routerReducer,
@@ -28,4 +29,5 @@ export const rootReducer = combineReducers({
   adSense:adsenseReducer,
   settings:settingsReducer,
   media:mediaReducer,
+  file:fileReducer,
 });

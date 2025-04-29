@@ -40,6 +40,7 @@ class EditPostContainer extends Component {
 }
 
 const mapStateToProps = (state) => (
+  console.log("redux state is",state),
   {
     tags: state.tags?.tags || [], // Assuming there's a tags reducer
     categories: state.category?.categories || {},
