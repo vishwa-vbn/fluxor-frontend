@@ -281,7 +281,7 @@ const Modal = ({
         {mode === "form" ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
-              <div className="grid grid-cols-1 gap-4">{enhancedChildren}</div>
+              <div className="grid grid-cols-1 gap-4 p-1">{enhancedChildren}</div>
             </div>
             <div className="mt-4 pt-2 border-t border-gray-300 dark:border-gray-600 flex justify-end gap-2">
               <Button
