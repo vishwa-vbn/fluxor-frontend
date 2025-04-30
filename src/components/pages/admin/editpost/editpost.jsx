@@ -762,12 +762,14 @@ const EditPost = ({
                           placeholder="SEO title"
                           disabled={loading}
                         />
+
+
+
+
                         <Textarea
                           label="Meta Description"
                           value={formData.metaDescription}
-                          onChange={(e) =>
-                            handleChange("yntheticDescription", e.target.value)
-                          }
+                            onChange={(e) => handleChange("metaDescription", e.target.value)}
                           placeholder="SEO description"
                           className="h-20 resize-none"
                           disabled={loading}
