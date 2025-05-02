@@ -118,13 +118,13 @@ export const actionTypes = {
       case actionTypes.DELETE_USER_SUCCESS:
         return {
           ...state,
-          users: state.users.filter((user) => user.id !== payload.deletedUserId),
+          users: state.users?.filter((user) => user.id !== payload.deletedUserId),
         };
   
       case actionTypes.BULK_DELETE_USERS_SUCCESS:
         return {
           ...state,
-          users: state.users.filter(
+          users: state.users?.filter(
             (user) => !payload.deletedUserIds.includes(user.id)
           ),
         };

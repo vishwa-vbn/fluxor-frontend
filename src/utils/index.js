@@ -174,10 +174,9 @@ export const getPostStatusData = () => {
   };
 };
 
-// Utility to get data for User Growth line chart
 export const getUserGrowthData = () => {
   const state = getState();
-  const users = state.auth?.users || [];
+  const users = Array.isArray(state.auth?.users) ? state.auth.users : [];
 
   // Group users by registration month (assuming createdat field exists)
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
