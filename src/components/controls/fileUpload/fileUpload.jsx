@@ -104,13 +104,13 @@
 
 // export default FileUpload;
 
-
 import React, { useRef } from "react";
 
 const FileUpload = ({
   label,
   name,
   value, // Can be a File object or a URL string
+  initialPreview, // New prop for initial preview URL
   onChange,
   accept = "image/*",
   preview = true,
@@ -122,7 +122,7 @@ const FileUpload = ({
   // Handle file selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && onChange) {
       onChange(file); // Pass the File object to the parent
     }
   };
@@ -134,6 +134,8 @@ const FileUpload = ({
       : typeof value === "string" && value
       ? value.split("/").pop()
       : "No file chosen"
+    : initialPreview
+    ? initialPreview.split("/").pop()
     : "No file chosen";
 
   // Generate preview URL
@@ -142,6 +144,8 @@ const FileUpload = ({
       ? URL.createObjectURL(value)
       : typeof value === "string" && value
       ? value
+      : typeof initialPreview === "string" && initialPreview
+      ? initialPreview
       : null;
 
   return (
@@ -195,7 +199,7 @@ const FileUpload = ({
 
       {/* Optional preview */}
       {preview && previewUrl && (
-        <div className="mt-2">
+        <div className="mt-2 flex items-center space-x-4">
           {accept.includes("image") ? (
             <img
               src={previewUrl}
@@ -209,6 +213,11 @@ const FileUpload = ({
               className="w-32 h-32 object-cover rounded border border-gray-200 dark:border-gray-600"
             />
           ) : null}
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {value instanceof File
+              ? "New Profile Image"
+              : "Existing Profile Image"}
+          </p>
         </div>
       )}
     </div>

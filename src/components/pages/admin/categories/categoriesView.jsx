@@ -232,11 +232,7 @@ const CategoriesView = ({
               required
               className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             />
-            <FileUpload
-              label="Featured Image"
-              name="featuredImage"
-              className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-            />
+           
             <Select
               label="Parent Category"
               name="parentId"
@@ -277,12 +273,7 @@ const CategoriesView = ({
                 required
                 className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
               />
-              <FileUpload
-                label="Featured Image"
-                name="featuredImage"
-                value={editCategory.featuredImage}
-                className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-              />
+              
               <Select
                 label="Parent Category"
                 name="parentId"
