@@ -13,6 +13,7 @@ import SearchBar from "../../../controls/searchbar/searchbar";
 import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage";
 import ReusableDataTable from "../../../common/DataTable/DataTable";
 import { getCategoryInfoByKey } from "../../../../utils";
+import AlertDialog  from "../../../common/alertDialog/alertDialog";
 
 const CategoriesView = ({
   categories,
@@ -31,6 +32,8 @@ const CategoriesView = ({
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage(
     {
@@ -45,6 +48,25 @@ const CategoriesView = ({
       debounceDelay: 200,
     }
   );
+
+  // Function to handle delete click
+const handleDeleteClick = (category) => {
+  setCategoryToDelete(category);
+  setIsDialogOpen(true);
+};
+
+// Function to handle delete confirmation
+const handleDeleteConfirm = () => {
+  if (categoryToDelete) {
+    try {
+      onDelete(categoryToDelete.id);
+    } catch (error) {
+      console.error("Error in onDelete:", error);
+    }
+  }
+  setIsDialogOpen(false);
+  setCategoryToDelete(null);
+};
 
   useEffect(() => {
     let filteredData = categories || [];
@@ -111,9 +133,13 @@ const CategoriesView = ({
           >
             <Edit className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onDelete(row.id)}>
-            <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
-          </Button>
+          <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => handleDeleteClick(row)}
+      >
+        <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+      </Button>
         </div>
       ),
       right: true,
@@ -135,6 +161,15 @@ const CategoriesView = ({
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-0 py-0 space-y-6 transition-colors duration-200">
+     
+     <AlertDialog
+  open={isDialogOpen}
+  onClose={() => setIsDialogOpen(false)}
+  onConfirm={handleDeleteConfirm}
+  title="Are you sure?"
+  description={`This will permanently delete the category "${categoryToDelete?.name || ""}".`}
+/>
+     
       <div className="flex-1 flex flex-col">
         <TopNavbar
           userData={sampleUserData}

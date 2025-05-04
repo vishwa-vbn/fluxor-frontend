@@ -249,7 +249,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Eye, Edit, Trash2, PlusCircle, ArrowLeft } from "lucide-react";
 import { Link, useHistory } from "react-router-dom";
 import TopNavbar from "../../../common/topNavbar/topNavbar";
-import AlertDialog from "../../../common/alertDialog/alertDialog";
+import ConfirmationDialog from "../../../common/alertDialog/alertDialog";
 import Button from "../../../controls/button/buttonView";
 import Select from "../../../controls/selection/selection";
 import SearchBar from "../../../controls/searchbar/searchbar";
@@ -611,14 +611,17 @@ export default function Post({ posts = [], loading, deletePost }) {
         </div>
 
         {selectedPost && (
-          <AlertDialog
-            open={isDialogOpen}
-            onClose={() => setIsDialogOpen(false)}
-            onConfirm={handleDelete}
-            title="Are you sure?"
-            description={`This will permanently delete the post "${selectedPost.title}".`}
-          />
-        )}
+  <ConfirmationDialog
+    open={isDialogOpen}
+    onClose={() => setIsDialogOpen(false)}
+    onConfirm={handleDelete}
+    title="Are you sure?"
+    description={`This will permanently delete the post "${selectedPost.title}".`}
+    cancelLabel="Cancel"
+    confirmLabel="Delete"
+    confirmVariant="error"
+  />
+)}
       </main>
     </div>
   );

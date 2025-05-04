@@ -329,6 +329,7 @@ import TopNavbar from "../../../common/topNavbar/topNavbar";
 import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage";
 import { getPostInfoByKey, getUserInfoByKey } from "../../../../utils/index";
 import ReusableDataTable from "../../../common/DataTable/DataTable";
+import AlertDialog  from "../../../common/alertDialog/alertDialog";
 
 const CommentsView = ({
   comments,
@@ -353,6 +354,8 @@ const CommentsView = ({
   postsLoading,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+const [commentToDelete, setCommentToDelete] = useState(null);
 
   const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage({
     rowHeight: 60,
@@ -369,6 +372,24 @@ const CommentsView = ({
   useEffect(() => {
     setCurrentPage(1);
   }, [search, selectedStatus, comments, setCurrentPage]);
+
+  const handleDeleteClick = (comment) => {
+    setCommentToDelete(comment);
+    setIsDialogOpen(true);
+  };
+  
+  // Function to handle delete confirmation
+  const handleDeleteConfirm = () => {
+    if (commentToDelete) {
+      try {
+        onDeleteClick(commentToDelete.id);
+      } catch (error) {
+        console.error("Error in onDeleteClick:", error);
+      }
+    }
+    setIsDialogOpen(false);
+    setCommentToDelete(null);
+  };
 
   const columns = [
     {
@@ -472,15 +493,15 @@ const CommentsView = ({
               <X className="w-4 h-4" />
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="mini"
-            onClick={() => onDeleteClick(row.id)}
-            title="Delete Comment"
-            className="p-1 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
-            >
-            <Trash2 className="w-4 h-4" />
-          </Button>
+           <Button
+        variant="ghost"
+        size="mini"
+        onClick={() => handleDeleteClick(row)}
+        title="Delete Comment"
+        className="p-1 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+      >
+        <Trash2 className="w-4 h-4" />
+      </Button>
         </div>
       ),
       center: true,
@@ -506,6 +527,14 @@ const CommentsView = ({
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-0 py-0 space-y-6 transition-colors duration-200">
+     <AlertDialog
+  open={isDialogOpen}
+  onClose={() => setIsDialogOpen(false)}
+  onConfirm={handleDeleteConfirm}
+  title="Are you sure?"
+  description={`This will permanently delete the comment by "${commentToDelete?.authorName || "Anonymous"}".`}
+/>
+     
       <div className="flex-1 flex flex-col">
         <TopNavbar
           userData={sampleUserData}

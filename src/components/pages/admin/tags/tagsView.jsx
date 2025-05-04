@@ -418,6 +418,7 @@ import SearchBar from "../../../controls/searchbar/searchbar";
 import { useResponsiveRowsPerPage } from "../../../../utils/responsiveRowsPerPage";
 import ReusableDataTable from "../../../common/DataTable/DataTable";
 import clsx from "clsx";
+import AlertDialog from "../../../common/alertDialog/alertDialog";
 
 const TagsView = ({
   tags,
@@ -436,6 +437,8 @@ const TagsView = ({
   selectedTag,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [tagToDelete, setTagToDelete] = useState(null);
 
   // Use the responsive rows per page hook
   const { rowsPerPage, currentPage, setCurrentPage } = useResponsiveRowsPerPage(
@@ -452,6 +455,24 @@ const TagsView = ({
     }
   );
 
+  // Function to handle delete click
+  const handleDeleteClick = (tag) => {
+    setTagToDelete(tag);
+    setIsDialogOpen(true);
+  };
+
+  // Function to handle delete confirmation
+  const handleDeleteConfirm = () => {
+    if (tagToDelete) {
+      try {
+        onDeleteClick(tagToDelete.id);
+      } catch (error) {
+        console.error("Error in onDeleteClick:", error);
+      }
+    }
+    setIsDialogOpen(false);
+    setTagToDelete(null);
+  };
   // Reset page when search or tags change
   useEffect(() => {
     setCurrentPage(1);
@@ -529,16 +550,10 @@ const TagsView = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onDeleteClick(row.id)}
+            onClick={() => handleDeleteClick(row)}
           >
             <Trash2
-              className={clsx(
-                "w-4 h-4",
-                // Light theme
-                "text-red-600",
-                // Dark theme
-                "dark:text-red-400"
-              )}
+              className={clsx("w-4 h-4", "text-red-600", "dark:text-red-400")}
             />
           </Button>
         </div>
@@ -570,6 +585,15 @@ const TagsView = ({
         "dark:bg-gray-900"
       )}
     >
+      <AlertDialog
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Are you sure?"
+        description={`This will permanently delete the tag "${
+          tagToDelete?.name || ""
+        }".`}
+      />
       <div className="flex-1 flex flex-col">
         <TopNavbar
           userData={sampleUserData}

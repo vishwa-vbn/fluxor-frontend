@@ -22,8 +22,8 @@ export const FILE_DELETE_SUCCESS = "FILE_DELETE_SUCCESS";
 export const FILE_DELETE_ERROR = "FILE_DELETE_ERROR";
 
 // API Configuration
-// const API_URL = `${DOMAIN}/api/cloudinary`;
-const API_URL = `http://localhost:3000/api/cloudinary`;
+const API_URL = `${DOMAIN}/api/cloudinary`;
+// const API_URL = `http://localhost:3000/api/cloudinary`;
 
 
 // UPLOAD FILE
